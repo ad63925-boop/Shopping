@@ -41,6 +41,7 @@ db.on("value", (snapshot) => {
 
 function addItem() {
     const nameInput = document.getElementById('itemName');
+    const qtyInput = document.getElementById('itemQty'); // Получаем поле количества
     const priceInput = document.getElementById('itemPrice');
     const catInput = document.getElementById('itemCat');
     
@@ -49,6 +50,7 @@ function addItem() {
     const newItem = {
         id: Date.now().toString(),
         name: nameInput.value,
+        quantity: parseInt(qtyInput.value) || 1, // Добавляем количество (по умолчанию 1)
         price: parseInt(priceInput.value) || 0,
         category: catInput.value,
         completed: false
@@ -57,13 +59,16 @@ function addItem() {
     // Сохраняем в историю: категорию и последнюю цену
     history[nameInput.value.toLowerCase()] = {
         category: catInput.value,
-        lastPrice: newItem.price
+        lastPrice: newItem.price,
+        lastQuantity: newItem.quantity // Сохраняем последнее количество
     };
     historyDb.child(nameInput.value.toLowerCase()).set(history[nameInput.value.toLowerCase()]);
 
 
     db.child(newItem.id).set(newItem);
-    nameInput.value = ''; priceInput.value = '';
+    nameInput.value = ''; 
+    priceInput.value = '';
+    qtyInput.value = ''; // Очищаем поле количества
 }
 
 // Функция для обновления цены в Firebase
