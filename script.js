@@ -223,7 +223,7 @@ function render() {
             const div = document.createElement('div');
             div.className = `item ${item.completed ? 'completed' : ''}`;
             div.innerHTML = `
-
+                <span class="name">${item.name}</span>
                 <div class="item-qty-wrapper">
                     <input type="number"
                         class="edit-qty-input"
@@ -247,7 +247,7 @@ function render() {
                 <button onclick="deleteItem('${item.id}')" style="background:none; border:none; color:red; cursor:pointer">✕</button>
 
                 <input type="checkbox" ${item.completed ? 'checked' : ''} onclick="toggleComplete('${item.id}')">
-                <span class="name">${item.name}</span>
+                
 
             `;
             listContainer.appendChild(div);
