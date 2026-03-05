@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.gstatic.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.gstatic.com;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ProList Cloud</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --primary: #6200ee; --bg: #f8f9fa; --surface: #ffffff;
+            --text: #202124; --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --danger: #ea4335; --success: #34a853; --warning: #ff9800;
+        }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg);
+            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; color: var(--text); }
+        .container { width: 100%; max-width: 500px; }
+        .card { background: var(--surface); padding: 20px; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 15px; }
+        .sync-info { font-size: 0.75rem; color: #70757a; text-align: center; margin-bottom: 10px; }
+        .sync-id { font-weight: bold; color: var(--primary); cursor: pointer; text-decoration: underline; }
+        .total-row { display: flex; align-items: baseline; gap: 8px; margin-top: 5px; }
+        .total-amount { font-size: 1.8rem; font-weight: 800; }
+        #budgetLimit { width: 90px; border: none; border-radius: 8px; padding: 4px; font-size: 1.2rem; font-weight: bold; text-align: center; outline: none; background: #f1f3f4; }
+        .input-row { display: flex; gap: 8px; margin-bottom: 8px; position: relative; }
+        input, select { border: 1px solid #dadce0; border-radius: 10px; padding: 12px; font-size: 16px; outline: none; width: 100%; box-sizing: border-box; }
+        .btn-primary { background: var(--primary); color: white; border: none; border-radius: 10px; padding: 14px; width: 100%; font-weight: bold; cursor: pointer; }
+        .cat-title { font-size: 0.8rem; font-weight: bold; color: #70757a; margin: 15px 0 5px 5px; text-transform: uppercase; }
+        .item { background: var(--surface); padding: 12px; border-radius: 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .item.completed { opacity: 0.5; filter: grayscale(1); }
+        .name { flex: 1; font-weight: 500; }
+        .price-edit { width: 65px; border: none; background: #f1f3f4; border-radius: 5px; text-align: right; padding: 5px; font-weight: bold; }
+        .rec-box { background: #fff3e0; border: 1px dashed var(--warning); padding: 12px; border-radius: 15px; margin-bottom: 15px; }
+        .rec-btn { background: white; border: 1px solid var(--warning); padding: 5px 12px; border-radius: 20px; margin: 4px; cursor: pointer; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="sync-info">
+        ID списка: <span class="sync-id" id="displayID" onclick="changeID()">...</span>
+    </div>
+
+    <div class="card">
+        <span style="color: #5f6368; font-size: 0.8rem;">Итого / Лимит</span>
+        <div class="total-row">
+            <span class="total-amount" id="totalSum">0</span>
+            <span style="color: #dadce0;">/</span>
+            <input type="number" id="budgetLimit" placeholder="0" onchange="updateLimit(this.value)">
+            <span style="font-weight: bold;">₽</span>
+        </div>
+    </div>
+
+    <div id="recContainer" class="rec-box" style="display: none;">
+        <div style="font-size: 0.75rem; font-weight: bold; color: #e65100; margin-bottom: 5px;">💡 РЕКОМЕНДУЕМ:</div>
+        <div id="recList"></div>
+    </div>
+
+    <div class="card">
+        <div class="input-row">
+            <input type="text" id="itemName" placeholder="Название товара..." autocomplete="off">
+        </div>
+        <div class="input-row">
+            <input type="number" id="itemPrice" placeholder="Цена" style="flex: 1;">
+            <select id="itemCat" style="flex: 1.5;">
+                <option value="🛒 Разное">🛒 Разное</option>
+                <option value="🥦 Овощи/Фрукты">🥦 Овощи/Фрукты</option>
+                <option value="🥛 Молочка">🥛 Молочка</option>
+                <option value="🥩 Мясо/Рыба">🥩 Мясо/Рыба</option>
+                <option value="🍞 Бакалея">🍞 Бакалея</option>
+                <option value="🧼 Дом/Химия">🧼 Дом/Химия</option>
+            </select>
+        </div>
+        <button class="btn-primary" onclick="addItem()">ДОБАВИТЬ В ОБЛАКО</button>
+    </div>
+
+    <div id="shoppingList"></div>
+</div>
+
+<script>
+    // Минимальный конфиг без авторизации
+    const firebaseConfig = {
+      apiKey: "AIzaSyA2ly9PLLT0Rt14LtLY5Glce9c3762M5Ts",
+      databaseURL: "https://shoppinglist-7dd6e-default-rtdb.firebaseio.com"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let listID = localStorage.getItem('shopping_list_id') || ('list-' + Math.random().toString(36).substr(2, 6));
+    localStorage.setItem('shopping_list_id', listID);
+    document.getElementById('displayID').innerText = listID;
+
+    const listRef = db.ref('lists/' + listID);
+    let items = [], history = [];
+
+    function changeID() {
+        const newID = prompt("Введите ID списка:", listID);
+        if (newID) { localStorage.setItem('shopping_list_id', newID); location.reload(); }
+    }
+
+    listRef.on('value', (snap) => {
+        const data = snap.val() || {};
+        items = data.items ? Object.values(data.items) : [];
+        history = data.history ? Object.values(data.history) : [];
+        document.getElementById('budgetLimit').value = data.limit || "";
+        render();
+    });
+
+    function addItem() {
+        const nameInput = document.getElementById('itemName');
+        const priceInput = document.getElementById('itemPrice');
+        const name = nameInput.value.trim();
+        const price = parseInt(priceInput.value) || 0;
+        const cat = document.getElementById('itemCat').value;
+        if (!name) return;
+
+        const id = Date.now().toString();
+        listRef.child('items/' + id).set({ id, name, price, cat, completed: false });
+        updateHistory(name, cat);
+        nameInput.value = ""; priceInput.value = "";
+    }
+
+    function updateHistory(name, cat) {
+        const now = Date.now();
+        const monthAgo = now - (30 * 24 * 60 * 60 * 1000);
+        let record = history.find(h => h.name.to

@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <!-- V_6 -->
+    <meta charset="UTF-8">
+    <title>Список продуктов</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/17630/17630625.png">
+    <link rel="stylesheet" href="../burgerMenu/menustyle.css">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'self' data: blob: https://www.gstatic.com;">
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+    <style>
+        /* Весь предыдущий CSS стиль здесь сохраняется */
+        :root { --primary: #6200ee; --bg: #f8f9fa; --surface: #ffffff; }
+        body { font-family: sans-serif; background: #c9c6c6; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; 
+            max-width: 500px; 
+            margin-bottom: 40px;
+        }
+
+        .header-card, .input-card { 
+            background: var(--surface); 
+            padding: 5px; 
+            border-radius: 16px; 
+            box-shadow: 0px 0px 7px 0px rgb(0 0 0); margin-bottom: 5px; 
+}
+
+
+
+        .header-card, .limit-ok {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }    
+
+        .item { background: var(--surface); padding: 12px; border-radius: 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .name { flex: 1; font-weight: 500; }
+        .completed { opacity: 0.5; text-decoration: line-through; }
+        input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .status-sync { font-size: 0.7rem; color: #34a853; text-align: center; margin-bottom: 10px; }
+		
+		.limit-ok { background-color: #e8f5e9 !important; transition: 0.3s; } /* Зеленый */
+.limit-over { background-color: #ffebee !important; transition: 0.3s; } /* Красный */
+.category-header { 
+    background: #eeeeee; 
+    padding: 5px 12px; 
+    font-size: 0.8rem; 
+    font-weight: bold; 
+    border-radius: 4px; 
+    margin: 10px 0 5px 0; 
+    color: #616161;
+}
+
+/* Контейнер */
+.custom-select {
+    position: relative;
+    width: 100%;
+    margin-bottom: 10px;
+    user-select: none;
+}
+
+/* Поле, на которое нажимаем */
+.select-trigger {
+    background: #fff;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.select-trigger:hover { border-color: var(--primary); }
+
+/* Стрелочка */
+.arrow {
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid #666;
+    border-bottom: 2px solid #666;
+    transform: rotate(45deg);
+    transition: transform 0.3s;
+    margin-bottom: 4px;
+}
+
+.custom-select.active .arrow { transform: rotate(-135deg); margin-bottom: -4px; }
+
+/* Выпадающий список */
+.select-options {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.custom-select.active .select-options {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Пункты списка */
+.option {
+    padding: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.option:hover {
+    background: #f0ebff;
+    color: var(--primary);
+}
+
+.autocomplete-suggestions {
+    position: absolute;
+    top: 105%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    z-index: 1000;
+    max-height: 250px;
+    overflow-y: auto;
+    display: none; /* Скрыто по умолчанию */
+}
+
+.suggestion-card {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+}
+
+.suggestion-card:hover { background: #f8f9fa; }
+
+.suggestion-info { flex: 1; display: flex; align-items: center; gap: 10px; }
+
+.suggestion-name { font-weight: 500; color: #333; }
+
+.suggestion-cat { font-size: 0.8rem; color: #888; display: flex; align-items: center; gap: 4px; }
+
+.suggestion-delete {
+    color: #ff5252;
+    font-size: 1.2rem;
+    padding: 5px;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.suggestion-delete:hover { opacity: 1; }
+
+/* Основная карточка */
+.input-card {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 16px;
+    box-shadow: 0px 0px 7px 0px rgb(0 0 0);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid silver;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+/* Строка с Названием и Ценой */
+.input-row-top {
+    display: flex;
+    gap: 10px;
+}
+
+.input-row-top input {
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    outline: none;
+    font-size: 1rem;
+}
+
+/* Кнопка Добавить */
+.add-btn {
+    background: #08a609;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.add-btn:hover {
+    background: #227f15;
+}
+
+/* Подправляем стили подсказок, чтобы они не «раздували» карточку */
+.autocomplete-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: -110px; /* Чтобы подсказка была шире, чем поле названия */
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    z-index: 100;
+    margin-top: 5px;
+}
+
+.item-price-wrapper {
+    display: flex;
+    align-items: center;
+    background: #f1f3f4;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-right: 10px;
+}
+
+.edit-price-input {
+    border: none;
+    background: aquamarine;
+    font-weight: bold;
+    font-family: inherit;
+    font-size: 1rem;
+    color: #333;
+    width: 45px;
+    text-align: right;
+    outline: none;
+    text-align: center;
+}
+
+/* Убираем стрелочки у инпута цены */
+.edit-price-input::-webkit-outer-spin-button,
+.edit-price-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.currency {
+    font-weight: bold;
+    margin-left: 2px;
+    color: #333;
+}
+
+footer{
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    background: radial-gradient(circle, rgba(238, 174, 202, 1) 6%, rgba(148, 187, 233, 1) 100%);
+    width: -webkit-fill-available;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    padding: 5px;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+    background: #20da8b;
+    width: -webkit-fill-available;
+    border-radius: 5px;
+    font-family: cursive;
+    font-size: x-large;
+    font-weight: bold;
+}
+
+#itemPrice {
+    text-align: center;
+}
+    </style>
+</head>
+<body>
+<header>
+    Список продуктов
+</header>
+<!-- Бургер -->
+<div class="burger" title="Меню">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+
+<!-- Правое меню -->
+<div id="sideMenu" class="side-menu">
+  <a href="https://alexdemidenk0.neocities.org/">Главная</a>
+  <a href="https://alexdemidenk0.neocities.org/recept/recept">Рецепты</a>
+  <a href="https://alexdemidenk0.neocities.org/exchange_pro/exchange_pro">Обменник</a>
+  <a href="https://alexdemidenk0.neocities.org/exchange/exchange">Курс валют</a>
+  <a href="https://alexdemidenk0.neocities.org/calculatorMany/calculator">Купюрник</a>
+  <a href="https://alexdemidenk0.neocities.org/primery/primery">Тренажер *-/+</a>
+  <a href="https://alexdemidenk0.neocities.org/people/people_card">Карточки ДР</a>
+  <a href="https://alexdemidenk0.neocities.org/docs/document">Документы</a> 
+  <a href="https://alexdemidenk0.neocities.org/Grafik-19/">График</a>
+  
+ <div class="menu-bottom">
+  <a href="https://alexdemidenk0.neocities.org/possible">Возможности 📜</a>
+  <a href="mailto:ad63925@gmail.com">Написать нам 📧</a> 
+  </div>
+</div>
+
+<div class="container">
+    <div class="status-sync" id="syncStatus">● Облако синхронизировано</div>
+    
+<div class="header-card" id="headerCard">
+    <div>
+        <div style="color: #5f6368; font-size: 0.8rem;">Итого / Лимит</div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="font-size: 1.5rem; font-weight: bold;"><span id="totalSum">0</span> ₽</div>
+            <div style="color: #ccc; font-size: 1.2rem;">/</div>
+            <input type="number" id="budgetLimit" placeholder="Лимит" oninput="updateLimit()" 
+                   style="width: 80px; border: none; border-bottom: 2px solid #ddd; font-size: 1.2rem; font-weight: bold; outline: none;">
+        </div>
+    </div>
+    <div id="syncLoader" style="display:none;">⏳</div>
+</div>
+
+<div class="input-card">
+    <div class="input-row-top">
+        <div style="position: relative; flex: 2;">
+            <input type="text" id="itemName" placeholder="Название" autocomplete="off">
+            <div id="autocompleteList" class="autocomplete-suggestions"></div>
+        </div>
+        <input type="number" id="itemPrice" placeholder="Цена" style="flex: 1; width: 25%;">
+    </div>
+
+    <div class="custom-select" id="customSelect">
+        <div class="select-trigger">
+            <span id="selectedCatText">🛒 Разное</span>
+            <div class="arrow"></div>
+        </div>
+        <div class="select-options">
+            <div class="option" data-value="🛒 Разное">🛒 Разное</div>
+            <div class="option" data-value="🥦 Овощи/Фрукты">🥦 Овощи/Фрукты</div>
+            <div class="option" data-value="🥛 Молочка">🥛 Молочка</div>
+            <div class="option" data-value="🧃 Вода/соки">🧃 Вода/соки</div>
+            <div class="option" data-value="🥩 Гастроном">🥩 Гастроном</div>
+            <div class="option" data-value="🥫 Консервы">🥫 Консервы</div>
+            <div class="option" data-value="🍞 Хлебобулочные">🍞 Хлебобулочные</div>
+            <div class="option" data-value="🍬 Конфеты">🍬 Конфеты</div>
+            <div class="option" data-value="🧊 Заморозка">🧊 Заморозка</div>
+            <div class="option" data-value="🍾 Алкоголь">🍾 Алкоголь</div>
+            <div class="option" data-value="🧴 Пром">🧴 Пром</div>
+            
+        </div>
+        <input type="hidden" id="itemCat" value="🛒 Разное">
+    </div>
+
+    <button class="add-btn" onclick="addItem()">Добавить</button>
+</div>
+
+
+
+    <div id="shoppingList"></div>
+</div>
+
+<script>
+const firebaseConfig = {
+    databaseURL: "https://shoppinglist-7dd6e-default-rtdb.firebaseio.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database().ref("shopping_list");
+const settingsDb = firebase.database().ref("settings"); // Для сохранения лимита
+
+let items = [];
+
+// Заменяем старую загрузку из localStorage на Firebase
+let history = {}; 
+const historyDb = firebase.database().ref("suggestions_history");
+
+// Слушаем историю из облака
+historyDb.on("value", (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+        history = data;
+        // Обновляем подсказки, если пользователь прямо сейчас что-то вводит
+        if (typeof updateSuggestions === "function") { 
+            updateSuggestions(); 
+        }
+    }
+});
+
+// Загрузка лимита из облака
+settingsDb.child('limit').on('value', (snapshot) => {
+    const limit = snapshot.val() || 0;
+    document.getElementById('budgetLimit').value = limit;
+    render();
+});
+
+db.on("value", (snapshot) => {
+    const data = snapshot.val();
+    items = data ? Object.values(data) : [];
+    render();
+    updateSuggestions();
+    document.getElementById('syncStatus').innerText = "● Обновлено";
+});
+
+function addItem() {
+    const nameInput = document.getElementById('itemName');
+    const priceInput = document.getElementById('itemPrice');
+    const catInput = document.getElementById('itemCat');
+    
+    if (!nameInput.value) return;
+
+    const newItem = {
+        id: Date.now().toString(),
+        name: nameInput.value,
+        price: parseInt(priceInput.value) || 0,
+        category: catInput.value,
+        completed: false
+    };
+
+    // Запоминаем категорию для этого товара
+    history[nameInput.value.toLowerCase()] = catInput.value;
+    historyDb.child(nameInput.value.toLowerCase()).set(catInput.value);
+
+    db.child(newItem.id).set(newItem);
+    nameInput.value = ''; priceInput.value = '';
+}
+
+
+// Функция для обновления цены в Firebase
+function updateItemPrice(id, newPrice) {
+    const price = parseInt(newPrice) || 0;
+    
+    // db — это ваша ссылка на firebase.database().ref("shopping_list")
+    db.child(id).update({ 
+        price: price 
+    }).then(() => {
+        console.log("Цена успешно обновлена в облаке");
+    }).catch((error) => {
+        console.error("Ошибка обновления цены:", error);
+    });
+}
+
+function updateLimit() {
+    const limit = document.getElementById('budgetLimit').value;
+    settingsDb.update({ limit: parseInt(limit) || 0 });
+}
+
+
+// Умный выбор категории при вводе названия
+const nameInput = document.getElementById('itemName');
+const autoList = document.getElementById('autocompleteList');
+
+nameInput.addEventListener('input', () => {
+    const val = nameInput.value.toLowerCase();
+    autoList.innerHTML = '';
+    
+    if (val.length === 0) {
+        autoList.style.display = 'none';
+        return;
+    }
+
+    const matches = Object.keys(history).filter(name => name.startsWith(val));
+
+    if (matches.length > 0) {
+        matches.forEach(name => {
+            const cat = history[name];
+            const div = document.createElement('div');
+            div.className = 'suggestion-card';
+            
+            div.innerHTML = `
+                <div class="suggestion-info">
+                    <span class="suggestion-name">${name.charAt(0).toUpperCase() + name.slice(1)}</span>
+                    <span class="suggestion-cat">${cat}</span>
+                </div>
+                <span class="suggestion-delete" data-name="${name}">×</span>
+            `;
+
+            // Клик по карточке для выбора
+            div.addEventListener('click', (e) => {
+                if (e.target.classList.contains('suggestion-delete')) {
+                    deleteFromHistory(e.target.dataset.name);
+                    return;
+                }
+                selectSuggestion(name, cat);
+            });
+
+            autoList.appendChild(div);
+        });
+        autoList.style.display = 'block';
+    } else {
+        autoList.style.display = 'none';
+    }
+});
+
+// Функция выбора подсказки
+function selectSuggestion(name, cat) {
+    nameInput.value = name.charAt(0).toUpperCase() + name.slice(1);
+    
+    // Обновляем наш кастомный селект
+    const hiddenInput = document.getElementById('itemCat');
+    const selectedText = document.getElementById('selectedCatText');
+    if (hiddenInput) hiddenInput.value = cat;
+    if (selectedText) selectedText.innerText = cat;
+    
+    autoList.style.display = 'none';
+}
+
+// Функция удаления из истории (тот самый крестик)
+function deleteFromHistory(name) {
+    // Удаляем из Firebase
+    historyDb.child(name).remove();
+    
+    // Поле ввода само обновится, так как сработает слушатель historyDb.on("value")
+    nameInput.dispatchEvent(new Event('input')); 
+}
+
+// Закрытие при клике мимо
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.autocomplete-suggestions') && e.target !== nameInput) {
+        autoList.style.display = 'none';
+    }
+});
+
+
+function render() {
+    const listContainer = document.getElementById('shoppingList');
+    const totalSumEl = document.getElementById('totalSum');
+    const headerCard = document.getElementById('headerCard');
+    const limit = parseInt(document.getElementById('budgetLimit')?.value) || 0;
+    
+    listContainer.innerHTML = '';
+    let total = 0;
+
+    // 1. Группируем товары по категориям
+    const groups = items.reduce((acc, item) => {
+        if (!acc[item.category]) acc[item.category] = [];
+        acc[item.category].push(item);
+        return acc;
+    }, {});
+
+    // 2. Проходим по каждой категории
+    for (const cat in groups) {
+        // Добавляем заголовок категории
+        const catDiv = document.createElement('div');
+        catDiv.className = 'category-header';
+        catDiv.innerText = cat;
+        listContainer.appendChild(catDiv);
+
+        // --- ВОТ ЗДЕСЬ МАГИЯ СОРТИРОВКИ ---
+        // Сортируем: сначала невыполненные (false), потом выполненные (true)
+        const sortedItems = groups[cat].sort((a, b) => a.completed - b.completed);
+
+        sortedItems.forEach(item => {
+            total += item.price;
+            const div = document.createElement('div');
+            div.className = `item ${item.completed ? 'completed' : ''}`;
+            div.innerHTML = `
+                <input type="checkbox" ${item.completed ? 'checked' : ''} 
+                       onclick="toggleComplete('${item.id}')">
+                <span class="name">${item.name}</span>
+                <div class="item-price-wrapper">
+                    <input type="number" class="edit-price-input" 
+                           value="${item.price}" 
+                           onchange="updateItemPrice('${item.id}', this.value)">
+                    <span class="currency">₽</span>
+                </div>
+                <button onclick="deleteItem('${item.id}')" 
+                        style="background:none; border:none; color:red; cursor:pointer">✕</button>
+            `;
+            listContainer.appendChild(div);
+        });
+    }
+
+    // Обновляем сумму и проверку лимита
+    totalSumEl.innerText = total;
+    if (limit > 0) {
+        headerCard.className = total > limit ? 'header-card limit-over' : 'header-card limit-ok';
+    }
+}
+
+
+// Функции удаления и переключения (без изменений)
+function toggleComplete(id) {
+    const item = items.find(i => i.id === id);
+    if (item) db.child(id).update({ completed: !item.completed });
+}
+function deleteItem(id) { db.child(id).remove(); }
+
+const customSelect = document.getElementById('customSelect');
+const trigger = customSelect.querySelector('.select-trigger');
+const options = customSelect.querySelectorAll('.option');
+const hiddenInput = document.getElementById('itemCat');
+const selectedText = document.getElementById('selectedCatText');
+
+// Открыть/закрыть список
+trigger.addEventListener('click', () => {
+    customSelect.classList.toggle('active');
+});
+
+// Выбор опции
+options.forEach(option => {
+    option.addEventListener('click', function() {
+        const val = this.getAttribute('data-value');
+        
+        // Обновляем текст и скрытый инпут
+        selectedText.innerText = val;
+        hiddenInput.value = val;
+        
+        // Закрываем список
+        customSelect.classList.remove('active');
+    });
+});
+
+// Закрыть если кликнули вне списка
+window.addEventListener('click', (e) => {
+    if (!customSelect.contains(e.target)) {
+        customSelect.classList.remove('active');
+    }
+});
+
+//Связь с облаком    
+function updateSuggestions() {
+    const nameInput = document.getElementById('itemName');
+    const autoList = document.getElementById('autocompleteList');
+    if (!nameInput || !autoList) return; // Защита от ошибок, если элементы еще не созданы
+
+    const val = nameInput.value.toLowerCase();
+    autoList.innerHTML = '';
+    
+    if (val.length === 0) {
+        autoList.style.display = 'none';
+        return;
+    }
+
+    // Фильтруем ключи из объекта history, который синхронизируется с Firebase
+    const matches = Object.keys(history).filter(name => name.startsWith(val));
+
+    if (matches.length > 0) {
+        matches.forEach(name => {
+            const cat = history[name];
+            const div = document.createElement('div');
+            div.className = 'suggestion-card';
+            div.innerHTML = `
+                <div class="suggestion-info">
+                    <span class="suggestion-name">${name.charAt(0).toUpperCase() + name.slice(1)}</span>
+                    <span class="suggestion-cat">${cat}</span>
+                </div>
+                <span class="suggestion-delete" onclick="deleteFromHistory('${name}')">×</span>
+            `;
+            div.onclick = (e) => {
+                if (!e.target.classList.contains('suggestion-delete')) {
+                    selectSuggestion(name, cat);
+                }
+            };
+            autoList.appendChild(div);
+        });
+        autoList.style.display = 'block';
+    } else {
+        autoList.style.display = 'none';
+    }
+}
+
+</script>
+
+<footer>
+	<p>alex_demidenk0</p>
+</footer>
+
+<script src="../burgerMenu/menu.js" defer></script>
+</body>
+</html>
