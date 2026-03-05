@@ -201,6 +201,7 @@ function render() {
     
     listContainer.innerHTML = '';
     let total = 0;
+    let globalIndex = 1; // Глобальный счётчик для сквозной нумерации
 
     // Группировка по категориям
     const groups = items.reduce((acc, item) => {
@@ -223,7 +224,10 @@ function render() {
             const div = document.createElement('div');
             div.className = `item ${item.completed ? 'completed' : ''}`;
             div.innerHTML = `
+                <span class="item-number">${globalIndex++}</span>
+
                 <span class="name">${item.name}</span>
+                
                 <div class="item-qty-wrapper">
                     <input type="number"
                         class="edit-qty-input"
