@@ -329,3 +329,32 @@ header {
 #cyncStatus {
   background-color: white;
 }
+
+.input-error {
+    color: #d32f2f; /* Красный цвет */
+    font-size: 0.85rem;
+    margin-top: 4px;
+    margin-left: 8px;
+    padding: 6px 12px;
+    background-color: #ffebee;
+    border-left: 3px solid #d32f2f;
+    border-radius: 0 4px 4px 0;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Стиль для поля ввода при ошибке */
+#itemName:invalid {
+    border-color: #d32f2f !important;
+    box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2) !important;
+}
