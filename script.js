@@ -153,6 +153,20 @@ nameInput.addEventListener('input', () => {
     }
 });
 
+// Валидация названия товара (запрет точки)
+function isValidItemName(name) {
+    if (!name) return true; // Пустое поле — допустимо
+
+    // Проверяем наличие точки
+    if (name.includes('.')) {
+        showError('Название не может содержать точку (.) — это запрещено Firebase');
+        return false;
+    }
+
+    return true;
+}
+
+
 // Функция выбора подсказки
 function selectSuggestion(name, cat, price, quantity) {
     nameInput.value = name.charAt(0).toUpperCase() + name.slice(1);
@@ -224,10 +238,10 @@ function render() {
             const div = document.createElement('div');
             div.className = `item ${item.completed ? 'completed' : ''}`;
             div.innerHTML = `
-                <span class="item-number">${globalIndex++}</span>
+                <span class="item-number">${globalIndex++}.</span>
 
                 <span class="name">${item.name}</span>
-                
+
                 <div class="item-qty-wrapper">
                     <input type="number"
                         class="edit-qty-input"
