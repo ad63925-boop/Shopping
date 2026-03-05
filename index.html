@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <!-- V_5 -->
+    <meta charset="UTF-8">
+    <title>Список продуктов</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/17630/17630625.png">
+    <link rel="stylesheet" href="../burgerMenu/menustyle.css">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'self' data: blob: https://www.gstatic.com;">
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    🛒Список покупок🛍️
+</header>
+<!-- Бургер -->
+<div class="burger" title="Меню">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+
+<!-- Правое меню -->
+<div id="sideMenu" class="side-menu">
+  <a href="https://alexdemidenk0.neocities.org/">Главная</a>
+  <a href="https://alexdemidenk0.neocities.org/recept/recept">Рецепты</a>
+  <a href="https://alexdemidenk0.neocities.org/exchange_pro/exchange_pro">Обменник</a>
+  <a href="https://alexdemidenk0.neocities.org/exchange/exchange">Курс валют</a>
+  <a href="https://alexdemidenk0.neocities.org/calculatorMany/calculator">Купюрник</a>
+  <a href="https://alexdemidenk0.neocities.org/primery/primery">Тренажер *-/+</a>
+  <a href="https://alexdemidenk0.neocities.org/people/people_card">Карточки ДР</a>
+  <a href="https://alexdemidenk0.neocities.org/docs/document">Документы</a> 
+  <a href="https://alexdemidenk0.neocities.org/Grafik-19/">График</a>
+  
+ <div class="menu-bottom">
+  <a href="https://alexdemidenk0.neocities.org/possible">Возможности 📜</a>
+  <a href="mailto:ad63925@gmail.com">Написать нам 📧</a> 
+  </div>
+</div>
+
+<div class="status-sync" id="syncStatus">
+    <i class="fa-solid fa-arrows-rotate sync-spin"></i>
+    Синхронизация
+</div>
+
+    
+<div class="header-card" id="headerCard">
+    <div>
+        <div style="color: #5f6368; font-size: 0.8rem;">Итого / Лимит</div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="font-size: 1.5rem; font-weight: bold;"><span id="totalSum">0</span> ₽</div>
+            <div style="color: #ccc; font-size: 1.2rem;">/</div>
+            <input type="number" id="budgetLimit" placeholder="Лимит" oninput="updateLimit()" 
+                   style="width: 80px; border: none; border-bottom: 2px solid #ddd; font-size: 1.2rem; font-weight: bold; outline: none;">
+        </div>
+    </div>
+    <div id="syncLoader" style="display:none;">⏳</div>
+</div>
+
+<div class="input-card">
+    <div class="input-row-top">
+        <div style="position: relative; flex: 2;">
+            <input type="text" id="itemName" placeholder="Название" autocomplete="off">
+            <div id="autocompleteList" class="autocomplete-suggestions"></div>
+        </div>
+        <input type="number" id="itemPrice" placeholder="₽" style="flex: 1; width: 25%;">
+    </div>
+
+    <div class="custom-select" id="customSelect">
+        <div class="select-trigger">
+            <span id="selectedCatText">🛒 Разное</span>
+            <div class="arrow"></div>
+        </div>
+        <div class="select-options">
+            <div class="option" data-value="🛒 Разное">🛒 Разное</div>
+            <div class="option" data-value="🥦 Овощи/Фрукты">🥦 Овощи/Фрукты</div>
+            <div class="option" data-value="🥛 Молочка">🥛 Молочка</div>
+            <div class="option" data-value="🧃 Вода/соки">🧃 Вода/соки</div>
+            <div class="option" data-value="🥩 Гастроном">🥩 Гастроном</div>
+            <div class="option" data-value="🥫 Консервы">🥫 Консервы</div>
+            <div class="option" data-value="🍞 Хлебобулочные">🍞 Хлебобулочные</div>
+            <div class="option" data-value="🍬 Конфеты">🍬 Конфеты</div>
+            <div class="option" data-value="🧊 Заморозка">🧊 Заморозка</div>
+            <div class="option" data-value="🍾 Алкоголь">🍾 Алкоголь</div>
+            <div class="option" data-value="🧴 Пром">🧴 Пром</div>
+            
+        </div>
+        <input type="hidden" id="itemCat" value="🛒 Разное">
+    </div>
+
+    <button class="add-btn" onclick="addItem()">Добавить</button>
+</div>
+
+
+
+    <div id="shoppingList" class="shoppingLists"></div>
+</div>
+
+<script src="script.js"></script>
+
+<footer>
+	<p>alex_demidenk0</p>
+</footer>
+
+<script src="../burgerMenu/menu.js" defer></script>
+</body>
+</html>
