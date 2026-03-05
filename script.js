@@ -51,25 +51,25 @@ function addItem() {
         nameInput.focus();
         return;
     }
-    
-    if (!nameInput.value) return;
+
+    if (!itemName) return;
 
     const newItem = {
         id: Date.now().toString(),
-        name: nameInput.value,
+        name: itemName,
         quantity: parseInt(qtyInput.value) || 1, // Добавляем количество (по умолчанию 1)
         price: parseInt(priceInput.value) || 0,
         category: catInput.value,
         completed: false
     };
 
-    // Сохраняем в историю: категорию и последнюю цену
-    history[nameInput.value.toLowerCase()] = {
+    // Сохраняем в историю: категорию и последнюю цену/количество для этого товара
+    history[itemName.toLowerCase()] = {
         category: catInput.value,
         lastPrice: newItem.price,
-        lastQuantity: newItem.quantity // Сохраняем последнее количество
+        lastQuantity: newItem.quantity
     };
-    historyDb.child(nameInput.value.toLowerCase()).set(history[nameInput.value.toLowerCase()]);
+    historyDb.child(itemName.toLowerCase()).set(history[itemName.toLowerCase()]);
 
 
     db.child(newItem.id).set(newItem);
