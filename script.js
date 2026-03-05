@@ -396,3 +396,19 @@ function updateSuggestions() {
         autoList.style.display = 'none';
     }
 }
+
+// Добавляем проверку при вводе в поле названия
+document.getElementById('itemName').addEventListener('input', function() {
+    const name = this.value;
+
+    // Если есть точка — показываем ошибку
+    if (name.includes('.')) {
+        showError('Точка (.) запрещена в названии — это ограничение Firebase');
+    } else {
+        // Удаляем сообщение об ошибке, если пользователь исправил
+        const errorDiv = document.getElementById('inputError');
+        if (errorDiv) {
+            errorDiv.remove();
+        }
+    }
+});
