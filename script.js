@@ -187,7 +187,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
-
+// Функция рендера списка с группировкой по категориям
 function render() {
     const listContainer = document.getElementById('shoppingList');
     const totalSumEl = document.getElementById('totalSum');
@@ -212,12 +212,23 @@ function render() {
         listContainer.appendChild(catDiv);
 
         groups[cat].forEach(item => {
-            total += item.price;
+            const itemTotal = item.price * item.quantity; // Расчёт общей стоимости товара
+            total += itemTotal;
+
             const div = document.createElement('div');
             div.className = `item ${item.completed ? 'completed' : ''}`;
             div.innerHTML = `
-                <input type="checkbox" ${item.completed ? 'checked' : ''} onclick="toggleComplete('${item.id}')">
-                <span class="name">${item.name}</span>
+
+                <div class="item-qty-wrapper">
+                    <input type="number"
+                        class="edit-qty-input"
+                        min="1"
+                        value="${item.quantity}"
+                        onchange="updateItemQuantity('${item.id}', this.value)"
+                oninput="this.style.width = ((this.value.length + 1) * 8) + 'px'">
+                    <span class="unit">шт.</span>
+                </div>
+
                 <div class="item-price-wrapper">
                     <input type="number" 
                         class="edit-price-input" 
@@ -226,7 +237,13 @@ function render() {
                         oninput="this.style.width = ((this.value.length + 1) * 8) + 'px'">
                     <span class="currency">₽</span>
                 </div>
+
+                <div class="item-total">${itemTotal} ₽</div>
                 <button onclick="deleteItem('${item.id}')" style="background:none; border:none; color:red; cursor:pointer">✕</button>
+
+                <input type="checkbox" ${item.completed ? 'checked' : ''} onclick="toggleComplete('${item.id}')">
+                <span class="name">${item.name}</span>
+
             `;
             listContainer.appendChild(div);
         });
