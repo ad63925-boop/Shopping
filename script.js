@@ -44,6 +44,13 @@ function addItem() {
     const qtyInput = document.getElementById('itemQty'); // Получаем поле количества
     const priceInput = document.getElementById('itemPrice');
     const catInput = document.getElementById('itemCat');
+    const itemName = nameInput.value.trim();
+
+    // Проверяем валидность названия
+    if (!isValidItemName(itemName)) {
+        nameInput.focus();
+        return;
+    }
     
     if (!nameInput.value) return;
 
