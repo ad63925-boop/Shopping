@@ -154,7 +154,7 @@ nameInput.addEventListener('input', () => {
 });
 
 // Функция выбора подсказки
-function selectSuggestion(name, cat, price) {
+function selectSuggestion(name, cat, price, quantity) {
     nameInput.value = name.charAt(0).toUpperCase() + name.slice(1);
     
     // Обновляем категорию
@@ -166,6 +166,11 @@ function selectSuggestion(name, cat, price) {
     // Подставляем цену из истории (если есть)
     if (price !== undefined) {
         document.getElementById('itemPrice').value = price;
+    }
+    
+    // Подставляем количество из истории (если есть)
+    if (quantity !== undefined) {
+        document.getElementById('itemQty').value = quantity;
     }
 
     autoList.style.display = 'none';
