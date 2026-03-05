@@ -167,7 +167,7 @@ function selectSuggestion(name, cat, price, quantity) {
     if (price !== undefined) {
         document.getElementById('itemPrice').value = price;
     }
-    
+
     // Подставляем количество из истории (если есть)
     if (quantity !== undefined) {
         document.getElementById('itemQty').value = quantity;
@@ -322,19 +322,21 @@ function updateSuggestions() {
 
     if (matches.length > 0) {
         matches.forEach(name => {
-            const cat = history[name];
+            const { category, lastPrice, lastQuantity } = history[name];
             const div = document.createElement('div');
             div.className = 'suggestion-card';
             div.innerHTML = `
                 <div class="suggestion-info">
                     <span class="suggestion-name">${name.charAt(0).toUpperCase() + name.slice(1)}</span>
-                    <span class="suggestion-cat">${cat}</span>
+            <span class="suggestion-cat">${category}</span>
+            ${lastPrice ? `<span class="suggestion-price">(${lastPrice} ₽)</span>` : ''}
+            ${lastQuantity ? `<span class="suggestion-qty">×${lastQuantity} шт.</span>` : ''}
                 </div>
                 <span class="suggestion-delete" onclick="deleteFromHistory('${name}')">×</span>
             `;
             div.onclick = (e) => {
                 if (!e.target.classList.contains('suggestion-delete')) {
-                    selectSuggestion(name, cat);
+                    selectSuggestion(name, category, lastPrice, lastQuantity);
                 }
             };
             autoList.appendChild(div);
