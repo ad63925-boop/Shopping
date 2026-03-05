@@ -15,12 +15,15 @@
     <style>
         /* Весь предыдущий CSS стиль здесь сохраняется */
         :root { --primary: #6200ee; --bg: #f8f9fa; --surface: #ffffff; }
-        body { font-family: sans-serif; background: #c9c6c6; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: sans-serif; background: #c9c6c6; padding: 15px; display: flex; flex-direction: column; align-items: center; 
+    border: 3px solid black;}
         .container { width: 100%; 
             max-width: 500px; 
             margin-bottom: 40px;
         }
-
+        
+   
+        
         .header-card, .input-card { 
             background: var(--surface); 
             padding: 5px; 
@@ -44,7 +47,8 @@
         .name { flex: 1; font-weight: 500; }
         .completed { opacity: 0.5; text-decoration: line-through; }
         input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
-        .status-sync { font-size: 0.7rem; color: #34a853; text-align: center; margin-bottom: 10px; }
+        .status-sync { font-size: 0.7rem; color: #34a853; background-color: white;
+        border-radius: 5px; text-align: center; margin-bottom: 10px; padding: 3px;}
 		
 		.limit-ok { background-color: #e8f5e9 !important; transition: 0.3s; } /* Зеленый */
 .limit-over { background-color: #ffebee !important; transition: 0.3s; } /* Красный */
@@ -139,6 +143,7 @@
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     z-index: 1000;
     max-height: 250px;
+    width: 100%;
     overflow-y: auto;
     display: none; /* Скрыто по умолчанию */
 }
@@ -149,19 +154,8 @@
     padding: 12px 15px;
     cursor: pointer;
     border-bottom: 1px solid #f0f0f0;
-    background-color: red;
-    transition: background 0.8s;
-    animation-name: fadeIn;          /* имя анимации */
-  animation-duration: 0.5s;       /* длительность анимации */
-  animation-delay: 3s;           /* задержка 1 секунда */
-  opacity: 0;
+    transition: background 0.2s;
 }
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
 
 .suggestion-card:hover { background: #f8f9fa; }
 
@@ -283,17 +277,19 @@ footer{
 
 header {
     position: sticky;
-    top: 0;
+    top: -10px;
     padding: 5px;
     z-index: 100;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: lightgreen;
+    text-decoration: underline;
+    text-shadow: 2px 2px 4px black;
     text-align: center;
-    transition: transform 0.35s ease, opacity 0.35s ease;
-    background: #20da8b;
+    transition: transform 0.3 opacity 0.35s ease;
+    background: none;
     width: -webkit-fill-available;
     border-radius: 5px;
     font-family: cursive;
-    font-size: x-large;
+    font-size: 2rem;
     font-weight: bold;
 }
 
@@ -328,11 +324,19 @@ header {
 #shoppingList {
     width: 100%;
 }
+
+.shoppingLists {
+  margin-bottom: 30px;
+}
+
+#cyncStatus {
+  background-color: white;
+}
     </style>
 </head>
 <body>
 <header>
-    Список продуктов
+    🛒Список покупок🛍️
 </header>
 <!-- Бургер -->
 <div class="burger" title="Меню">
@@ -384,7 +388,7 @@ header {
             <input type="text" id="itemName" placeholder="Название" autocomplete="off">
             <div id="autocompleteList" class="autocomplete-suggestions"></div>
         </div>
-        <input type="number" id="itemPrice" placeholder="Цена" style="flex: 1; width: 25%;">
+        <input type="number" id="itemPrice" placeholder="₽" style="flex: 1; width: 25%;">
     </div>
 
     <div class="custom-select" id="customSelect">
@@ -414,7 +418,7 @@ header {
 
 
 
-    <div id="shoppingList"></div>
+    <div id="shoppingList" class="shoppingLists"></div>
 </div>
 
 <script>
@@ -456,7 +460,7 @@ db.on("value", (snapshot) => {
     items = data ? Object.values(data) : [];
     render();
     updateSuggestions();
-    document.getElementById('syncStatus').innerText = "● Обновлено";
+    document.getElementById('syncStatus').innerText = "● Обновлено " + new Date().toLocaleTimeString();
 });
 
 function addItem() {
@@ -528,8 +532,8 @@ nameInput.addEventListener('input', () => {
             const div = document.createElement('div');
             div.className = 'suggestion-card';
             
-            div.innerHTML = 
-            `<div class="suggestion-info">
+            div.innerHTML = `
+                <div class="suggestion-info">
                     <span class="suggestion-name">${name.charAt(0).toUpperCase() + name.slice(1)}</span>
                     <span class="suggestion-cat">${category}</span>
                     ${lastPrice ? `<span class="suggestion-price">(${lastPrice} ₽)</span>` : ''}
@@ -709,31 +713,10 @@ function updateSuggestions() {
                     <span class="suggestion-name">${name.charAt(0).toUpperCase() + name.slice(1)}</span>
                     <span class="suggestion-cat">${cat}</span>
                 </div>
-                <span class="suggestion-delete" onclick="deleteFromHistory('${name}')">×</span>`;
-                
+                <span class="suggestion-delete" onclick="deleteFromHistory('${name}')">×</span>
+            `;
             div.onclick = (e) => {
                 if (!e.target.classList.contains('suggestion-delete')) {
-                    selectSuggestion(name, cat);
-                }
-            };
-            autoList.appendChild(div);
-        });
-        autoList.style.display = 'block';
-    } else {
-        autoList.style.display = 'none';
-    }
-}
-
-</script>
-
-<footer>
-	<p>alex_demidenk0</p>
-</footer>
-
-<script src="../burgerMenu/menu.js" defer></script>
-</body>
-</html>
-lete')) {
                     selectSuggestion(name, cat);
                 }
             };
