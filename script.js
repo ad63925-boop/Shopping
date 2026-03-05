@@ -71,6 +71,20 @@ function addItem() {
     qtyInput.value = ''; // Очищаем поле количества
 }
 
+// Функция для обновления количества в Firebase
+function updateItemQuantity(id, newQuantity) {
+    const quantity = parseInt(newQuantity) || 1; // По умолчанию 1
+
+    db.child(id).update({
+        quantity: quantity
+    }).then(() => {
+        console.log("Количество успешно обновлено в облаке");
+        render(); // Перерисовываем список после обновления
+    }).catch((error) => {
+        console.error("Ошибка обновления количества:", error);
+    });
+}
+
 // Функция для обновления цены в Firebase
 function updateItemPrice(id, newPrice) {
     const price = parseInt(newPrice) || 0;
