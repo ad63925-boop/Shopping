@@ -318,7 +318,51 @@ function toggleComplete(id) {
     const item = items.find(i => i.id === id);
     if (item) db.child(id).update({ completed: !item.completed });
 }
-function deleteItem(id) { db.child(id).remove(); }
+
+//Удаление с подтверждением
+function deleteItem(id) {
+    // Находим товар по ID
+    const itemToDelete = items.find(item => item.id === id);
+    const itemName = itemToDelete ? itemToDelete.name : 'этот товар';
+
+
+    Swal.fire({
+        title: 'Вы уверены?',
+        text: `Вы хотите удалить "${itemName}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Да, удалить!',
+        cancelButtonText: 'Отмена',
+        reverseButtons: true,
+        customClass: {
+            confirmButton: 'swal2-btn-confirm',
+            cancelButton: 'swal2-btn-cancel'
+        },
+        buttonsStyling: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            db.child(id).remove()
+                .then(() => {
+                    Swal.fire({
+                title: 'Удалено!',
+                text: `"${itemName}" успешно удалён из списка.`,
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        })
+        .catch((error) => {
+            Swal.fire({
+                title: 'Ошибка!',
+                text: 'Не удалось удалить товар. Попробуйте ещё раз.',
+                icon: 'error'
+            });
+            console.error('Ошибка при удалении товара:', error);
+        });
+    }
+});
+}
+
 
 const customSelect = document.getElementById('customSelect');
 const trigger = customSelect.querySelector('.select-trigger');
