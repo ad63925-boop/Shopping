@@ -37,7 +37,18 @@
             border-bottom-left-radius: 0;
         }    
 
-        .item { background: var(--surface); padding: 2px; border-radius: 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .item { background: var(--surface); 
+            padding: 2px; 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            margin-bottom: 5px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            transition: background 0.8s;
+            box-sizing: border-box;
+        }
+
         .name { 
             flex: 1; 
             font-weight: bold;
@@ -188,11 +199,11 @@
 /* Строка с Названием и Ценой */
 .input-row-top {
     display: flex;
-    gap: 10px;
+    gap: 5px;
 }
 
 .input-row-top input {
-    padding: 12px;
+    padding: 6px;
     border: 1px solid #e0e0e0;
     border-radius: 10px;
     outline: none;
@@ -357,4 +368,25 @@ header {
 #itemName:invalid {
     border-color: #d32f2f !important;
     box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2) !important;
+}
+
+.item-qty {
+    width: 50px;
+    text-align: center;
+}
+
+.item-qty-wrapper {
+    display: flex;
+    align-items: center;
+    background: #f1f3f4;
+    border-radius: 6px;
+}
+.edit-qty-input {
+    width: 20px;
+}
+
+input[type="checkbox"] {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
 }

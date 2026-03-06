@@ -273,7 +273,6 @@ function render() {
                 <span class="item-number">${globalIndex++}.</span>
 
                 <span class="name">${item.name}</span>
-
                 <div class="item-qty-wrapper">
                     <input type="number"
                         class="edit-qty-input"
