@@ -37,22 +37,94 @@
             border-bottom-left-radius: 0;
         }    
 
-        .item { background: var(--surface); 
-            padding: 2px; 
-            border-radius: 12px; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            margin-bottom: 5px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-            transition: background 0.8s;
-            box-sizing: border-box;
-        }
+.item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    width: 100%; /* Занимает всю доступную ширину */
+    flex-wrap: wrap; /* Разрешаем перенос элементов на новую строку */
+}
 
-        .name { 
-            flex: 1; 
-            font-weight: bold;
-        }
+.name {
+    flex: 1 1 auto; /* Может расти и сжиматься */
+    min-width: 300px; /* Позволяет сжиматься при нехватке места */
+    font-weight: 500;
+}
+
+.item-details {
+    display: flex;
+    flex-wrap: wrap; /* Элементы внутри могут переноситься */
+    gap: 12px;
+    align-items: center;
+    flex: 2 1 auto; /* Занимает больше пространства, чем название */
+    margin-left: auto; /* Прижимает группу деталей вправо */
+    justify-content: space-between;
+}
+
+.item-qty-wrapper,
+.item-price-wrapper,
+.item-total {
+    white-space: nowrap; /* Запрещаем перенос текста внутри этих блоков */
+}
+
+/* Стили для элементов внутри item-details */
+.edit-qty-input,
+.edit-price-input {
+    min-width: 60px;
+    padding: 4px 8px;
+    text-align: right;
+}
+
+.btnDel {
+    background-color: red; 
+    border: 1px solid darkred;
+    border-radius: 5px;
+    color: white; 
+    cursor:pointer;
+}
+.unit,
+.currency {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.item-total {
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+/* Для завершённых товаров */
+.item.completed .name {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.item.completed .item-number {
+    background-color: #e0e0e0;
+    color: #999;
+}
+
+/* Улучшаем внешний вид чекбокса */
+.item input[type="checkbox"] {
+    margin: 0;
+    transform: scale(1.2);
+}
+
+.item-number {
+    flex-shrink: 0; /* Фиксированная ширина, не сжимается */
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    font-weight: bold;
+    color: #666;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    font-size: 0.9rem;
+}
+
         .completed { opacity: 0.5; text-decoration: line-through; }
         input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
         .status-sync { font-size: 0.7rem; color: #34a853; background-color: white;

@@ -270,34 +270,32 @@ function render() {
             const div = document.createElement('div');
             div.className = `item ${item.completed ? 'completed' : ''}`;
             div.innerHTML = `
-                <span class="item-number">${globalIndex++}.</span>
-
+<span class="item-number">${globalIndex++}.</span>
                 <span class="name">${item.name}</span>
-                <div class="item-qty-wrapper">
-                    <input type="number"
-                        class="edit-qty-input"
-                        min="1"
-                        value="${item.quantity}"
-                        onchange="updateItemQuantity('${item.id}', this.value)"
-                oninput="this.style.width = ((this.value.length + 1) * 8) + 'px'">
-                    <span class="unit">шт.</span>
-                </div>
+                <div class="item-details">
+                    <div class="item-qty-wrapper">
+                        <input type="number"
+                    class="edit-qty-input"
+            min="1"
+            value="${item.quantity}"
+            onchange="updateItemQuantity('${item.id}', this.value)"
+            oninput="this.style.width = ((this.value.length + 1) * 8) + 'px'">
+                <span class="unit">шт.</span>
+            </div>
 
-                <div class="item-price-wrapper">
-                    <input type="number" 
-                        class="edit-price-input" 
-                        value="${item.price}" 
-                        onchange="updateItemPrice('${item.id}', this.value)"
-                        oninput="this.style.width = ((this.value.length + 1) * 8) + 'px'">
-                    <span class="currency">₽</span>
-                </div>
+            <div class="item-price-wrapper">
+                <input type="number" 
+            class="edit-price-input" 
+            value="${item.price}" 
+            onchange="updateItemPrice('${item.id}', this.value)"
+            oninput="this.style.width = ((this.value.length + 1) * 8) + 'px'">
+                <span class="currency">₽</span>
+            </div>
 
-                <div class="item-total">${itemTotal} ₽</div>
-                <button onclick="deleteItem('${item.id}')" style="background:none; border:none; color:red; cursor:pointer">✕</button>
-
-                <input type="checkbox" ${item.completed ? 'checked' : ''} onclick="toggleComplete('${item.id}')">
-                
-
+            <div class="item-total">${itemTotal} ₽</div>
+            <button class="btnDel" onclick="deleteItem('${item.id}')">✕</button>
+            <input type="checkbox" ${item.completed ? 'checked' : ''} onclick="toggleComplete('${item.id}')">
+        </div>
             `;
             listContainer.appendChild(div);
         });
