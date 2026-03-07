@@ -3,13 +3,15 @@
         body { 
             font-family: sans-serif; 
             background: #c9c6c6; 
-            padding: 15px; 
+            padding: 5px; 
             margin: 0;
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             border: 3px solid #08a609;
-            height: 100vh;}
+            margin-bottom: 30px;
+          
+        }
 
         .container { width: 100%; 
             max-width: 500px; 
@@ -45,21 +47,25 @@
     border-bottom: 1px solid #eee;
     width: 100%; /* Занимает всю доступную ширину */
     flex-wrap: wrap; /* Разрешаем перенос элементов на новую строку */
+    background-color: bisque;
 }
 
 .name {
-    flex: 1 1 auto; /* Может расти и сжиматься */
-    min-width: 300px; /* Позволяет сжиматься при нехватке места */
+     /* Может расти и сжиматься */
+    width: 330px; /* Позволяет сжиматься при нехватке места */
+    font-size: 1.5rem;
     font-weight: 500;
+    background-color: white;
+    padding: 2px;
+    border-radius: 3px;
 }
 
 .item-details {
     display: flex;
-    flex-wrap: wrap; /* Элементы внутри могут переноситься */
-    gap: 12px;
+    flex-wrap: nowrap; /* Элементы внутри могут переноситься */
+    gap: 5px;
     align-items: center;
-    flex: 2 1 auto; /* Занимает больше пространства, чем название */
-    margin-left: auto; /* Прижимает группу деталей вправо */
+    width: 330px;
     justify-content: space-between;
 }
 
@@ -72,9 +78,12 @@
 /* Стили для элементов внутри item-details */
 .edit-qty-input,
 .edit-price-input {
-    min-width: 60px;
-    padding: 4px 8px;
-    text-align: right;
+   
+    width: 60px;
+    text-align: center;
+    padding: 2px;
+    font-size: 1.2rem;
+    font-weight: bold;
 }
 
 .btnDel {
@@ -83,6 +92,7 @@
     border-radius: 5px;
     color: white; 
     cursor:pointer;
+    font-size: 1rem;
 }
 .unit,
 .currency {
@@ -91,8 +101,11 @@
 }
 
 .item-total {
+    font-size: 1.5rem;
     font-weight: bold;
-    color: #2e7d32;
+    color: white;
+    background-color: green;
+    padding: 2px;
 }
 
 /* Для завершённых товаров */
@@ -109,7 +122,8 @@
 /* Улучшаем внешний вид чекбокса */
 .item input[type="checkbox"] {
     margin: 0;
-    transform: scale(1.2);
+    transform: scale(1.1);
+    margin: 2px;
 }
 
 .item-number {
@@ -120,18 +134,24 @@
     text-align: center;
     font-weight: bold;
     color: #666;
-    background-color: #f0f0f0;
-    border-radius: 50%;
-    font-size: 0.9rem;
+    background-color: white;
+    border-radius: 5px;
+    font-size: 1.5rem;
+    padding: 3px; 
 }
 
-        .completed { opacity: 0.5; text-decoration: line-through; }
-        input { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
-        .status-sync { font-size: 0.7rem; color: #34a853; background-color: white;
+/*Перечёркнутый текст и серый фон*/
+.completed { opacity: 0.5; text-decoration: line-through; }
+        
+input { padding: 10px; border: 1px solid black; border-radius: 8px; }
+        
+.status-sync { font-size: 0.7rem; color: #34a853; background-color: white;
         border-radius: 5px; text-align: center; margin-bottom: 10px; padding: 3px;}
 		
 		.limit-ok { background-color: #e8f5e9 !important; transition: 0.3s; } /* Зеленый */
-.limit-over { background-color: #ffebee !important; transition: 0.3s; } /* Красный */
+.limit-over { background-color: deeppink !important; transition: 0.3s; } /* Красный */
+
+/*Название категории*/
 .category-header { 
     background: #eeeeee; 
     padding: 5px 12px; 
@@ -162,6 +182,7 @@
     align-items: center;
     transition: all 0.3s;
 }
+
 
 .select-trigger:hover { border-color: var(--primary); }
 
@@ -272,6 +293,8 @@
 .input-row-top {
     display: flex;
     gap: 5px;
+    justify-content: space-around;
+    flex-wrap: nowrap;
 }
 
 .input-row-top input {
@@ -279,7 +302,11 @@
     border: 1px solid #e0e0e0;
     border-radius: 10px;
     outline: none;
-    font-size: 1rem;
+}
+
+.inpPrice {
+    flex: 1; 
+    width: 25px;
 }
 
 /* Кнопка Добавить */
@@ -312,26 +339,13 @@
     margin-top: 5px;
 }
 
-.item-price-wrapper {
-    display: flex;
-    align-items: center;
-    background: #f1f3f4;
-    padding: 4px 8px;
-    border-radius: 6px;
-    margin-right: 10px;
-}
-
 .edit-price-input {
     border: none;
-    background: aquamarine;
-    font-weight: bold;
+    background: white;
+    
     font-family: inherit;
-    font-size: 1rem;
-    color: #333;
-    width: 45px;
-    text-align: right;
+    color: green;
     outline: none;
-    text-align: center;
 }
 
 /* Убираем стрелочки у инпута цены */
@@ -395,14 +409,15 @@ header {
 
 .suggestion-price {
     font-size: 0.8rem;
-    color: #666;
+    color: red;
     margin-left: 8px;
     font-style: italic;
     width: 100%;
 }
 
 #shoppingList {
-    width: 100%;
+    min-width: 400px;
+    max-width: 700px;
 }
 
 .shoppingLists {
@@ -448,13 +463,8 @@ header {
 }
 
 .item-qty-wrapper {
-    display: flex;
     align-items: center;
-    background: #f1f3f4;
-    border-radius: 6px;
-}
-.edit-qty-input {
-    width: 20px;
+    margin: 3px;
 }
 
 input[type="checkbox"] {
