@@ -291,7 +291,7 @@ function render() {
                 <span class="currency">₽ </span>
             </div>
 
-            <div class="item-total">= ${itemTotal} ₽</div>
+            <div class="item-total"> ${itemTotal} ₽</div>
             <button class="btnDel" onclick="deleteItem('${item.id}')">✕</button>
             <input type="checkbox" ${item.completed ? 'checked' : ''} onclick="toggleComplete('${item.id}')">
         </div>
