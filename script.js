@@ -278,8 +278,7 @@ function render() {
                     class="edit-qty-input"
             min="1"
             value="${item.quantity}"
-            onchange="updateItemQuantity('${item.id}', this.value)"
-            oninput="this.style.width = ((this.value.length + 1) * 8) + 'px'">
+            onchange="updateItemQuantity('${item.id}', this.value)">
                 <span class="unit">шт.</span>
             </div>
 

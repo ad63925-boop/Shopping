@@ -67,6 +67,7 @@
     align-items: center;
     width: 330px;
     justify-content: space-between;
+    margin-left: auto;
 }
 
 .item-qty-wrapper,
@@ -415,13 +416,20 @@ header {
     width: 100%;
 }
 
-#shoppingList {
-    min-width: 400px;
-    max-width: 700px;
+.shoppingLists {
+    margin-bottom: 30px;
 }
 
-.shoppingLists {
-  margin-bottom: 30px;
+@media (min-width: 400px) {
+    .shoppingLists, .headerCard {
+        width: calc(387px * 2);
+    }
+}
+
+@media (max-width: 800px) {
+    .shoppingLists, .headerCard {
+        width: 387px;
+    }
 }
 
 #cyncStatus {
