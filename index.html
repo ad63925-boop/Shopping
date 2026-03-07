@@ -66,13 +66,13 @@
 <div class="input-card">
     <div class="input-row-top">
         <div style="position: relative; flex: 2;">
-            <input type="text" id="itemName" placeholder="Название" autocomplete="off">
+            <input type="text" id="itemName" class="item-name" placeholder="Название" autocomplete="off">
             <div id="autocompleteList" class="autocomplete-suggestions"></div>
         </div>
         <div class="item-qty-wrapper">
             <input type="number" id="itemQty" class="item-qty" placeholder="шт" value="1">
         </div>
-        <input type="number" id="itemPrice" placeholder="₽" style="flex: 1; width: 25%;">
+        <input type="number" id="itemPrice" class="inpPrice" placeholder="₽" step="0.01" min="0">
     </div>
 
     <div class="custom-select" id="customSelect">
