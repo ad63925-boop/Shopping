@@ -289,10 +289,10 @@ function render() {
             value="${item.price}" 
             onchange="updateItemPrice('${item.id}', this.value)"
             oninput="this.style.width = ((this.value.length + 1) * 8) + 'px'">
-                <span class="currency">₽</span>
+                <span class="currency">₽ </span>
             </div>
 
-            <div class="item-total">${itemTotal} ₽</div>
+            <div class="item-total">= ${itemTotal} ₽</div>
             <button class="btnDel" onclick="deleteItem('${item.id}')">✕</button>
             <input type="checkbox" ${item.completed ? 'checked' : ''} onclick="toggleComplete('${item.id}')">
         </div>
