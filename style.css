@@ -52,7 +52,7 @@
 
 .name {
      /* Может расти и сжиматься */
-    width: 330px; /* Позволяет сжиматься при нехватке места */
+    width: 320px; /* Позволяет сжиматься при нехватке места */
     font-size: 1.5rem;
     font-weight: 500;
     background-color: white;
@@ -428,7 +428,7 @@ header {
     .shoppingLists, 
     .header-card, 
     .input-card {
-        width: calc(387px * 2);
+        width: calc(370px * 2);
     }
 
     .item-name {
@@ -441,7 +441,7 @@ header {
     .shoppingLists, 
     .header-card, 
     .input-card {
-        width: 387px;
+        width: 370px;
     }
 
     .item-name {
