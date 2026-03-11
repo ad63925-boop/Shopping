@@ -52,7 +52,7 @@
 
 .name {
      /* Может расти и сжиматься */
-    width: 320px; /* Позволяет сжиматься при нехватке места */
+    width: 250px; /* Позволяет сжиматься при нехватке места */
     font-size: 1.5rem;
     font-weight: 500;
     background-color: white;
@@ -63,10 +63,11 @@
 .item-details {
     display: flex;
     flex-wrap: nowrap; /* Элементы внутри могут переноситься */
-    gap: 5px;
+    gap: 25px;
     align-items: center;
     width: 380px;
     justify-content: space-between;
+    padding: 0 5px;
 }
 
 .item-qty-wrapper,
@@ -76,7 +77,14 @@
 }
 
 /* Стили для элементов внутри item-details */
-.edit-qty-input,
+.edit-qty-input {
+    width: 55px;
+    text-align: center;
+    padding: 2px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
 .edit-price-input {
     width: 60px;
     text-align: center;
@@ -112,11 +120,6 @@
 /* Для завершённых товаров */
 .item.completed .name {
     text-decoration: line-through;
-    color: #999;
-}
-
-.item.completed .item-number {
-    background-color: #e0e0e0;
     color: #999;
 }
 
