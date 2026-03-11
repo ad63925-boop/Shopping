@@ -295,8 +295,9 @@ input {
 /* Строка с Названием и Ценой */
 .input-row-top {
     display: flex;
-    gap: 5px;
+    gap: 3px;
     flex-wrap: nowrap;
+    justify-content: space-around;
     align-items: center;
 }
 
@@ -311,7 +312,7 @@ input {
 
 .item-qty,
 .inpPrice {
-    width: 60px;
+    width: 55px;
     text-align: center;
 }
 
@@ -428,7 +429,7 @@ header {
     .shoppingLists, 
     .header-card, 
     .input-card {
-        width: calc(370px * 2);
+        width: calc(368px * 2);
     }
 
     .item-name {
@@ -441,7 +442,7 @@ header {
     .shoppingLists, 
     .header-card, 
     .input-card {
-        width: 370px;
+        width: 368px;
     }
 
     .item-name {
@@ -511,4 +512,24 @@ input[type="checkbox"] {
 
 .swal2-html-container {
     font-family: Arial, sans-serif;
+}
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: white;
+  border: 1px solid #ddd;
+  color: #333;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.google-btn:hover {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
 }

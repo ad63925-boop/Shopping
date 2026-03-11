@@ -272,16 +272,16 @@ function render() {
             div.innerHTML = `
 <span class="item-number">${globalIndex++}.</span>
                 <span class="name">${item.name}</span>
-                <div class="item-details">
-                    <div class="item-qty-wrapper">
+                                    <div class="item-qty-wrapper">
                         <input type="number"
                     class="edit-qty-input"
             min="1"
             value="${item.quantity}"
             onchange="updateItemQuantity('${item.id}', this.value)">
-                <span class="unit">шт.</span>
+                <span class="unit"></span>
             </div>
 
+                <div class="item-details">
             <div class="item-price-wrapper">
                 <input type="number" 
             class="edit-price-input" 
