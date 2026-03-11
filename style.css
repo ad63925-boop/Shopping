@@ -253,15 +253,16 @@ input {
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     z-index: 1000;
     max-height: 250px;
-    width: 100%;
+    width: 350px;
     overflow-y: auto;
     display: none; /* Скрыто по умолчанию */
+    border: 1px solid #ddd;
 }
 
 .suggestion-card {
     display: flex;
     align-items: center;
-    padding: 12px 15px;
+    padding: 4px 5px;
     cursor: pointer;
     border-bottom: 1px solid #f0f0f0;
     transition: background 0.2s;
@@ -273,14 +274,26 @@ input {
 
 .suggestion-name { font-weight: 500; color: #333; }
 
-.suggestion-cat { font-size: 0.8rem; color: #888; display: flex; align-items: center; gap: 4px; }
+.suggestion-cat { 
+    font-size: 0.8rem; 
+    width: 100%;
+    color: #888; 
+    display: flex; 
+    align-items: center;
+    gap: 4px; 
+}
 
 .suggestion-delete {
-    color: #ff5252;
-    font-size: 1.2rem;
+    color: white;
+    background-color: red;
+    font-size: 1rem;
+    text-align: center;
     padding: 5px;
     cursor: pointer;
     opacity: 0.6;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
 }
 
 .suggestion-delete:hover { opacity: 1; }
