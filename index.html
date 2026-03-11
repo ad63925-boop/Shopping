@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
 
 </head>
 <body>
@@ -59,6 +61,13 @@
             <input type="number" id="budgetLimit" placeholder="Лимит" oninput="updateLimit()" 
                    style="width: 80px; border: none; border-bottom: 2px solid #ddd; font-size: 1.2rem; font-weight: bold; outline: none;">
         </div>
+        <div class="google-auth">
+  <button id="googleSignIn" class="google-btn">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google logo" width="20">
+    Войти через Google
+  </button>
+</div>
+
     </div>
     <div id="syncLoader" style="display:none;">⏳</div>
 </div>
