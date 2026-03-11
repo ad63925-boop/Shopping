@@ -51,23 +51,22 @@
     Синхронизация
 </div>
 
-    
-<div class="header-card" id="headerCard">
-    <div>
-        <div style="color: #5f6368; font-size: 0.8rem;">Итого / Лимит</div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="font-size: 1.5rem; font-weight: bold;"><span id="totalSum">0</span> ₽</div>
-            <div style="color: #ccc; font-size: 1.2rem;">/</div>
-            <input type="number" id="budgetLimit" placeholder="Лимит" oninput="updateLimit()" 
-                   style="width: 80px; border: none; border-bottom: 2px solid #ddd; font-size: 1.2rem; font-weight: bold; outline: none;">
-        </div>
-        <div class="google-auth">
+ <div class="google-auth">
   <button id="googleSignIn" class="google-btn">
     <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google logo" width="20">
     Войти через Google
   </button>
 </div>
-
+    
+<div class="header-card" id="headerCard">
+    <div class="total-limit">
+        <span >Итого / Лимит</span>
+        <div class="limits">
+            <div><span id="totalSum">0</span> ₽</div>
+            <div> / </div>
+            <input type="number" id="budgetLimit" class="budget-limit" placeholder="Лимит" oninput="updateLimit()">
+        </div>
+    </div>
     </div>
     <div id="syncLoader" style="display:none;">⏳</div>
 </div>
