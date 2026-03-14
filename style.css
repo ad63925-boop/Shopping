@@ -224,7 +224,8 @@ input {
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.3s ease;
-    overflow: hidden;
+    height: 250px;
+    overflow: scroll;
 }
 
 .custom-select.active .select-options {
