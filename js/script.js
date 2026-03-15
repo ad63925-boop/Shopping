@@ -184,7 +184,7 @@ function deleteItem(id) {
                 .then(() => {
                     Swal.fire({
                 title: 'Удалено!',
-                text: `"<div class="swal2-title">${itemName}</div>" успешно удалён из списка.`,
+                text: `"${itemName}" успешно удалён из списка.`,
                 icon: 'success',
                 timer: 1500,
                 showConfirmButton: false

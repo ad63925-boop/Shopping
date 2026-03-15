@@ -533,9 +533,6 @@ input[type="checkbox"] {
 }
 
 /* Улучшаем внешний вид всех але́ртов */
-.swal2-title {
-    font-family: Arial, sans-serif;
-}
 
 .swal2-html-container {
     font-family: Arial, sans-serif;
@@ -556,11 +553,10 @@ input[type="checkbox"] {
 }
 
 .swal2-title {
+    font-family: Arial, sans-serif;
     font-size: 1.5rem;
     color: red;
 }
-
-
 
 .google-btn {
   display: flex;
