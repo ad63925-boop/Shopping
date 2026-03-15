@@ -157,4 +157,3 @@ nameInput.addEventListener('input', () => {
         autoList.style.display = 'none';
     }
 });
-
