@@ -54,7 +54,16 @@ function render() {
             <div class="item-total"> ${itemTotal} ₽</div>
             <button class="btnDel" onclick="deleteItem('${item.id}')">✕</button>
             <input type="checkbox" ${item.completed ? 'checked' : ''} onclick="toggleComplete('${item.id}')">
-        </div>
+            </div>
+
+            <!-- Поле для комментариев -->
+            <div class="comment-wrapper">
+                <textarea 
+                    class="comment-input" 
+                    placeholder="Добавьте комментарий к товару..."
+                    oninput="updateItemComment('${item.id}', this.value)"
+                    >${item.comment || ''}</textarea>
+            </div>
             `;
             listContainer.appendChild(div);
         });
