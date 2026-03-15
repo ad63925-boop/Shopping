@@ -58,12 +58,15 @@ function render() {
 
             <!-- Поле для комментариев -->
             <div class="comment-wrapper">
-                <textarea 
-                    class="comment-input" 
-                    placeholder="Добавьте комментарий к товару..."
-                    oninput="updateItemComment('${item.id}', this.value)"
-                    >${item.comment || ''}</textarea>
-            </div>
+            <textarea
+            class="comment-input"
+            placeholder="Добавьте комментарий к товару..."
+            onblur="handleCommentSave('${item.id}', this)"
+            onkeydown="handleKeyPress(event, '${item.id}', this)">
+                ${item.comment || ''}
+            </textarea>
+            <span class="save-status" id="status-${item.id}">Готово</span>
+        </div>
             `;
             listContainer.appendChild(div);
         });

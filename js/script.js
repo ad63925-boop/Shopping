@@ -78,6 +78,105 @@ function addItem() {
     qtyInput.value = ''; // Очищаем поле количества
 }
 
+//Комментарии к товарам
+async function updateItemComment(itemId, comment) {
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
+
+    // Обновляем локальный объект
+    item.comment = comment;
+
+    try {
+        // Используем уже инициализированную базу данных
+        // db указывает на 'shopping_list'
+        const itemRef = db.child(itemId);
+
+        // Обновляем только поле comment у конкретного товара
+        await itemRef.update({
+            comment: comment
+        });
+
+        console.log('Комментарий успешно сохранён в Firebase Realtime Database');
+
+        // Опционально: обновляем статус синхронизации
+        document.getElementById('syncStatus').innerText =
+            "● Обновлено " + new Date().toLocaleTimeString();
+
+    } catch (error) {
+        console.error('Ошибка при сохранении комментария в Firebase:', error);
+
+        // Резервное сохранение в localStorage на случай проблем с сетью
+        saveToLocalStorage();
+    }
+}
+
+//Вспомогательная функция резервного сохранения в localStorage при проблемах с сетью
+function saveToLocalStorage() {
+    try {
+        localStorage.setItem('shoppingList', JSON.stringify(items));
+        console.log('Данные сохранены в localStorage как fallback');
+    } catch (e) {
+        console.error('Не удалось сохранить в localStorage:', e);
+    }
+}
+
+// Обработчик нажатия клавиш
+function handleKeyPress(event, itemId, textarea) {
+    // Сохраняем при нажатии Enter (но не при Shift+Enter для переноса строки)
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        saveComment(itemId, textarea.value, textarea);
+    }
+}
+
+// Обработчик потери фокуса
+function handleCommentSave(itemId, textarea) {
+    saveComment(itemId, textarea.value, textarea);
+}
+
+// Основная функция сохранения с индикацией статуса
+async function saveComment(itemId, comment, textarea) {
+    const statusEl = document.getElementById(`status-${itemId}`);
+
+    // Показываем статус «сохраняется»
+    if (statusEl) {
+        statusEl.textContent = 'Сохраняется...';
+        statusEl.className = 'save-status saving';
+    }
+
+    try {
+        await updateItemComment(itemId, comment);
+
+        // Показываем успех
+        if (statusEl) {
+            statusEl.textContent = 'Сохранено';
+            statusEl.className = 'save-status saved';
+
+            // Возвращаем статус «готово» через 2 секунды
+            setTimeout(() => {
+                statusEl.textContent = 'Готово';
+                statusEl.className = 'save-status';
+            }, 2000);
+        }
+    } catch (error) {
+        console.error('Ошибка сохранения:', error);
+        if (statusEl) {
+            statusEl.textContent = 'Ошибка сохранения';
+            statusEl.style.color = '#dc3545';
+        }
+    }
+}
+
+//Курсор слева при фокусе на комментарии
+function forceCursorToBeginning(textarea) {
+    // Даём браузеру обработать клик, затем перемещаем курсор
+    setTimeout(() => {
+        textarea.setSelectionRange(0, 0);
+        textarea.focus();
+    }, 0);
+}
+
+
 // Функция выбора подсказки (не перемещать в ругое место, там есть зависимость от функции updateSuggestions)
 function selectSuggestion(name, cat, price, quantity) {
     nameInput.value = name.charAt(0).toUpperCase() + name.slice(1);
