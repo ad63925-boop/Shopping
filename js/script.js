@@ -184,7 +184,7 @@ function deleteItem(id) {
                 .then(() => {
                     Swal.fire({
                 title: 'Удалено!',
-                text: `"${itemName}" успешно удалён из списка.`,
+                text: `"<div class="swal2-title">${itemName}</div>" успешно удалён из списка.`,
                 icon: 'success',
                 timer: 1500,
                 showConfirmButton: false
@@ -201,17 +201,6 @@ function deleteItem(id) {
     }
 });
 }
-
-// Физические размеры экрана в пикселях
-console.log('Ширина (px):', screen.width);
-console.log('Высота (px):', screen.height);
-
-// Размеры viewport (с учётом масштабирования)
-console.log('Viewport ширина (px):', window.innerWidth);
-console.log('Viewport высота (px):', window.innerHeight);
-
-// Плотность пикселей (DPI)
-console.log('Плотность (PPI):', window.devicePixelRatio);
 
 // Запуск при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
