@@ -541,6 +541,19 @@ input[type="checkbox"] {
     font-family: Arial, sans-serif;
 }
 
+.swal2-actions {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+.swal2-actions button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
 .google-btn {
   display: flex;
   align-items: center;
