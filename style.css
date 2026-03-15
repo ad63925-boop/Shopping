@@ -628,6 +628,10 @@ input[type="checkbox"] {
     font-weight: bold;
 }
 
+.comment-wrapper {
+    text-align: left;
+}
+
 .comment-input {
     width: 300px;
     height: 20px;
@@ -635,4 +639,5 @@ input[type="checkbox"] {
     border: 1px solid #070707;
     border-radius: 4px;
     resize: vertical;
+    text-align: left;
 }
