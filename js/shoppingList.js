@@ -60,12 +60,16 @@ function render() {
             <div class="comment-wrapper">
                 <input
                     class="comment-input"
+                    id="comment"
+                    type="text"
+                    max-length="46"
+                    autocapitalize="sentences"
                     placeholder="Добавьте комментарий к товару..."
                     value="${item.comment || ''}"
                     onblur="handleCommentSave('${item.id}', this)"
                     onkeydown="handleKeyPress(event, '${item.id}', this)">
                 </input>
-                <span class="save-status" id="status-${item.id}">Готово</span>
+                <span class="save-status" id="status-${item.id}">✅</span>
             </div>
             `;
             listContainer.appendChild(div);

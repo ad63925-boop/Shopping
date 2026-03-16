@@ -153,19 +153,19 @@ async function saveComment(itemId, comment, input) {
 
         // Показываем успех
         if (statusEl) {
-            statusEl.textContent = 'Сохранено';
+            statusEl.textContent = '✅';
             statusEl.className = 'save-status saved';
 
             // Возвращаем статус «готово» через 2 секунды
             setTimeout(() => {
-                statusEl.textContent = 'Готово';
+                statusEl.textContent = '✅';
                 statusEl.className = 'save-status';
             }, 2000);
         }
     } catch (error) {
         console.error('Ошибка сохранения:', error);
         if (statusEl) {
-            statusEl.textContent = 'Ошибка сохранения';
+            statusEl.textContent = '❗️';
             statusEl.style.color = '#dc3545';
         }
     }

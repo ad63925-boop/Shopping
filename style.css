@@ -629,15 +629,17 @@ input[type="checkbox"] {
 }
 
 .comment-wrapper {
-    text-align: left;
+    width: 350px;
+    display: flex;
+    gap: 5px;
+    justify-content: space-between;
 }
 
 .comment-input {
-    width: 300px;
-    height: 20px;
+    width: 330px;
     padding: 8px;
     border: 1px solid #070707;
     border-radius: 4px;
     resize: vertical;
-    text-align: left;
 }
+
