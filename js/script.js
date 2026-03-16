@@ -121,21 +121,21 @@ function saveToLocalStorage() {
 }
 
 // Обработчик нажатия клавиш
-function handleKeyPress(event, itemId, textarea) {
+function handleKeyPress(event, itemId, input) {
     // Сохраняем при нажатии Enter (но не при Shift+Enter для переноса строки)
     if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault();
-        saveComment(itemId, textarea.value, textarea);
+        saveComment(itemId, input.value, input);
     }
 }
 
 // Обработчик потери фокуса
-function handleCommentSave(itemId, textarea) {
-    saveComment(itemId, textarea.value, textarea);
+function handleCommentSave(itemId, input) {
+    saveComment(itemId, input.value, input);
 }
 
 // Основная функция сохранения с индикацией статуса
-async function saveComment(itemId, comment, textarea) {
+async function saveComment(itemId, comment, input) {
     const statusEl = document.getElementById(`status-${itemId}`);
 
     // Показываем статус «сохраняется»
@@ -145,14 +145,18 @@ async function saveComment(itemId, comment, textarea) {
     }
 
     try {
-        await updateItemComment(itemId, comment);
+        // Предполагаем, что updateItemComment возвращает обновлённый комментарий
+        const updatedComment = await updateItemComment(itemId, comment);
+
+        // Обновляем значение поля ввода, если сервер вернул изменённый текст
+        input.value = updatedComment || comment;
 
         // Показываем успех
         if (statusEl) {
             statusEl.textContent = 'Сохранено';
             statusEl.className = 'save-status saved';
 
-            // Возвращаем статус «готово» через 2 секунды
+            // Возвращаем статус «готово» через 2 секунды
             setTimeout(() => {
                 statusEl.textContent = 'Готово';
                 statusEl.className = 'save-status';
@@ -168,11 +172,11 @@ async function saveComment(itemId, comment, textarea) {
 }
 
 //Курсор слева при фокусе на комментарии
-function forceCursorToBeginning(textarea) {
+function forceCursorToBeginning(input) {
     // Даём браузеру обработать клик, затем перемещаем курсор
     setTimeout(() => {
-        textarea.setSelectionRange(0, 0);
-        textarea.focus();
+        input.setSelectionRange(0, 0);
+        input.focus();
     }, 0);
 }
 
