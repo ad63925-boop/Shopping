@@ -57,7 +57,20 @@
     Войти через Google
   </button>
 </div>
-    
+
+<div id="loginClient" class="login-client">
+<h2>Вход в систему</h2>
+    <form action="login.php" method="post">
+        <label for="username">Имя пользователя:</label><br>
+        <input type="text" id="username" name="username" required><br><br>
+
+        <label for="password">Пароль:</label><br>
+        <input type="password" id="password" name="password" required minlength="8"><br><br>
+
+        <input type="submit" value="Войти">
+    </form>
+</div>
+
 <div class="header-card" id="headerCard">
     <div class="total-limit">
         <span >Итого / Лимит</span>
