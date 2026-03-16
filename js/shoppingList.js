@@ -85,4 +85,27 @@ function render() {
     } else {
         headerCard.className = 'header-card';
     }
+
+function updateHeaderStyle() {
+    const headerCard = document.getElementById('headerCard');
+    if (!headerCard) return;
+
+    const rect = headerCard.getBoundingClientRect();
+
+
+    // Проверяем, что верхний край элемента находится на уровне верхней границы viewport
+    if (rect.top <= 0) {
+        headerCard.style.borderRadius = '0';
+    } else {
+        // Возвращаем стандартное значение, если элемент не у верха
+        headerCard.style.borderRadius = ''; // или конкретное значение, например '8px'
+    }
+}
+
+// Вызываем при загрузке страницы
+document.addEventListener('DOMContentLoaded', updateHeaderStyle);
+
+// Вызываем при скролле
+window.addEventListener('scroll', updateHeaderStyle);
+
 }
