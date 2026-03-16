@@ -43,10 +43,10 @@
 .item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 0;
+    gap: 4px;
+    padding: 4px 0 0 3px;
     border-bottom: 1px solid #eee;
-    width: 100%; /* Занимает всю доступную ширину */
+    border-left: 2px solid #ffac00;
     flex-wrap: wrap; /* Разрешаем перенос элементов на новую строку */
     background-color: bisque;
 }
@@ -168,7 +168,7 @@ input {
     font-size: 0.8rem; 
     font-weight: bold; 
     border-radius: 4px; 
-    margin: 15px 0 1px 0; 
+    margin: 8px 0 1px 0; 
     color: #616161;
     transition: all 0.3s;
 }
@@ -637,9 +637,8 @@ input[type="checkbox"] {
 
 .comment-input {
     width: 330px;
-    padding: 8px;
+    padding: 3px;
     border: 1px solid #070707;
     border-radius: 4px;
-    resize: vertical;
 }
 
