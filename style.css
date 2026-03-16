@@ -1,44 +1,42 @@
-        /* Весь предыдущий CSS стиль здесь сохраняется */
-        :root { --primary: #6200ee; --bg: #f8f9fa; --surface: #ffffff; }
-        body { 
-            font-family: sans-serif; 
-            background: #c9c6c6; 
-            padding: 5px; 
-            margin: 0;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            border: 3px solid #08a609;
-            border-bottom: none;
-            margin-bottom: 30px;
-          
-        }
+/* Весь предыдущий CSS стиль здесь сохраняется */
+:root { --primary: #6200ee; --bg: #f8f9fa; --surface: #ffffff; }
+body { 
+    font-family: sans-serif; 
+    background: #c9c6c6; 
+    padding: 5px; 
+    margin: 0;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    border: 3px solid #08a609;
+    border-bottom: none;
+    margin-bottom: 30px;
+    
+}
 
-        .container { width: 100%; 
-            max-width: 500px; 
-            margin-bottom: 40px;
-        }
-        
-   
-        
-        .header-card, .input-card { 
-            background: var(--surface); 
-            padding: 5px; 
-            border-radius: 16px; 
-            margin-bottom: 5px; 
-            /* width: -webkit-fill-available; */
-        }
+.container { width: 100%; 
+    max-width: 500px; 
+    margin-bottom: 40px;
+}
 
-        .header-card, .limit-ok {
-            position: sticky;
-            top: 0;
-            z-index: 200;
-            display: flex;
-            justify-content: center;
-            text-align: center;
-            border-bottom-right-radius: 0;
-            border-bottom-left-radius: 0;
-        }    
+.header-card, .input-card { 
+    background: var(--surface); 
+    padding: 5px; 
+    border-radius: 16px; 
+    margin-bottom: 5px; 
+    /* width: -webkit-fill-available; */
+}
+
+.header-card, .limit-ok {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}    
 
 .item {
     display: flex;

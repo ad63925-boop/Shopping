@@ -20,6 +20,7 @@ document.getElementById('itemName').addEventListener('input', function() {
     // Если есть точка — показываем ошибку
     if (name.includes('.')) {
         showError('Точка (.) запрещена в названии — это ограничение Firebase');
+        Swal.fire('Ошибка', 'Точка (.) запрещена!', 'error');
     } else {
         // Удаляем сообщение об ошибке, если пользователь исправил
         const errorDiv = document.getElementById('inputError');

@@ -63,6 +63,7 @@ function render() {
                     id="comment"
                     type="text"
                     max-length="46"
+                    autocomplete="on"
                     autocapitalize="sentences"
                     placeholder="Добавьте комментарий к товару..."
                     value="${item.comment || ''}"

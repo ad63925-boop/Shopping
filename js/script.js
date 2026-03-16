@@ -126,12 +126,25 @@ function addItem() {
     const catInput = document.getElementById('itemCat');
     const itemName = nameInput.value.trim();
 
-    // Проверяем валидность названия
+        // Проверка на пустое название
+    if (itemName === '') {
+        nameInput.focus();
+        Swal.fire('Ошибка', 'Название товара не может быть пустым.', 'error');
+        return;
+    }
+
+        if (itemName === '.') {
+        nameInput.focus();
+        Swal.fire('Ошибка', 'Точка (.) запрещена!', 'error');
+        return;
+    }
+
+    // Проверяем валидность названия  проверка №1
     if (!isValidItemName(itemName)) {
         nameInput.focus();
         return;
     }
-
+    //проверка №2
     if (!itemName) return;
 
     const newItem = {
@@ -219,7 +232,7 @@ async function saveComment(itemId, comment, input) {
 
     // Показываем статус «сохраняется»
     if (statusEl) {
-        statusEl.textContent = 'Сохраняется...';
+        statusEl.textContent = '💾';
         statusEl.className = 'save-status saving';
     }
 
@@ -232,7 +245,7 @@ async function saveComment(itemId, comment, input) {
 
         // Показываем успех
         if (statusEl) {
-            statusEl.textContent = '✅';
+            statusEl.textContent = '👍';
             statusEl.className = 'save-status saved';
 
             // Возвращаем статус «готово» через 2 секунды
