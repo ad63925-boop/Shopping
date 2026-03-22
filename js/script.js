@@ -175,8 +175,12 @@ async function updateItemComment(itemId, comment) {
     const item = items.find(i => i.id === itemId);
     if (!item) return;
 
+    // Получаем текущее время
+  const currentTime = new Date().toTimeString().slice(0, 8);
+
     // Обновляем локальный объект
     item.comment = comment;
+    item.commentTime = currentTime; // Сохраняем время отдельно
 
     try {
         // Используем уже инициализированную базу данных
@@ -184,9 +188,10 @@ async function updateItemComment(itemId, comment) {
         const itemRef = db.child(itemId);
 
         // Обновляем только поле comment у конкретного товара
-        await itemRef.update({
-            comment: comment
-        });
+    await itemRef.update({
+      comment: comment,
+      commentTime: currentTime
+    });
 
         console.log('Комментарий успешно сохранён в Firebase Realtime Database');
 

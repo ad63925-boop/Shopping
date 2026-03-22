@@ -47,6 +47,7 @@ body {
     border-left: 2px solid #ffac00;
     flex-wrap: wrap; /* Разрешаем перенос элементов на новую строку */
     background-color: bisque;
+    padding-bottom: 5px;
 }
 
 .name {
@@ -59,12 +60,18 @@ body {
     border-radius: 3px;
 }
 
+.item-names {
+    display: flex;
+    justify-content: space-between;
+    width: 360px;
+}
+
 .item-details {
     display: flex;
     flex-wrap: nowrap; /* Элементы внутри могут переноситься */
     gap: 25px;
     align-items: center;
-    width: 380px;
+    width: 360px;
     justify-content: space-between;
     padding: 0 5px;
 }
@@ -318,6 +325,7 @@ input {
 /* Строка с Названием и Ценой */
 .input-row-top {
     display: flex;
+    width: 360px;
     gap: 3px;
     flex-wrap: nowrap;
     justify-content: space-around;
@@ -450,15 +458,15 @@ header {
     transition: all 0.9s;
 }
 
-@media (min-width: 400px) {
+@media (max-width: 400px) {
     .shoppingLists, 
     .header-card, 
     .input-card {
         width: calc(368px * 2);
     }
 
-    .item-name {
-    width: 330px;
+    .item-name { 
+    width: 200px;
 }
 
 }
@@ -470,8 +478,8 @@ header {
         width: 368px;
     }
 
-    .item-name {
-    width: 200px;
+    .item-names {
+    width: 390px;
 }
 
 }

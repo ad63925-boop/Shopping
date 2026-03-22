@@ -30,7 +30,8 @@ function render() {
             const div = document.createElement('div');
             div.className = `item ${item.completed ? 'completed' : ''}`;
             div.innerHTML = `
-<span class="item-number">${globalIndex++}.</span>
+        <div class="item-names">    
+            <span class="item-number">${globalIndex++}.</span>
                 <span class="name">${item.name}</span>
                                     <div class="item-qty-wrapper">
                         <input type="number"
@@ -40,7 +41,7 @@ function render() {
             onchange="updateItemQuantity('${item.id}', this.value)">
                 <span class="unit"></span>
             </div>
-
+        </div>        
                 <div class="item-details">
             <div class="item-price-wrapper">
                 <input type="number" 
@@ -61,12 +62,12 @@ function render() {
                 <input
                     class="comment-input"
                     id="comment"
-                    type="text"
+                    type="search"
                     max-length="46"
                     autocomplete="on"
                     autocapitalize="sentences"
                     placeholder="Добавьте комментарий к товару..."
-                    value="${item.comment || ''}"
+                    value="${item.commentTime ? item.commentTime + '_' + item.comment : ''}"
                     onblur="handleCommentSave('${item.id}', this)"
                     onkeydown="handleKeyPress(event, '${item.id}', this)">
                 </input>
