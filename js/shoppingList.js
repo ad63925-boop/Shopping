@@ -33,13 +33,14 @@ function render() {
         <div class="item-names">    
             <span class="item-number">${globalIndex++}.</span>
                 <span class="name">${item.name}</span>
-                                    <div class="item-qty-wrapper">
+        <div class="item-qty-wrapper">
                         <input type="number"
                     class="edit-qty-input"
-            min="1"
+            min="0"
+            step="any"
             value="${item.quantity}"
             onchange="updateItemQuantity('${item.id}', this.value)">
-                <span class="unit"></span>
+                <span class="unit">шт</span>
             </div>
         </div>        
                 <div class="item-details">
@@ -49,11 +50,11 @@ function render() {
             value="${item.price}" 
             onchange="updateItemPrice('${item.id}', this.value)"
             oninput="this.style.width = ((this.value.length + 1) * 8) + 'px'">
-                <span class="currency">₽/шт. </span>
+                <span class="currency">руб/шт. </span>
             </div>
 
             <div class="item-total"> ${itemTotal} ₽</div>
-            <button class="btnDel" onclick="deleteItem('${item.id}')">✕</button>
+            <button class="btnDel" onclick="deleteItem('${item.id}')">🗑️</button>
             <input type="checkbox" ${item.completed ? 'checked' : ''} onclick="toggleComplete('${item.id}')">
             
 
