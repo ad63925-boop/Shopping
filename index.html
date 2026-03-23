@@ -18,6 +18,7 @@
 
 </head>
 <body>
+    <div class="contents">
 <header>
     🛒Список покупок🛍️
 </header>
@@ -76,6 +77,7 @@
 
 
 <div class="header-card" id="headerCard">
+    
     <div class="total-limit">
         <span >Итого / Лимит</span>
         <div class="limits">
@@ -83,10 +85,11 @@
             <div> / </div>
             <input type="number" id="budgetLimit" class="budget-limit" placeholder="Лимит" oninput="updateLimit()">
         </div>
+        <span class="total-quantity">Позиций: <span id="totalQuantityCount" class="totalQuantityCount" value="${ totalQuantity }">0</span> шт.</span>
     </div>
     </div>
     <div id="syncLoader" style="display:none;">⏳</div>
-</div>
+
 
 <div class="input-card">
     <div class="input-row-top">
@@ -95,7 +98,12 @@
             <div id="autocompleteList" class="autocomplete-suggestions"></div>
         </div>
         <div class="item-qty-wrapper">
-            <input type="number" id="itemQty" class="item-qty" placeholder="шт" value="1">
+            <input type="number" 
+            id="itemQty" 
+            class="item-qty" 
+            step="any" 
+            placeholder="шт" 
+            value="1">
         </div>
         <input type="number" id="itemPrice" class="inpPrice" placeholder="₽" step="0.01" min="0">
     </div>
@@ -146,5 +154,7 @@
 </footer>
 
 <script src="../burgerMenu/menu.js" defer></script>
+
+</div>
 </body>
 </html>
