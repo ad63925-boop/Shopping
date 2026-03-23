@@ -175,12 +175,16 @@ async function updateItemComment(itemId, comment) {
     const item = items.find(i => i.id === itemId);
     if (!item) return;
 
-    // Получаем текущее время
-  const currentTime = new Date().toTimeString().slice(0, 8);
+    let currentTime = null;
+
+    // Если комментарий не пустой, получаем текущее время
+    if (comment && comment.trim() !== '') {
+        currentTime = new Date().toTimeString().slice(0, 8);
+    }
 
     // Обновляем локальный объект
-    item.comment = comment;
-    item.commentTime = currentTime; // Сохраняем время отдельно
+    item.comment = comment && comment.trim() !== '' ? comment : '';
+    item.commentTime = currentTime; // Будет null, если комментарий пустой
 
     try {
         // Используем уже инициализированную базу данных
@@ -189,7 +193,7 @@ async function updateItemComment(itemId, comment) {
 
         // Обновляем только поле comment у конкретного товара
     await itemRef.update({
-      comment: comment,
+      comment: item.comment,
       commentTime: currentTime
     });
 
