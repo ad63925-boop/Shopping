@@ -11,7 +11,6 @@ body {
     border: 3px solid #08a609;
     border-bottom: none;
     margin-bottom: 30px;
-    
 }
 
 .container { width: 100%; 
@@ -19,12 +18,18 @@ body {
     margin-bottom: 40px;
 }
 
+.contents {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 368px;
+}
+
 .header-card, .input-card { 
     background: var(--surface); 
     padding: 5px; 
     border-radius: 16px; 
     margin-bottom: 5px; 
-    /* width: -webkit-fill-available; */
 }
 
 .header-card, .limit-ok {
@@ -51,9 +56,11 @@ body {
 }
 
 .name {
-     /* Может расти и сжиматься */
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
     width: 250px; /* Позволяет сжиматься при нехватке места */
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 500;
     background-color: white;
     padding: 2px;
@@ -67,8 +74,8 @@ body {
 }
 
 .item-details {
-    display: flex;
-    flex-wrap: nowrap; /* Элементы внутри могут переноситься */
+    display: flex; /* Элементы внутри могут переноситься */
+    flex-wrap: wrap;
     gap: 25px;
     align-items: center;
     width: 360px;
@@ -456,32 +463,13 @@ header {
 .shoppingLists {
     margin-bottom: 30px;
     transition: all 0.9s;
+    width: 368px;
 }
 
-@media (max-width: 400px) {
-    .shoppingLists, 
-    .header-card, 
-    .input-card {
-        width: calc(368px * 2);
+@media (min-width: 500px) {
+    .contents {
+        scale: 1.5;
     }
-
-    .item-name { 
-    width: 200px;
-}
-
-}
-
-@media (max-width: 500px) {
-    .shoppingLists, 
-    .header-card, 
-    .input-card {
-        width: 368px;
-    }
-
-    .item-names {
-    width: 390px;
-}
-
 }
 
 #cyncStatus {
@@ -594,6 +582,7 @@ input[type="checkbox"] {
     flex-direction: column;
     align-items: center;
     gap: 5px;
+    width: 360px;
 }
 
 .limits {

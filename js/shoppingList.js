@@ -55,7 +55,7 @@ function render() {
             <div class="item-total"> ${itemTotal} ₽</div>
             <button class="btnDel" onclick="deleteItem('${item.id}')">✕</button>
             <input type="checkbox" ${item.completed ? 'checked' : ''} onclick="toggleComplete('${item.id}')">
-            </div>
+            
 
             <!-- Поле для комментариев -->
             <div class="comment-wrapper">
@@ -72,6 +72,8 @@ function render() {
                     onkeydown="handleKeyPress(event, '${item.id}', this)">
                 </input>
                 <span class="save-status" id="status-${item.id}">✅</span>
+            </div>
+
             </div>
             `;
             listContainer.appendChild(div);
