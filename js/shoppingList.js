@@ -4,7 +4,9 @@ function render() {
     const totalSumEl = document.getElementById('totalSum');
     const headerCard = document.getElementById('headerCard');
     const limit = parseInt(document.getElementById('budgetLimit').value) || 0;
-    
+    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);// Расчёт общего количества товаров (сумма количеств всех позиций)
+
+  //Товары
     listContainer.innerHTML = '';
     let total = 0;
     let globalIndex = 1; // Глобальный счётчик для сквозной нумерации
@@ -82,6 +84,12 @@ function render() {
     }
 
     totalSumEl.innerText = total;
+
+      // Обновляем отображение общего количества в headerCard
+  const totalQuantityEl = document.getElementById('totalQuantityCount');
+  if (totalQuantityEl) {
+    totalQuantityEl.innerText = totalQuantity;
+  }
 
     // Логика цвета лимита
     if (limit > 0) {

@@ -112,6 +112,7 @@ body {
     outline: none;
     border: none;
     border-radius: 0;
+
     color: white;
     background-color: #4fa6ee;
 }
@@ -142,12 +143,6 @@ body {
     color: #666;
 }
 
-/* Для завершённых товаров */
-.item.completed .name {
-    text-decoration: line-through;
-    color: #999;
-}
-
 /* Улучшаем внешний вид чекбокса */
 .item input[type="checkbox"] {
     margin: 0;
@@ -171,8 +166,16 @@ body {
 }
 
 /*Перечёркнутый текст и серый фон*/
-.completed { opacity: 0.5; text-decoration: line-through; }
-        
+.completed { 
+    opacity: 0.5; 
+    text-decoration: line-through; 
+}
+
+.item.completed .name {
+  text-decoration: line-through;
+  color: #888; /* Опционально: меняем цвет текста для лучшей видимости зачёркивания */
+}
+
 input { 
     padding: 10px; 
     border: 1px solid black; 
@@ -184,6 +187,17 @@ input {
 		
 		.limit-ok { background-color: #e8f5e9 !important; transition: 0.3s; } /* Зеленый */
 .limit-over { background-color: deeppink !important; transition: 0.3s; } /* Красный */
+
+.total-quantity{
+    color: #08a609;
+    background-color: white;
+    padding: 0 5px;
+    border-radius: 3px;
+}
+
+.totalQuantityCount {
+    font-weight: bold;
+}
 
 /*Название категории*/
 .category-header { 
