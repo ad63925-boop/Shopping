@@ -5,9 +5,32 @@ function render() {
     const headerCard = document.getElementById('headerCard');
     const limit = parseInt(document.getElementById('budgetLimit').value) || 0;
     const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);// Расчёт общего количества товаров (сумма количеств всех позиций)
+    const summCheckedEl = document.getElementById('summChecked'); // Получаем элемент для суммы отмеченных
 
-  //Товары
+    //Товары
     listContainer.innerHTML = '';
+    
+  // Проверяем, есть ли товары в списке
+  if (items.length === 0) {
+    // Если товаров нет, показываем сообщение
+    listContainer.innerHTML = `<div class="emptuList">
+    <h2 class="empty-list-message">Список пуст!</h2>
+    <p>Добавьте товар пожалуйста!</p>
+    </div>
+    `;
+    totalSumEl.innerText = 0;
+    if (totalQuantityEl) totalQuantityEl.innerText = 0;
+    if (summCheckedEl) summCheckedEl.innerText = 0;
+
+    // Обновляем стили лимита (если лимит установлен)
+    if (limit > 0) {
+      headerCard.className = 'header-card limit-ok';
+    } else {
+      headerCard.className = 'header-card';
+    }
+    return; // Завершаем выполнение функции
+  }
+
     let total = 0;
     let globalIndex = 1; // Глобальный счётчик для сквозной нумерации
 
@@ -89,6 +112,12 @@ function render() {
   const totalQuantityEl = document.getElementById('totalQuantityCount');
   if (totalQuantityEl) {
     totalQuantityEl.innerText = totalQuantity;
+  }
+
+    // Обновляем сумму отмеченных товаров
+  if (summCheckedEl) {
+    const checkedSum = calculateCheckedSum();
+    summCheckedEl.innerText = checkedSum;
   }
 
     // Логика цвета лимита

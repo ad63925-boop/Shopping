@@ -321,10 +321,21 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Функции удаления и переключения (без изменений)
+// Отмеченные товары
 function toggleComplete(id) {
     const item = items.find(i => i.id === id);
     if (item) db.child(id).update({ completed: !item.completed });
+    calculateCheckedSum();
+}
+
+//Сумма отмесенных товаров
+function calculateCheckedSum() {
+  return items.reduce((sum, item) => {
+    if (item.completed) {
+      return sum + (item.price * item.quantity);
+    }
+    return sum;
+  }, 0);
 }
 
 //Удаление с подтверждением

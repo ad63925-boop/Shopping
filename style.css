@@ -195,17 +195,26 @@ input {
 		.limit-ok { background-color: #e8f5e9 !important; transition: 0.3s; } /* Зеленый */
 .limit-over { background-color: deeppink !important; transition: 0.3s; } /* Красный */
 
-.total-quantity{
+.total-quantity {
     color: #08a609;
     background-color: white;
     padding: 0 5px;
     border-radius: 3px;
 }
 
-.totalQuantityCount {
+.totalQuantityCount, .summChecked {
     font-weight: bold;
 }
 
+.summChecked {
+    border: 1px solid;
+    border-radius: 3px;
+    padding: 3px;
+}
+
+.checked-sum {
+    color: blue;
+}
 /*Название категории*/
 .category-header { 
     background: #ffc107a6; 
