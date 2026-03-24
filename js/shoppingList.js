@@ -36,8 +36,8 @@ function render() {
             <span class="item-number">${globalIndex++}.</span>
                 <span class="name">${item.name}</span>
         <div class="item-qty-wrapper">
-                        <input type="number"
-                    class="edit-qty-input"
+            <input type="number"
+            class="edit-qty-input"
             min="0"
             step="any"
             value="${item.quantity}"
