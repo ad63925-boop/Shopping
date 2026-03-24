@@ -510,6 +510,14 @@ header {
     width: 368px;
 }
 
+.emptuList {
+    text-align: center;
+}
+
+.smile {
+    font-size: 2rem;
+}
+
 @media (min-width: 500px) {
 
 }

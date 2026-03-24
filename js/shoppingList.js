@@ -15,6 +15,7 @@ function render() {
     // Если товаров нет, показываем сообщение
     listContainer.innerHTML = `<div class="emptuList">
     <h2 class="empty-list-message">Список пуст!</h2>
+    <p class="smile">🤷‍♂️</p>
     <p>Добавьте товар пожалуйста!</p>
     </div>
     `;
