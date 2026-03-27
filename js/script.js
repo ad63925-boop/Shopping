@@ -40,7 +40,6 @@ db.on("value", (snapshot) => {
 });
 
 //Выпадающий список категорий
-
 const customSelect = document.getElementById('customSelect');
 const trigger = customSelect.querySelector('.select-trigger');
 const options = customSelect.querySelectorAll('.option');
@@ -147,13 +146,15 @@ function addItem() {
     //проверка №2
     if (!itemName) return;
 
+    //Карточка товара
     const newItem = {
         id: Date.now().toString(),
         name: itemName,
         quantity: parseInt(qtyInput.value) || 1, // Добавляем количество (по умолчанию 1)
         price: parseInt(priceInput.value) || 0,
         category: catInput.value,
-        completed: false
+        completed: false,
+        time: new Date().toLocaleDateString()
     };
 
     // Сохраняем в историю: категорию и последнюю цену/количество для этого товара
@@ -170,7 +171,12 @@ function addItem() {
     qtyInput.value = ''; // Очищаем поле количества
 }
 
-//Комментарии к товарам
+//Клик по name показывает время добавления
+itemName.addEventListener('click', function() {
+    alert('Время добавления товара: '+ time);
+});
+
+//КОМЕНТАРИИ к товарам
 async function updateItemComment(itemId, comment) {
     const item = items.find(i => i.id === itemId);
     if (!item) return;
@@ -235,7 +241,7 @@ function handleCommentSave(itemId, input) {
     saveComment(itemId, input.value, input);
 }
 
-// Основная функция сохранения с индикацией статуса
+// Основная функция сохранения коментария с индикацией статуса
 async function saveComment(itemId, comment, input) {
     const statusEl = document.getElementById(`status-${itemId}`);
 
@@ -243,6 +249,7 @@ async function saveComment(itemId, comment, input) {
     if (statusEl) {
         statusEl.textContent = '💾';
         statusEl.className = 'save-status saving';
+        console.log('Коментарий сохранен');
     }
 
     try {
@@ -273,16 +280,16 @@ async function saveComment(itemId, comment, input) {
 }
 
 //Курсор слева при фокусе на комментарии
-function forceCursorToBeginning(input) {
+/*function forceCursorToBeginning(input) {
     // Даём браузеру обработать клик, затем перемещаем курсор
     setTimeout(() => {
         input.setSelectionRange(0, 0);
         input.focus();
     }, 0);
-}
+}*/
 
 
-// Функция выбора подсказки (не перемещать в ругое место, там есть зависимость от функции updateSuggestions)
+// Функция выбора подсказки (не перемещать в другое место, там есть зависимость от функции updateSuggestions)
 function selectSuggestion(name, cat, price, quantity) {
     nameInput.value = name.charAt(0).toUpperCase() + name.slice(1);
     
@@ -328,7 +335,7 @@ function toggleComplete(id) {
     calculateCheckedSum();
 }
 
-//Сумма отмесенных товаров
+//Сумма отмеченных товаров
 function calculateCheckedSum() {
   return items.reduce((sum, item) => {
     if (item.completed) {

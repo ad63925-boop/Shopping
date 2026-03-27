@@ -1,6 +1,4 @@
 // Валидация названия товара (запрет точки)
-
-
 function isValidItemName(name) {
     if (!name) return true; // Пустое поле — допустимо
 
