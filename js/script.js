@@ -180,23 +180,6 @@ function addItem() {
     qtyInput.value = ''; // Очищаем поле количества
 }
 
-// Обработчик клика по названию товара (делегирование событий)
-document.addEventListener('click', function(event) {
-    // Проверяем, был ли клик по элементу с классом 'name'
-    if (event.target.classList.contains('name')) {
-        // Получаем ID товара из data-атрибута
-        const productId = event.target.dataset.productId;
-
-        // Находим соответствующий блок времени по ID
-        const timeElement = document.getElementById(`times-${productId}`);
-
-        // Показываем блок времени
-        if (timeElement) {
-            timeElement.style.display = 'block';
-        }
-    }
-});
-
 //КОМЕНТАРИИ к товарам
 async function updateItemComment(itemId, comment) {
     const item = items.find(i => i.id === itemId);

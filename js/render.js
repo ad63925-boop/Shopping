@@ -101,7 +101,7 @@ function render() {
                     onblur="handleCommentSave('${item.id}', this)"
                     onkeydown="handleKeyPress(event, '${item.id}', this)">
                 </input>
-                <span class="save-status" id="status-${item.id}">✅</span>
+                <div class="save-status" id="status-${item.id}">✅</div>
             </div>
             <!-- Время с уникальным ID -->
                 <div class="times" id="times-${item.id}" style="display: block;">⏰${item.time}</div>
