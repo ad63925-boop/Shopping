@@ -150,11 +150,20 @@ function addItem() {
     const newItem = {
         id: Date.now().toString(),
         name: itemName,
-        quantity: parseInt(qtyInput.value) || 1, // Добавляем количество (по умолчанию 1)
-        price: parseInt(priceInput.value) || 0,
+        quantity: qtyInput.value || 1, // Добавляем количество (по умолчанию 1)
+        price: priceInput.value || 0,
         category: catInput.value,
         completed: false,
-        time: new Date().toLocaleDateString()
+        time: new Date().toLocaleString('ru-RU', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        }),
+        comment: '',
+        commentTime: null
     };
 
     // Сохраняем в историю: категорию и последнюю цену/количество для этого товара
@@ -171,9 +180,21 @@ function addItem() {
     qtyInput.value = ''; // Очищаем поле количества
 }
 
-//Клик по name показывает время добавления
-itemName.addEventListener('click', function() {
-    alert('Время добавления товара: '+ time);
+// Обработчик клика по названию товара (делегирование событий)
+document.addEventListener('click', function(event) {
+    // Проверяем, был ли клик по элементу с классом 'name'
+    if (event.target.classList.contains('name')) {
+        // Получаем ID товара из data-атрибута
+        const productId = event.target.dataset.productId;
+
+        // Находим соответствующий блок времени по ID
+        const timeElement = document.getElementById(`times-${productId}`);
+
+        // Показываем блок времени
+        if (timeElement) {
+            timeElement.style.display = 'block';
+        }
+    }
 });
 
 //КОМЕНТАРИИ к товарам

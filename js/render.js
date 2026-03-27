@@ -69,8 +69,7 @@ function render() {
             step="any"
             value="${item.quantity}"
             onchange="updateItemQuantity('${item.id}', this.value)">
-                <span class="unit">шт</span>
-            <span class="item-name" data-time="${item.time}">${item.name}</span>    
+                <span class="unit">шт</span>   
             </div>
         </div>        
                 <div class="item-details">
@@ -104,7 +103,8 @@ function render() {
                 </input>
                 <span class="save-status" id="status-${item.id}">✅</span>
             </div>
-
+            <!-- Время с уникальным ID -->
+                <div class="times" id="times-${item.id}" style="display: block;">⏰${item.time}</div>
             </div>
             `;
             listContainer.appendChild(div);
