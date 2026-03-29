@@ -117,6 +117,36 @@ window.addEventListener('click', (e) => {
     }
 });
 
+//Оповещение при удачном добавлении товара в ---function addItem() --- Должна оставаться тут, так как используется в других местах
+function showNotification(message, type = 'success') {
+    // Удаляем предыдущее уведомление, если есть
+    const existing = document.querySelector('.notification');
+    if (existing) {
+        existing.remove();
+    }
+
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    // Показываем уведомление
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+
+    // Автоматически скрываем через 3 секунды
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
 // Функция для добавления товара
 function addItem() {
     const nameInput = document.getElementById('itemName');
@@ -174,11 +204,22 @@ function addItem() {
     };
     historyDb.child(itemName.toLowerCase()).set(history[itemName.toLowerCase()]);
 
-    db.child(newItem.id).set(newItem);
-    nameInput.value = ''; 
-    priceInput.value = '';
-    qtyInput.value = ''; // Очищаем поле количества
+
+try {
+        db.child(newItem.id).set(newItem);
+        // Успешное оповещение
+        showNotification(`Товар "${itemName}" успешно добавлен!`, 'success');
+        // Очищаем поля ввода
+        nameInput.value = '';
+        priceInput.value = '';
+        qtyInput.value = '';
+    } catch (error) {
+        console.error('Ошибка при добавлении товара:', error);
+        // Оповещение об ошибке
+        showNotification('Не удалось добавить товар. Попробуйте ещё раз.', 'error');
+    }
 }
+
 
 //КОМЕНТАРИИ к товарам
 async function updateItemComment(itemId, comment) {
@@ -282,16 +323,6 @@ async function saveComment(itemId, comment, input) {
         }
     }
 }
-
-//Курсор слева при фокусе на комментарии
-/*function forceCursorToBeginning(input) {
-    // Даём браузеру обработать клик, затем перемещаем курсор
-    setTimeout(() => {
-        input.setSelectionRange(0, 0);
-        input.focus();
-    }, 0);
-}*/
-
 
 // Функция выбора подсказки (не перемещать в другое место, там есть зависимость от функции updateSuggestions)
 function selectSuggestion(name, cat, price, quantity) {
