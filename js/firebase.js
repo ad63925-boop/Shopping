@@ -59,16 +59,18 @@ function updateItemQuantity(id, newQuantity) {
 // Функция для обновления цены в Firebase
 function updateItemPrice(id, newPrice) {
     const price = parseInt(newPrice) || 0;
-    
-    // db — это ваша ссылка на firebase.database().ref("shopping_list")
-    db.child(id).update({ 
-        price: price 
+
+    db.child(id).update({
+        price: price
     }).then(() => {
+        showNotification("Цена успешно обновлена в облаке!", "success");
         console.log("Цена успешно обновлена в облаке");
     }).catch((error) => {
+        showNotification(`Ошибка обновления цены: ${error.message}`, "error");
         console.error("Ошибка обновления цены:", error);
     });
 }
+
 
 // Функция для обновления лимита в Firebase
 function updateLimit() {

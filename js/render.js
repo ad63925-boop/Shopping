@@ -4,7 +4,6 @@ function render() {
     const totalSumEl = document.getElementById('totalSum');
     const headerCard = document.getElementById('headerCard');
     const limit = parseInt(document.getElementById('budgetLimit').value) || 0;
-    const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);// Расчёт общего количества товаров (сумма количеств всех позиций)
     const summCheckedEl = document.getElementById('summChecked'); // Получаем элемент для суммы отмеченных
 
     //Товары
@@ -37,6 +36,12 @@ function render() {
 
     let total = 0;
     let globalIndex = 1; // Глобальный счётчик для сквозной нумерации
+
+        // РАСЧЁТ totalQuantity ПОСЛЕ ПРОВЕРКИ НА ПУСТОЙ СПИСОК
+    const totalQuantity = items.filter(item => item && typeof item.quantity !== 'undefined' && !item.deleted).reduce((sum, item) => {
+            const qty = Number(item.quantity);
+            return sum + (isNaN(qty) ? 0 : qty);
+        }, 0);
 
     // Группировка по категориям
     const groups = items.reduce((acc, item) => {
@@ -72,13 +77,14 @@ function render() {
                 <span class="unit">шт</span>   
             </div>
         </div>        
-                <div class="item-details">
+            <div class="item-details">
             <div class="item-price-wrapper">
-                <input type="number" 
-            class="edit-price-input" 
+            <input type="number" 
+            class="edit-price-input"
+            min="0";
+            step="0.01" 
             value="${item.price}" 
-            onchange="updateItemPrice('${item.id}', this.value)"
-            oninput="this.style.width = ((this.value.length + 1) * 8) + 'px'">
+            onchange="updateItemPrice('${item.id}', this.value)">
                 <span class="currency">руб/шт. </span>
             </div>
 
