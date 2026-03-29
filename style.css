@@ -215,6 +215,7 @@ input {
 
 .checked-sum {
     color: blue;
+    background-color: white;
 }
 /*Название категории*/
 .category-header { 
@@ -691,6 +692,7 @@ input[type="checkbox"] {
     text-align: center;
     color: #dd4646;
     margin-left: 5px;
+    box-shadow: 2px 2px 2px;
 }
 
 .save-status {

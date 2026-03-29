@@ -49,9 +49,11 @@ function updateItemQuantity(id, newQuantity) {
     db.child(id).update({
         quantity: quantity
     }).then(() => {
+        showNotification("Количество успешно обновлено в облаке!", "success");
         console.log("Количество успешно обновлено в облаке");
         render(); // Перерисовываем список после обновления
     }).catch((error) => {
+        showNotification(`Ошибка обновления количества: ${error.message}`, "error");
         console.error("Ошибка обновления количества:", error);
     });
 }
