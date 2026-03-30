@@ -247,7 +247,7 @@ async function updateItemComment(itemId, comment) {
       comment: item.comment,
       commentTime: currentTime
     });
-
+        showNotification(`Комментарий успешно сохранён!`, 'success');
         console.log('Комментарий успешно сохранён в Firebase Realtime Database');
 
         // Опционально: обновляем статус синхронизации
@@ -255,6 +255,7 @@ async function updateItemComment(itemId, comment) {
             "● Обновлено " + new Date().toLocaleTimeString();
 
     } catch (error) {
+        showNotification('Не удалось сохранить комментарий. Попробуйте ещё раз.', 'error');
         console.error('Ошибка при сохранении комментария в Firebase:', error);
 
         // Резервное сохранение в localStorage на случай проблем с сетью
@@ -266,8 +267,10 @@ async function updateItemComment(itemId, comment) {
 function saveToLocalStorage() {
     try {
         localStorage.setItem('shoppingList', JSON.stringify(items));
+        showNotification('Данные сохранены в localStorage:', 'success');
         console.log('Данные сохранены в localStorage как fallback');
     } catch (e) {
+        showNotification('Не удалось сохранить в localStorage:', 'error');
         console.error('Не удалось сохранить в localStorage:', e);
     }
 }
