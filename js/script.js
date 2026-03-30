@@ -209,6 +209,7 @@ try {
         db.child(newItem.id).set(newItem);
         // Успешное оповещение
         showNotification(`Товар "${itemName}" успешно добавлен!`, 'success');
+        console.success('Товар успешно добавлен:', newItem);
         // Очищаем поля ввода
         nameInput.value = '';
         priceInput.value = '';
