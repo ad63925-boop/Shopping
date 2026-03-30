@@ -232,6 +232,7 @@ async function updateItemComment(itemId, comment) {
     // Если комментарий не пустой, получаем текущее время
     if (comment && comment.trim() !== '') {
         currentTime = new Date().toTimeString().slice(0, 8);
+        
     }
 
     // Обновляем локальный объект
@@ -250,7 +251,6 @@ async function updateItemComment(itemId, comment) {
     });
         showNotification(`Комментарий успешно сохранён!`, 'success');
         console.log('Комментарий успешно сохранён в Firebase Realtime Database');
-
         // Опционально: обновляем статус синхронизации
         document.getElementById('syncStatus').innerText =
             "● Обновлено " + new Date().toLocaleTimeString();
@@ -310,6 +310,7 @@ async function saveComment(itemId, comment, input) {
 
         // Показываем успех
         if (statusEl) {
+            showNotification('Комментарий успешно сохранён!', 'success');
             statusEl.textContent = '👍';
             statusEl.className = 'save-status saved';
 
@@ -320,7 +321,8 @@ async function saveComment(itemId, comment, input) {
             }, 2000);
         }
     } catch (error) {
-        console.error('Ошибка сохранения:', error);
+        showNotification('Ошибка сохранения комментария:', 'error');
+        console.error('Ошибка сохранениякомментария:', error);
         if (statusEl) {
             statusEl.textContent = '❗️';
             statusEl.style.color = '#dc3545';
