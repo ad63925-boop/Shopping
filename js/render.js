@@ -38,10 +38,10 @@ function render() {
     let globalIndex = 1; // Глобальный счётчик для сквозной нумерации
 
         // РАСЧЁТ totalQuantity ПОСЛЕ ПРОВЕРКИ НА ПУСТОЙ СПИСОК
-    const totalQuantity = items.filter(item => item && typeof item.quantity !== 'undefined' && !item.deleted).reduce((sum, item) => {
-            const qty = Number(item.quantity);
-            return sum + (isNaN(qty) ? 0 : qty);
-        }, 0);
+    const totalQuantity = Math.round(items.filter(item => item && typeof item.quantity !== 'undefined' && !item.deleted).reduce((sum, item) => {
+        const qty = Number(item.quantity);
+        return sum + (isNaN(qty) ? 0 : qty);
+    }, 0));
 
     // Группировка по категориям
     const groups = items.reduce((acc, item) => {
@@ -128,7 +128,7 @@ function render() {
     // Обновляем сумму отмеченных товаров
   if (summCheckedEl) {
     const checkedSum = calculateCheckedSum();
-    summCheckedEl.innerText = checkedSum;
+    summCheckedEl.innerText = checkedSum.toFixed(2);
   }
 
     // Логика цвета лимита

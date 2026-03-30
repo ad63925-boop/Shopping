@@ -44,8 +44,8 @@ function updateSuggestions() {
 
 // Функция для обновления количества в Firebase
 function updateItemQuantity(id, newQuantity) {
-    const quantity = parseFloat(newQuantity) || 0; // По умолчанию 0, если ввод некорректный
-
+    const quantity = parseFloat(newQuantity) || 1; // По умолчанию 1, если ввод некорректный
+    
     db.child(id).update({
         quantity: quantity
     }).then(() => {
