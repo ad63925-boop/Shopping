@@ -58,8 +58,8 @@ function render() {
         listContainer.appendChild(catDiv);
 
         groups[cat].forEach(item => {
-            const itemTotal = item.price * item.quantity; // Расчёт общей стоимости товара
-            total += itemTotal;
+        const itemTotal = parseFloat((item.price * item.quantity).toFixed(2));
+        total += itemTotal;
 
             const div = document.createElement('div');
             div.className = `item ${item.completed ? 'completed' : ''}`;
@@ -70,8 +70,8 @@ function render() {
         <div class="item-qty-wrapper">
             <input type="number"
             class="edit-qty-input"
-            min="0"
-            step="any"
+            min="0.01"
+            step="0.01"
             value="${item.quantity}"
             onchange="updateItemQuantity('${item.id}', this.value)">
                 <span class="unit">шт</span>   
@@ -81,7 +81,7 @@ function render() {
             <div class="item-price-wrapper">
             <input type="number" 
             class="edit-price-input"
-            min="0";
+            min="0.01"
             step="0.01" 
             value="${item.price}" 
             onchange="updateItemPrice('${item.id}', this.value)">

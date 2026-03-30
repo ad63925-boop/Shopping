@@ -44,7 +44,7 @@ function updateSuggestions() {
 
 // Функция для обновления количества в Firebase
 function updateItemQuantity(id, newQuantity) {
-    const quantity = parseInt(newQuantity) || 1; // По умолчанию 1
+    const quantity = parseFloat(newQuantity) || 0; // По умолчанию 0, если ввод некорректный
 
     db.child(id).update({
         quantity: quantity
@@ -60,18 +60,30 @@ function updateItemQuantity(id, newQuantity) {
 
 // Функция для обновления цены в Firebase
 function updateItemPrice(id, newPrice) {
-    const price = parseInt(newPrice) || 0;
+    // Преобразуем в число и проверяем на корректность
+    const numericInput = parseFloat(newPrice);
+
+    // Если не число или отрицательное — устанавливаем 0
+    if (isNaN(numericInput) || numericInput < 0) {
+        showNotification("Ошибка: введите корректную положительную цену", "error");
+        return;
+    }
+
+    // Округление до сотых
+    const price = Math.round(numericInput * 100) / 100;
 
     db.child(id).update({
         price: price
     }).then(() => {
-        showNotification("Цена успешно обновлена в облаке!", "success");
-        console.log("Цена успешно обновлена в облаке");
+        // Показываем округлённую цену в уведомлении
+        showNotification(`Цена ${price.toFixed(2)} ₽ успешно обновлена в облаке!`, "success");
+        console.log(`Цена успешно обновлена: ${price}`);
     }).catch((error) => {
         showNotification(`Ошибка обновления цены: ${error.message}`, "error");
         console.error("Ошибка обновления цены:", error);
     });
 }
+
 
 
 // Функция для обновления лимита в Firebase
