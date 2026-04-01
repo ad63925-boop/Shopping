@@ -40,14 +40,12 @@ body {
     border: 1px solid #b2ebf2;
 }
 
-.user-name {
+.user-name, .user-email {
     font-size: 1.1rem;
-    color: #333;
-}
-
-.user-email {
-    font-size: 0.9rem;
-    color: #666;
+    color: #4CAF50;
+    font-style: normal;
+    font-family: auto;
+    text-shadow: none;
 }
 
 .container { width: 100%; 

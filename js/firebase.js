@@ -94,67 +94,7 @@ function setupDatabaseListeners(userId) {
     comments: [],
     checkedItems: new Set()
   };
-
-  // Общий слушатель для всех данных пользователя
-  const userRef = ref(db, `users/${userId}`);
-  onValue(userRef, (snapshot) => {
-    if (snapshot.exists()) {
-      const currentData = snapshot.val();
-      const currentList = currentData.shoppingList || [];
-      const currentComments = currentData.comments || [];
-      const currentChecked = new Set(currentData.checkedItems || []);
-
-      // 1. Оповещение о добавлении нового товара
-      if (currentList.length > previousState.shoppingList.length) {
-        const newItem = currentList[currentList.length - 1];
-        showNotification(`Добавлен товар: ${newItem}`, 'success', 3000);
-      }
-
-      // 2. Оповещение об удалении товара
-      if (currentList.length < previousState.shoppingList.length) {
-        showNotification('Товар удалён из списка', 'warning', 3000);
-      }
-
-      // 3.Оповещение об изменении комментария
-      if (currentComments.length !== previousState.comments.length) {
-        if (currentComments.length > previousState.comments.length) {
-          const newComment = currentComments[currentComments.length - 1];
-          showNotification(`Новый комментарий: ${newComment}`, 'info', 3000);
-        } else {
-          showNotification('Комментарий удалён', 'warning', 3000);
-        }
-      } else if (currentComments.length > 0) {
-        // Если длина та же, но содержимое изменилось
-        const lastCommentChanged = currentComments[currentComments.length - 1] !==
-                     previousState.comments[previousState.comments.length - 1];
-        if (lastCommentChanged) {
-          showNotification('Комментарий изменён', 'info', 3000);
-        }
-      }
-
-      // 4.Оповещение о отмеченном товаре (выбран)
-      for (const item of currentChecked) {
-        if (!previousState.checkedItems.has(item)) {
-          showNotification(`Товар отмечен: ${item}`, 'info', 2000);
-        }
-      }
-
-      // Обновляем предыдущее состояние
-      previousState = {
-        shoppingList: currentList,
-        comments: currentComments,
-        checkedItems: currentChecked
-      };
-
-      // Оповещение о смене аватара
-      if (currentData.picture && currentData.picture !== localStorage.getItem('lastAvatar')) {
-        showNotification('Аватар обновлён', 'success', 2000);
-        localStorage.setItem('lastAvatar', currentData.picture);
-      }
-    }
-  });
 }
-
 
 // Функция для обновления лимита в Firebase
 function updateLimit() {
