@@ -190,7 +190,8 @@ function updateUIAfterLogin(user) {
   const userInfo = createSafeElement('div',{},[`🛒Список покупок🛍️`]);
   userInfo.className = 'user-info';
   const name = createSafeElement('div', {
-      }, [`Добро пожаловать, ${user.name}!`]);
+      }, [`Добро пожаловать!`]);
+      console.log('Пользователь:', name.textContent);
   name.className = 'user-name';
   const email = createSafeElement('div', {
   }, [user.email]);
@@ -217,6 +218,9 @@ function updateUIAfterLogin(user) {
   if (signInBtn) {
     signInBtn.style.display = 'none';
     shoppingList.style.display = 'block';
+    visit.style.display = 'none';
+  } else {
+    visit.style.display = 'block';
   }  
 }
 

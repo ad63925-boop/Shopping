@@ -242,9 +242,16 @@ input {
     position: absolute;
     left: 2px;
 }
-		
-		.limit-ok { background-color: #e8f5e9 !important; transition: 0.3s; } /* Зеленый */
-.limit-over { background-color: deeppink !important; transition: 0.3s; } /* Красный */
+
+.limit-ok { 
+    background-color: #e8f5e9 !important; 
+    transition: 0.3s; 
+} /* Зеленый */
+
+.limit-over { 
+    background-color: deeppink !important; 
+    transition: 0.3s; 
+} /* Красный */
 
 .total-quantity {
     color: #08a609;
