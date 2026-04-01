@@ -433,4 +433,5 @@ function deleteItem(id) {
 document.addEventListener('DOMContentLoaded', () => {
   loadGoogleAuthScript();
   checkAuthOnLoad();
+  setupGlobalChangeListener()
 });
