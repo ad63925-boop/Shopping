@@ -36,7 +36,7 @@ db.on("value", (snapshot) => {
     items = data ? Object.values(data) : [];
     render();
     updateSuggestions();
-    document.getElementById('syncStatus').innerText = "● Обновлено " + new Date().toLocaleTimeString();
+    document.getElementById('syncStatus').innerText = "● Обновлено: " + new Date().toLocaleTimeString();
 });
 
 //Выпадающий список категорий

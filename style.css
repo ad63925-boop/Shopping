@@ -18,9 +18,50 @@ body {
     color: #1f2937;
 }
 
+.profile-container {
+    background-color: #e0f7fa;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #b2ebf2;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.profile-container img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #b2ebf2;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border: 1px solid #b2ebf2;
+}
+
+.user-name {
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.user-email {
+    font-size: 0.9rem;
+    color: #666;
+}
+
 .container { width: 100%; 
     max-width: 500px; 
     margin-bottom: 40px;
+}
+.visiteSite {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #34a853;
+    margin: 10px;
+    border: 3px solid #34a853;
+    border-radius: 8px;
+    padding: 10px;
 }
 
 .contents {
@@ -91,7 +132,6 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 360px;
     border-bottom: 1px solid black;
 }
 
@@ -190,8 +230,18 @@ input {
     border-radius: 8px; 
 }
         
-.status-sync { font-size: 0.7rem; color: #34a853; background-color: white;
-        border-radius: 5px; text-align: center; margin-bottom: 10px; padding: 3px;}
+.status-sync { 
+    font-size: 0.7rem; 
+    color: #34a853; 
+    background-color: white;
+    border: 1px solid #34a853;
+    border-radius: 5px; 
+    text-align: center; 
+    margin-bottom: 10px; 
+    padding: 3px;
+    position: absolute;
+    left: 2px;
+}
 		
 		.limit-ok { background-color: #e8f5e9 !important; transition: 0.3s; } /* Зеленый */
 .limit-over { background-color: deeppink !important; transition: 0.3s; } /* Красный */
@@ -264,7 +314,7 @@ input {
 /* Поле, на которое нажимаем */
 .select-trigger {
     background: #fff;
-    padding: 12px;
+    padding: 10px;
     border: 1px solid #ddd;
     border-radius: 8px;
     cursor: pointer;
@@ -318,12 +368,14 @@ input {
 .option {
     padding: 12px;
     cursor: pointer;
-    transition: background 0.2s;
+    border-bottom: 1px solid #333;
+    transition: background 0.5s;
 }
 
 .option:hover {
     background: #f0ebff;
     color: var(--primary);
+    background-color: #2196F3;
 }
 
 .autocomplete-suggestions {
@@ -399,7 +451,7 @@ input {
 
 .input-row-top input {
     padding: 6px;
-    border: 1px solid #000000;
+    border: 1px solid #4CAF50;
     border-radius: 8px;
     outline: none;
 }
@@ -465,9 +517,9 @@ footer{
 
 header {
     position: sticky;
-    top: -10px;
+    top: -300px;
     padding: 5px;
-    z-index: 100;
+    z-index: 0;
     color: lightgreen;
     text-decoration: underline;
     text-shadow: 2px 2px 4px black;
@@ -515,9 +567,14 @@ header {
 }
 
 .shoppingLists {
+    display: none;
     margin-bottom: 50px;
     transition: all 0.9s;
     width: 368px;
+}
+
+.visible {
+    display: block;
 }
 
 .emptuList {
@@ -649,10 +706,10 @@ input[type="checkbox"] {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: white;
+  background: #b2f5b4;
   border: 1px solid #ddd;
-  color: #333;
-  padding: 12px 24px;
+  padding: 3px;
+  margin: 10px;
   border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
@@ -660,13 +717,14 @@ input[type="checkbox"] {
 }
 
 .google-btn:hover {
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  transform: translateY(-1px);
+    background: #08a609;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
+    padding: 3px;
 }
 
 .google-auth {
-    background-color: silver;
-    margin: 3px;
+    margin: 10px;
 }
 
 .total-limit {
