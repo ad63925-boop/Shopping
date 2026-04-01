@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <!-- V_5 -->
+    <!-- Авторизация -->
     <meta charset="UTF-8">
     <title>Список продуктов</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,17 +47,9 @@
   </div>
 </div>
 
-<div class="status-sync" id="syncStatus">
-    <i class="fa-solid fa-arrows-rotate sync-spin"></i>
-    Синхронизация
-</div>
 
- <div class="google-auth">
-  <button id="googleSignIn" class="google-btn">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google logo" width="20">
-    Войти через Google
-  </button>
-</div>
+
+
 
 
 <!-- Форма входа для php
@@ -79,6 +71,10 @@
 <div class="header-card" id="headerCard">
     
     <div class="total-limit">
+    <div class="status-sync" id="syncStatus">
+    <i class="fa-solid fa-arrows-rotate sync-spin"></i>
+    Синхронизация
+    </div>
         <span >Итого / Лимит</span>
         <div class="limits">
             <div><span id="totalSum">0</span> ₽</div>
@@ -87,9 +83,9 @@
         <span class="total-quantity">Всего позиций: <span id="totalQuantityCount" class="totalQuantityCount" value="${ totalQuantity }">0</span>
         <span class="checked-sum"> || Выбрано на: <span id="summChecked" class="summChecked">0</span> руб.</span></span>
     </div>
-    </div>
-    <div id="syncLoader" style="display:none;">⏳</div>
+</div>
 
+    <div id="syncLoader" style="display:none;">⏳</div>
 
 <div class="input-card">
     <div class="input-row-top">
@@ -151,8 +147,16 @@
 
     <button class="add-btn" onclick="addItem()">Добавить</button>
 </div>
-
+    <div id="visit" class="visiteSite">Добрый день!<br>Для того чобы увидеть список неоходимо авторизоваться...</div> 
     <div id="shoppingList" class="shoppingLists"></div>
+
+    <div class="google-auth">
+        <button id="googleSignIn" class="google-btn">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google logo" width="20">
+        Войти через Google
+        </button>
+    </div>
+
     <div id="notification" class="notification"></div>
 </div>
 
