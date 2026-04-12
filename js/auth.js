@@ -215,7 +215,7 @@ function updateUIAfterLogin(user) {
 
   // Скрываем кнопку входа
   const signInBtn = document.getElementById('googleSignIn');
-  if (signInBtn) {
+  if (signInBtn && user.email === 'ad63925@gmail.com') {
     signInBtn.style.display = 'none';
     shoppingList.style.display = 'block';
     visit.style.display = 'none';
