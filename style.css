@@ -105,7 +105,7 @@ body {
     display: flex;
     flex-wrap: wrap;
     align-content: center;
-    width: 250px; /* Позволяет сжиматься при нехватке места */
+    width: 240px; /* Позволяет сжиматься при нехватке места */
     font-size: 1.25rem;
     font-weight: 500;
     background-color: white;
