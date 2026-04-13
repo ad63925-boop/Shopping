@@ -138,6 +138,7 @@ function render() {
         headerCard.className = 'header-card';
     }
 
+// Функция для отображения информации о пользователе в header    
 function updateHeaderStyle() {
     const headerCard = document.getElementById('headerCard');
     if (!headerCard) return;

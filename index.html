@@ -72,9 +72,12 @@
 <div class="header-card" id="headerCard">
     
     <div class="total-limit">
+    <div class="lefts">    
     <div class="status-sync" id="syncStatus">
     <i class="fa-solid fa-arrows-rotate sync-spin"></i>
     Синхронизация
+    </div>
+    <button class="btnLog" onclick="showLogs()">Журнал</button>
     </div>
         <div class="limits">
             <label class="total-summ-label">Итого / Лимит</label><br>
@@ -156,6 +159,8 @@
     <div id="visit" class="visiteSite">Добрый день!<br>Для того чобы увидеть список неоходимо авторизоваться...</div> 
     <div id="shoppingList" class="shoppingLists"></div>
 
+    <div id="logsContainer" class="logs-container" style="display:none;"></div>
+    
     <div class="google-auth">
         <button id="googleSignIn" class="google-btn">
         <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google logo" width="20">

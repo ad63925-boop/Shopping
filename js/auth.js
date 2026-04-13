@@ -221,7 +221,9 @@ function updateUIAfterLogin(user) {
     visit.style.display = 'none';
   } else {
     visit.style.display = 'block';
-  }  
+  }
+  
+  addLog("Вошел в аккаунт: " + user.email);
 }
 
 // Выход из аккаунта

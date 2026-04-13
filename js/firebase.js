@@ -51,6 +51,7 @@ function updateItemQuantity(id, newQuantity) {
     }).then(() => {
         showNotification("Количество успешно обновлено в облаке!", "success");
         console.log("Количество успешно обновлено в облаке");
+        addLog(`Количество обновлено: ${quantity}`);
         render(); // Перерисовываем список после обновления
     }).catch((error) => {
         showNotification(`Ошибка обновления количества: ${error.message}`, "error");
@@ -78,6 +79,7 @@ function updateItemPrice(id, newPrice) {
         // Показываем округлённую цену в уведомлении
         showNotification(`Цена ${price} ₽ успешно обновлена в облаке!`, "success");
         console.log(`Цена успешно обновлена: ${price}`);
+        addLog(`Цена обновлена: ${price}`);
     }).catch((error) => {
         showNotification(`Ошибка обновления цены: ${error.message}`, "error");
         console.error("Ошибка обновления цены:", error);
@@ -100,6 +102,7 @@ function setupDatabaseListeners(userId) {
 function updateLimit() {
     const limit = document.getElementById('budgetLimit').value;
     settingsDb.update({ limit: parseInt(limit) || 0 });
+    addLog("Лимит обновлен: " + limit);
 }
 
 

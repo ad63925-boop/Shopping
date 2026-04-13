@@ -107,6 +107,7 @@ options.forEach(option => {
         
         // Закрываем список
         customSelect.classList.remove('active');
+
     });
 });
 
@@ -218,6 +219,8 @@ try {
         // Оповещение об ошибке
         showNotification('Не удалось добавить товар. Попробуйте ещё раз.', 'error');
     }
+    
+    addLog("Добавлен товар: " + itemName);
 }
 
 
@@ -261,6 +264,7 @@ async function updateItemComment(itemId, comment) {
         // Резервное сохранение в localStorage на случай проблем с сетью
         saveToLocalStorage();
     }
+    addLog("Комментарий обновлён: " + comment);
 }
 
 //Вспомогательная функция резервного сохранения в localStorage при проблемах с сетью
@@ -359,6 +363,7 @@ function deleteFromHistory(name) {
     
     // Поле ввода само обновится, так как сработает слушатель historyDb.on("value")
     nameInput.dispatchEvent(new Event('input')); 
+    addLog("Удален товар из истории: " + name);
 }
 
 // Закрытие при клике мимо
@@ -427,6 +432,7 @@ function deleteItem(id) {
         });
     }
 });
+addLog("Удален товар: " + itemName);
 }
 
 // Запуск при загрузке страницы
