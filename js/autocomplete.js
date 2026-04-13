@@ -19,9 +19,9 @@ nameInput.addEventListener('focus', () => {
                     <span class="suggestion-name">${name.charAt(0).toUpperCase() + name.slice(1)}</span>
                     <span class="suggestion-cat">${category}</span>
             ${lastPrice ? `<span class="suggestion-price">(${lastPrice} ₽)</span>` : ''}
-            ${lastQuantity ? `<span class="suggestion-qty">×${lastQuantity} шт.</span>` : ''}
+            ${lastQuantity ? `<span class="suggestion-qty">${lastQuantity}</span>` : ''}
                 </div>
-                <span class="suggestion-delete" onclick="deleteFromHistory('${name}')">×</span>
+                <span class="suggestion-delete" onclick="deleteFromHistory('${name}')">X</span>
             `;
             div.onclick = (e) => {
                 if (!e.target.classList.contains('suggestion-delete')) {

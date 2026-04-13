@@ -76,13 +76,18 @@
     <i class="fa-solid fa-arrows-rotate sync-spin"></i>
     Синхронизация
     </div>
-        <span >Итого / Лимит</span>
         <div class="limits">
-            <div><span id="totalSum">0</span> ₽</div>
+            <label class="total-summ-label">Итого / Лимит</label><br>
+            <div class="total-summ">
+            <span id="totalSum">0</span> ₽</div>
             <input type="number" id="budgetLimit" class="budget-limit" placeholder="Лимит" oninput="updateLimit()">
+            <div class="weekSumm">
+                <input type="number" id="weekLimit" class="week-limit" placeholder="сумма">
+                <div id="limitOfWeek" class="limit-of-week">0<span> ₽</span></div>
+            </div>        
         </div>
         <span class="total-quantity">Всего позиций: <span id="totalQuantityCount" class="totalQuantityCount" value="${ totalQuantity }">0</span>
-        <span class="checked-sum"> || Выбрано на: <span id="summChecked" class="summChecked">0</span> руб.</span></span>
+        <span class="checked-sum">Сумма: <span id="summChecked" class="summChecked">0</span> руб.</span></span>
     </div>
 </div>
 

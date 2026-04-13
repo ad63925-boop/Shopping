@@ -36,7 +36,7 @@ db.on("value", (snapshot) => {
     items = data ? Object.values(data) : [];
     render();
     updateSuggestions();
-    document.getElementById('syncStatus').innerText = "● Обновлено: " + new Date().toLocaleTimeString();
+    document.getElementById('syncStatus').innerText = "Обновлено: " + new Date().toLocaleTimeString();
 });
 
 //Выпадающий список категорий
@@ -79,7 +79,7 @@ function updateSuggestions() {
                     <span class="suggestion-name">${name.charAt(0).toUpperCase() + name.slice(1)}</span>
             <span class="suggestion-cat">${category}</span>
             ${lastPrice ? `<span class="suggestion-price">(${lastPrice} ₽)</span>` : ''}
-            ${lastQuantity ? `<span class="suggestion-qty">×${lastQuantity} шт.</span>` : ''}
+            ${lastQuantity ? `<span class="suggestion-qty">${lastQuantity}</span>` : ''}
                 </div>
                 <span class="suggestion-delete" onclick="deleteFromHistory('${name}')">×</span>
             `;
@@ -252,7 +252,7 @@ async function updateItemComment(itemId, comment) {
         console.log('Комментарий успешно сохранён в Firebase Realtime Database');
         // Опционально: обновляем статус синхронизации
         document.getElementById('syncStatus').innerText =
-            "● Обновлено " + new Date().toLocaleTimeString();
+            "Обновлено " + new Date().toLocaleTimeString();
 
     } catch (error) {
         showNotification('Не удалось сохранить комментарий. Попробуйте ещё раз.', 'error');
