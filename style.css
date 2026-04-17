@@ -509,8 +509,7 @@ input {
     color: white;
     border: none;
     padding: 10px 15px;
-    margin: 5px;
-    border-radius: 8px;
+    margin-top: 5px;
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
