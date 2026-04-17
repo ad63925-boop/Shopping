@@ -184,20 +184,23 @@ window.addEventListener('scroll', updateHeaderStyle);
 }
 
 //Переключене на другой список (например, отложенные покупки)
+var btnToggleList = document.getElementById('btnToggleList');
+
+btnToggleList.addEventListener('click', toggleList);
+
 function toggleList() {
+    const listNames = {
+    shoppingList: "🛒 Основной список",
+    deferredList: "📦 Отложенные покупки"
+};
+
     if (currentList === "shoppingList") {
         currentList = "deferredList"; // ✅ правильно
     } else {
         currentList = "shoppingList";
     }
 
+document.getElementById('btnToggleList').innerText = listNames[currentList];
+
     render();
-
-const listNames = {
-    shoppingList: "🛒 Основной список",
-    deferredList: "📦 Отложенные покупки"
-};
-
-document.getElementById('syncStatus').innerText =
-    "Список: " + listNames[currentList];
 }

@@ -33,10 +33,11 @@ historyDb.on("value", (snapshot) => {
 });
 
 // Загрузка лимита из облака
-settingsgetDb().child('limit').on('value', (snapshot) => {
+settingsDb.child('limit').on('value', (snapshot) => {
     const limit = snapshot.val() || 0;
     document.getElementById('budgetLimit').value = limit;
     render();
+    sunsStatus();
 });
 
 //Выпадающий список категорий
@@ -203,7 +204,7 @@ function addItem() {
         lastPrice: newItem.price,
         lastQuantity: newItem.quantity
     };
-    //historygetDb().child(itemName.toLowerCase()).set(history[itemName.toLowerCase()]);
+    historygetDb().child(itemName.toLowerCase()).set(history[itemName.toLowerCase()]);
 
 
 try {
@@ -281,8 +282,7 @@ async function updateItemComment(itemId, comment) {
         showNotification(`Комментарий успешно сохранён!`, 'success');
         console.log('Комментарий успешно сохранён в Firebase Realtime Database');
         // Опционально: обновляем статус синхронизации
-        document.getElementById('syncStatus').innerText =
-            "Обновлено " + new Date().toLocaleTimeString();
+        sunsStatus();
 
     } catch (error) {
         showNotification('Не удалось сохранить комментарий. Попробуйте ещё раз.', 'error');
@@ -462,6 +462,16 @@ function deleteItem(id) {
 addLog("Удален товар: " + itemName);
 }
 
+//Обновление статуса синхронизации
+function sunsStatus() {
+  const statusElement = document.getElementById('syncStatus');
+  if (!statusElement) return;
+
+  statusElement.textContent = "Синхронизировано: " +
+    new Date().toLocaleTimeString();
+}
+
+
 // Запуск при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
   loadGoogleAuthScript();
@@ -469,5 +479,4 @@ document.addEventListener('DOMContentLoaded', () => {
   setupGlobalChangeListener();
   render();
   updateSuggestions();
-  document.getElementById('syncStatus').innerText = "Синхронизировано: " + new Date().toLocaleTimeString();
 });

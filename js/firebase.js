@@ -155,7 +155,7 @@ function updateDailyLimitDisplay(weekLimitValue) {
         return;
     }
     const remainingDays = getRemainingDays();
-    console.log('Оставшиеся дни до конца недели:', remainingDays);
+    //console.log('Оставшиеся дни до конца недели:', remainingDays);
     if (remainingDays === 0) {
         limitOfWeekOutput.textContent = weekLimitValue + ' ₽';
         return;

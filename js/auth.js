@@ -191,7 +191,7 @@ function updateUIAfterLogin(user) {
   userInfo.className = 'user-info';
   const name = createSafeElement('div', {
       }, [`Добро пожаловать!`]);
-      console.log('Пользователь:', name.textContent);
+      //console.log('Пользователь:', name.textContent);
   name.className = 'user-name';
   const email = createSafeElement('div', {
   }, [user.email]);
@@ -218,6 +218,7 @@ function updateUIAfterLogin(user) {
   if (signInBtn && user.email === 'ad63925@gmail.com') {
     signInBtn.style.display = 'none';
     shoppingList.style.display = 'block';
+    currentList = "deferredList";
     visit.style.display = 'none';
   } else {
     visit.style.display = 'block';
