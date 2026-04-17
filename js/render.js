@@ -7,7 +7,7 @@ function render() {
 
     ref.on("value", snapshot => {
     
-        const items = [];
+         items = [];
 
     snapshot.forEach(child => {
         items.push({
@@ -145,6 +145,8 @@ function render() {
   if (summCheckedEl) {
     const checkedSum = calculateCheckedSum();
     summCheckedEl.innerText = checkedSum.toFixed(2);
+    console.log('Отмечено');
+    deletCheced.style.display = checkedSum > 0 ? 'block' : 'none'; // Показываем кнопку удаления только если есть отмеченные товары
   }
 
     // Логика цвета лимита
@@ -183,24 +185,24 @@ window.addEventListener('scroll', updateHeaderStyle);
 
 }
 
-//Переключене на другой список (например, отложенные покупки)
+//Переключене на другой список (например, доп список)
 var btnToggleList = document.getElementById('btnToggleList');
 
 btnToggleList.addEventListener('click', toggleList);
 
 function toggleList() {
     const listNames = {
-    shoppingList: "🛒 Основной список",
-    deferredList: "📦 Отложенные покупки"
-};
+        shoppingList: "📦 Доп список",
+        deferredList: "🛒 Основной список"
+    };
 
-    if (currentList === "shoppingList") {
-        currentList = "deferredList"; // ✅ правильно
-    } else {
-        currentList = "shoppingList";
-    }
+    // Переключаем список
+    currentList = currentList === "shoppingList" ? "deferredList" : "shoppingList";
 
-document.getElementById('btnToggleList').innerText = listNames[currentList];
+    // Устанавливаем цвет в зависимости от текущего списка
+    btnToggleList.style.backgroundColor =
+        currentList === "shoppingList" ? "#3f51b5" : "#2196f3";
 
+    btnToggleList.textContent = listNames[currentList];
     render();
 }

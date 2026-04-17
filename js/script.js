@@ -198,14 +198,16 @@ function addItem() {
         commentTime: null
     };
 
-    // Сохраняем в историю: категорию и последнюю цену/количество для этого товара
-    history[itemName.toLowerCase()] = {
-        category: catInput.value,
-        lastPrice: newItem.price,
-        lastQuantity: newItem.quantity
-    };
-    historygetDb().child(itemName.toLowerCase()).set(history[itemName.toLowerCase()]);
+// Сохраняем в историю: категорию и последнюю цену/количество для этого товара
+history[itemName.toLowerCase()] = {
+    category: catInput.value,
+    lastPrice: newItem.price,
+    lastQuantity: newItem.quantity
+};
 
+historyDb
+    .child(itemName.toLowerCase())
+    .set(history[itemName.toLowerCase()]);
 
 try {
         getDb().child(newItem.id).set(newItem);
@@ -225,6 +227,8 @@ try {
 }
 
 //Удаление всех отмеченных товаров
+var deletCheced = document.getElementById('deletCheced');
+deletCheced.addEventListener('click', deleteCheckedItems);
 function deleteCheckedItems() {
     Swal.fire({
         title: "Удалить отмеченные?",
@@ -403,8 +407,14 @@ document.addEventListener('click', (e) => {
 // Отмеченные товары
 function toggleComplete(id) {
     const item = items.find(i => i.id === id);
-    if (item) getDb().child(id).update({ completed: !item.completed });
-    calculateCheckedSum();
+
+    if (!item) return;
+
+    getDb().child(id).update({
+        completed: !item.completed
+    });
+
+    addLog("Товар отмечен: " + item.name);
 }
 
 //Сумма отмеченных товаров
@@ -467,16 +477,14 @@ function sunsStatus() {
   const statusElement = document.getElementById('syncStatus');
   if (!statusElement) return;
 
-  statusElement.textContent = "Синхронизировано: " +
+  statusElement.textContent = "Обновлено: " +
     new Date().toLocaleTimeString();
 }
-
 
 // Запуск при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
   loadGoogleAuthScript();
   checkAuthOnLoad();
-  setupGlobalChangeListener();
   render();
   updateSuggestions();
 });
