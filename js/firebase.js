@@ -46,7 +46,7 @@ function updateSuggestions() {
 function updateItemQuantity(id, newQuantity) {
     const quantity = parseFloat(newQuantity) || 1; // По умолчанию 1, если ввод некорректный
     
-    db.child(id).update({
+    getDb().child(id).update({
         quantity: quantity
     }).then(() => {
         showNotification("Количество успешно обновлено в облаке!", "success");
@@ -73,7 +73,7 @@ function updateItemPrice(id, newPrice) {
     // Округление до сотых
     const price = Math.round(numericInput * 100) / 100;
 
-    db.child(id).update({
+    getDb().child(id).update({
         price: price
     }).then(() => {
         // Показываем округлённую цену в уведомлении

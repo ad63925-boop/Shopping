@@ -3,7 +3,15 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-const db = firebase.database().ref("shopping_list");
+
+let currentList = "shoppingList"; // по умолчанию основной список, но может быть изменён на другой (например, для разных пользователей или категорий)
+
+//const db = firebase.database().ref("shopping_list");
+
+function getDb() {
+    return firebase.database().ref(currentList);
+}
+
 const settingsDb = firebase.database().ref("settings"); // Для сохранения лимита
 
 let items = [];
@@ -25,18 +33,10 @@ historyDb.on("value", (snapshot) => {
 });
 
 // Загрузка лимита из облака
-settingsDb.child('limit').on('value', (snapshot) => {
+settingsgetDb().child('limit').on('value', (snapshot) => {
     const limit = snapshot.val() || 0;
     document.getElementById('budgetLimit').value = limit;
     render();
-});
-
-db.on("value", (snapshot) => {
-    const data = snapshot.val();
-    items = data ? Object.values(data) : [];
-    render();
-    updateSuggestions();
-    document.getElementById('syncStatus').innerText = "Обновлено: " + new Date().toLocaleTimeString();
 });
 
 //Выпадающий список категорий
@@ -203,11 +203,11 @@ function addItem() {
         lastPrice: newItem.price,
         lastQuantity: newItem.quantity
     };
-    historyDb.child(itemName.toLowerCase()).set(history[itemName.toLowerCase()]);
+    //historygetDb().child(itemName.toLowerCase()).set(history[itemName.toLowerCase()]);
 
 
 try {
-        db.child(newItem.id).set(newItem);
+        getDb().child(newItem.id).set(newItem);
         // Успешное оповещение
         showNotification(`Товар "${itemName}" успешно добавлен!`, 'success');
         // Очищаем поля ввода
@@ -223,6 +223,33 @@ try {
     addLog("Добавлен товар: " + itemName);
 }
 
+//Удаление всех отмеченных товаров
+function deleteCheckedItems() {
+    Swal.fire({
+        title: "Удалить отмеченные?",
+        text: "Это действие нельзя отменить",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Да, удалить",
+        cancelButtonText: "Отмена"
+    }).then(result => {
+        if (!result.isConfirmed) return;
+
+        const ref = firebase.database().ref(currentList);
+
+        ref.once("value", snapshot => {
+            snapshot.forEach(child => {
+                const item = child.val();
+
+                if (item.completed) {
+                    ref.child(child.key).remove();
+                }
+            });
+        });
+
+        addLog("Удалены отмеченные товары");
+    });
+}
 
 //КОМЕНТАРИИ к товарам
 async function updateItemComment(itemId, comment) {
@@ -244,7 +271,7 @@ async function updateItemComment(itemId, comment) {
     try {
         // Используем уже инициализированную базу данных
         // db указывает на 'shopping_list'
-        const itemRef = db.child(itemId);
+        const itemRef = getDb().child(itemId);
 
         // Обновляем только поле comment у конкретного товара
     await itemRef.update({
@@ -359,7 +386,7 @@ function selectSuggestion(name, cat, price, quantity) {
 // Функция удаления из истории (тот самый крестик)
 function deleteFromHistory(name) {
     // Удаляем из Firebase
-    historyDb.child(name).remove();
+    historygetDb().child(name).remove();
     
     // Поле ввода само обновится, так как сработает слушатель historyDb.on("value")
     nameInput.dispatchEvent(new Event('input')); 
@@ -376,7 +403,7 @@ document.addEventListener('click', (e) => {
 // Отмеченные товары
 function toggleComplete(id) {
     const item = items.find(i => i.id === id);
-    if (item) db.child(id).update({ completed: !item.completed });
+    if (item) getDb().child(id).update({ completed: !item.completed });
     calculateCheckedSum();
 }
 
@@ -412,7 +439,7 @@ function deleteItem(id) {
         buttonsStyling: false
     }).then((result) => {
         if (result.isConfirmed) {
-            db.child(id).remove()
+            getDb().child(id).remove()
                 .then(() => {
                     Swal.fire({
                 title: 'Удалено!',
@@ -439,5 +466,8 @@ addLog("Удален товар: " + itemName);
 document.addEventListener('DOMContentLoaded', () => {
   loadGoogleAuthScript();
   checkAuthOnLoad();
-  setupGlobalChangeListener()
+  setupGlobalChangeListener();
+  render();
+  updateSuggestions();
+  document.getElementById('syncStatus').innerText = "Синхронизировано: " + new Date().toLocaleTimeString();
 });

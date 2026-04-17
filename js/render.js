@@ -1,5 +1,21 @@
 // Функция рендера списка с группировкой по категориям
 function render() {
+
+    const ref = firebase.database().ref(currentList); // убираем старый listener
+
+    ref.off();
+
+    ref.on("value", snapshot => {
+    
+        const items = [];
+
+    snapshot.forEach(child => {
+        items.push({
+            id: child.key,
+            ...child.val()
+        });
+    });
+
     const listContainer = document.getElementById('shoppingList');
     const totalSumEl = document.getElementById('totalSum');
     const headerCard = document.getElementById('headerCard');
@@ -153,6 +169,8 @@ function updateHeaderStyle() {
         // Возвращаем стандартное значение, если элемент не у верха
         headerCard.style.borderRadius = ''; // или конкретное значение, например '8px'
     }
+
+    
 }
 
 // Вызываем при загрузке страницы
@@ -161,4 +179,25 @@ document.addEventListener('DOMContentLoaded', updateHeaderStyle);
 // Вызываем при скролле
 window.addEventListener('scroll', updateHeaderStyle);
 
+ });
+
+}
+
+//Переключене на другой список (например, отложенные покупки)
+function toggleList() {
+    if (currentList === "shoppingList") {
+        currentList = "deferredList"; // ✅ правильно
+    } else {
+        currentList = "shoppingList";
+    }
+
+    render();
+
+const listNames = {
+    shoppingList: "🛒 Основной список",
+    deferredList: "📦 Отложенные покупки"
+};
+
+document.getElementById('syncStatus').innerText =
+    "Список: " + listNames[currentList];
 }
