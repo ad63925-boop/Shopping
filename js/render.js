@@ -82,7 +82,11 @@ function render() {
             div.innerHTML = `
         <div class="item-names">    
             <span class="item-number">${globalIndex++}.</span>
-                <span class="name">${item.name}</span>
+        <input 
+            type="text"
+            class="edit-name-input"
+            value="${item.name}"
+            onchange="updateItemName('${item.id}', this.value)">
         <div class="item-qty-wrapper">
             <input type="number"
             class="edit-qty-input"

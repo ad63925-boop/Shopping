@@ -42,6 +42,35 @@ function updateSuggestions() {
     }
 }
 
+// Функция для обновления названия в Firebase
+function updateItemName(id, newName) {
+    const name = newName.trim();
+
+    if (!name) {
+        showNotification("Название не может быть пустым", "error");
+        render(); // вернуть старое значение
+        return;
+    }
+
+    if (name === ".") {
+        showNotification("Точка (.) запрещена!", "error");
+        render();
+        return;
+    }
+
+    if (!isValidItemName(name)) {
+        render();
+        return;
+    }
+
+    getDb().child(id).update({
+        name: name
+    });
+        showNotification("Название [" + name + "] успешно обновлено в облаке!", "success");
+        console.log("Название [" + name + "] успешно обновлено в облаке");    
+        addLog("Название изменено: " + name);
+}
+
 // Функция для обновления количества в Firebase
 function updateItemQuantity(id, newQuantity) {
     const quantity = parseFloat(newQuantity) || 1; // По умолчанию 1, если ввод некорректный
