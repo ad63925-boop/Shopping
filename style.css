@@ -105,7 +105,7 @@ body {
     display: flex;
     flex-wrap: wrap;
     align-content: center;
-    width: 240px; /* Позволяет сжиматься при нехватке места */
+    width: 100%; /* Позволяет сжиматься при нехватке места */
     font-size: 1.25rem;
     font-weight: 500;
     background-color: white;
@@ -122,16 +122,59 @@ body {
     padding: 2px;
     font-size: 1.2rem;
     font-weight: bold;
-    border: none;
-    border-bottom: 1px solid black;
-    border-radius: 0;
+    border-radius: 3px;
 }
 
 .item-names {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid black;
+    margin: 0 5px 0 0;
+}
+
+
+.item-actions:hover {
+    cursor: pointer;
+}
+.menu-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.options-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 6px;
+
+    background: white;
+    border-radius: 10px;
+    padding: 6px;
+    min-width: 140px;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+
+    /* анимация */
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+    pointer-events: none;
+
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+.options-menu.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    box-shadow: 1px 1px 5px;
+}
+
+.item-actions {
+    rotate: 90deg;
+    font-weight: 900;
 }
 
 .item-details {
@@ -176,13 +219,12 @@ body {
 }
 
 .btnDel {
-    background-color: red; 
-    border: 1px solid darkred;
-    border-radius: 5px; 
     cursor:pointer;
     font-size: 1.2rem;
-    margin-left: auto; /* Кнопка будет прижата к правому краю */
+    border: none;
+    color: red;
 }
+
 
 .unit,
 .currency {

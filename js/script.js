@@ -226,6 +226,27 @@ try {
     addLog("Добавлен товар: " + itemName);
 }
 
+//Пказать скрыть меню опций
+function toggleMenu(event, id) {
+    event.stopPropagation(); // чтобы не закрывалось сразу
+
+    const menu = document.getElementById(`menu-${id}`);
+
+    // закрыть все меню
+    document.querySelectorAll('.options-menu').forEach(m => {
+        if (m !== menu) m.classList.remove('show');
+    });
+
+    // переключить текущее
+    menu.classList.toggle('show');
+}
+//Закрытие при клике вне меню
+document.addEventListener('click', () => {
+    document.querySelectorAll('.options-menu').forEach(menu => {
+        menu.classList.remove('show');
+    });
+});
+
 //Удаление всех отмеченных товаров
 var deletCheced = document.getElementById('deletCheced');
 deletCheced.addEventListener('click', deleteCheckedItems);

@@ -87,7 +87,18 @@ function render() {
             class="edit-name-input"
             value="${item.name}"
             onchange="updateItemName('${item.id}', this.value)">
-        <div class="item-qty-wrapper">
+        
+            <div class="menu-wrapper">
+                <div class="item-actions" onclick="toggleMenu(event, '${item.id}')">⋯</div>
+
+                <div id="menu-${item.id}" class="options-menu">
+                    <button class="btnDel" onclick="deleteItem('${item.id}')">🗑 Удалить</button>
+                </div>
+            </div>
+
+        </div>        
+            <div class="item-details">
+            <div class="item-qty-wrapper">
             <input type="number"
             class="edit-qty-input"
             min="0.01"
@@ -96,8 +107,7 @@ function render() {
             onchange="updateItemQuantity('${item.id}', this.value)">
                 <span class="unit">шт</span>   
             </div>
-        </div>        
-            <div class="item-details">
+
             <div class="item-price-wrapper">
             <input type="number" 
             class="edit-price-input"
@@ -109,7 +119,7 @@ function render() {
             </div>
 
             <div class="item-total"> ${itemTotal} ₽</div>
-            <button class="btnDel" onclick="deleteItem('${item.id}')">🗑️</button>
+            
             <input type="checkbox" ${item.completed ? 'checked' : ''} onclick="toggleComplete('${item.id}')">
             
 
