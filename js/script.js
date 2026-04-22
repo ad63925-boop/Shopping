@@ -363,6 +363,11 @@ async function saveComment(itemId, comment, input) {
         // Обновляем значение поля ввода, если сервер вернул изменённый текст
         input.value = updatedComment || comment;
 
+        const timeElement = document.getElementById('time-element');
+        if (timeElement) {
+            timeElement.style.backgroundColor = 'orange';
+        }
+        
         // Показываем успех
         if (statusEl) {
             showNotification('Комментарий успешно сохранён!', 'success');
