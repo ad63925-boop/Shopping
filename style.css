@@ -195,7 +195,7 @@ body {
     flex-wrap: wrap;
     gap: 3px;
     align-items: center;
-    width: 360px;
+    width: 100%;
     justify-content: space-between;
     padding: 0 5px;
 }
@@ -305,6 +305,7 @@ input {
 .weekSumm {
     display: flex;
     border-top: 1px solid black;
+    border-bottom: 1px solid black;
 }
 
 .limit-of-week {
@@ -470,7 +471,9 @@ input {
     transition: background 0.2s;
 }
 
-.suggestion-card:hover { background: #f8f9fa; }
+.suggestion-card:hover { 
+    background: #f8f9fa; 
+}
 
 .suggestion-info { 
     flex: 1; 
@@ -482,7 +485,9 @@ input {
 
 .suggestion-name { 
     font-weight: 500; 
-    color: #333; }
+    color: #333; 
+    width: 100%;
+}
 
 .suggestion-cat { 
     font-size: 0.8rem; 
@@ -500,13 +505,13 @@ input {
 }
 
 .suggestion-delete {
-    color: white;
-    background-color: red;
+    color: red;
+    background-color: white;
     font-size: 1rem;
     text-align: center;
     padding: 5px;
     cursor: pointer;
-    border-radius: 3px;
+    font-size: 1.2rem;
 }
 
 .suggestion-delete:hover { opacity: 1; }
@@ -878,6 +883,8 @@ input[type="checkbox"] {
 .total-summ {
     display: flex;
     flex-direction: row;
+    font-weight: 900;
+    color: blue;
 }
 
 .budget-limit {
@@ -894,6 +901,15 @@ input[type="checkbox"] {
     color: #08a609;
     background-color: white;
     border-radius: 3px;
+}
+
+#selectedCount {
+    color: #4caf50; /* зелёный */
+    font-weight: bold;
+}
+
+#totalCount {
+    opacity: 0.7;
 }
 
 .save-status {
@@ -993,4 +1009,34 @@ input[type="checkbox"] {
 
 .hidden {
     display: none;
+}
+
+#logsContainer {
+    background: #fff;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.logs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-logs-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #999;
+    transition: 0.2s;
+}
+
+.close-logs-btn:hover {
+    color: #f44336;
+}
+
+.log-item {
+    border-bottom: 1px solid #ccc;
+    padding: 5px;
 }

@@ -27,7 +27,7 @@ function updateSuggestions() {
             ${lastPrice ? `<span class="suggestion-price">(${lastPrice} ₽)</span>` : ''}
             ${lastQuantity ? `<span class="suggestion-qty">${lastQuantity}</span>` : ''}
                 </div>
-                <span class="suggestion-delete" onclick="deleteFromHistory('${name}')">×</span>
+                <span class="suggestion-delete" onclick="deleteFromHistory('${name}')">🗑</span>
             `;
             div.onclick = (e) => {
                 if (!e.target.classList.contains('suggestion-delete')) {
@@ -179,18 +179,32 @@ function loadWeekLimitFromFirebase() {
 // Функция обновления отображения дневного лимита
 function updateDailyLimitDisplay(weekLimitValue) {
     const limitOfWeekOutput = document.getElementById('limitOfWeek');
+    const budgetLimit = parseFloat(document.getElementById('budgetLimit').value) || 0;
+
     if (isNaN(weekLimitValue) || weekLimitValue < 0) {
         limitOfWeekOutput.textContent = '0 ₽';
+        limitOfWeekOutput.style.color = ''; // сброс цвета
         return;
     }
+
     const remainingDays = getRemainingDays();
-    //console.log('Оставшиеся дни до конца недели:', remainingDays);
+
+    let dailyLimit;
+
     if (remainingDays === 0) {
-        limitOfWeekOutput.textContent = weekLimitValue + ' ₽';
-        return;
+        dailyLimit = weekLimitValue;
+        limitOfWeekOutput.textContent = dailyLimit + ' ₽';
+    } else {
+        dailyLimit = Math.floor(weekLimitValue / remainingDays);
+        limitOfWeekOutput.textContent = dailyLimit + ' ₽/д';
     }
-    const dailyLimit = Math.floor(weekLimitValue / remainingDays);
-    limitOfWeekOutput.textContent = dailyLimit + ' ₽/д';
+
+    // ✅ Проверка лимита
+    if (budgetLimit > 0 && dailyLimit > budgetLimit) {
+        limitOfWeekOutput.style.color = '#f44336'; // 🔴 красный
+    } else {
+        limitOfWeekOutput.style.color = '#4caf50'; // 🟢 зелёный
+    }
 }
 
 // Получаем элементы DOM

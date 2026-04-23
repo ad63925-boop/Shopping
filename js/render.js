@@ -116,7 +116,7 @@ function render() {
             step="0.01" 
             value="${item.price}" 
             onchange="updateItemPrice('${item.id}', this.value)">
-                <span class="currency">руб/шт. </span>
+                <span class="currency">р/шт. = </span>
             </div>
 
             <div class="item-total"> ${itemTotal} ₽</div>

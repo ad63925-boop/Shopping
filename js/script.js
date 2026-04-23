@@ -426,22 +426,43 @@ function selectSuggestion(name, cat, price, quantity) {
     autoList.style.display = 'none';
 }
 
-// Функция удаления из истории (тот самый крестик)
-function deleteFromHistory(name) {
-    // Удаляем из Firebase
-    historygetDb().child(name).remove();
-    
-    // Поле ввода само обновится, так как сработает слушатель historyDb.on("value")
-    nameInput.dispatchEvent(new Event('input')); 
-    addLog("Удален товар из истории: " + name);
+function getHistoryDb() {
+    return firebase.database().ref("suggestions_history");
 }
 
-// Закрытие при клике мимо
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.autocomplete-suggestions') && e.target !== nameInput) {
-        autoList.style.display = 'none';
+// Функция удаления из истории (тот самый крестик)
+function deleteFromHistory(name) {
+    // Проверка на пустоту имени
+    if (!name || name.trim() === '') {
+        showNotification('Ошибка: не указано имя товара для удаления', 'error');
+        console.warn('Попытка удалить товар с пустым именем');
+        return;
     }
-});
+
+    // Показываем статус «удаляется»
+    showNotification('Удаляем товар из истории...', 'info');
+
+    getHistoryDb().child(name).remove((error) => {
+        if (error) {
+            // Ошибка удаления
+            const errorMessage = error.message || 'Неизвестная ошибка';
+            showNotification(`Ошибка удаления товара: ${errorMessage}`, 'error');
+            console.error('Ошибка удаления из Firebase:', error);
+            addLog(`Ошибка удаления товара ${name}: ${errorMessage}`);
+            return;
+        }
+
+        // Успешное удаление
+        showNotification(`Товар "${name}" успешно удалён из истории!`, 'success');
+        console.log('Товар успешно удалён из истории:', name);
+        addLog(`Удален товар из истории: ${name}`);
+
+        // Обновляем поле ввода
+        nameInput.dispatchEvent(new Event('input'));
+        render(); // Перерисовываем список после удаления
+    });
+}
+
 
 // Отмеченные товары
 function toggleComplete(id) {

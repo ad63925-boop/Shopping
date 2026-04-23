@@ -21,7 +21,7 @@ nameInput.addEventListener('focus', () => {
             ${lastPrice ? `<span class="suggestion-price">(${lastPrice} ₽)</span>` : ''}
             ${lastQuantity ? `<span class="suggestion-qty">${lastQuantity}</span>` : ''}
                 </div>
-                <span class="suggestion-delete" onclick="deleteFromHistory('${name}')">×</span>
+                <span class="suggestion-delete" onclick="deleteFromHistory('${name}')">🗑</span>
             `;
             div.onclick = (e) => {
                 if (!e.target.classList.contains('suggestion-delete')) {
@@ -60,7 +60,7 @@ nameInput.addEventListener('input', () => {
                     <span class="suggestion-cat">${category}</span>
                     ${lastPrice ? `<span class="suggestion-price">( ${lastPrice} ₽ )</span>` : ''}
                 </div>
-                <span class="suggestion-delete" data-name="${name}">×</span>
+                <span class="suggestion-delete" data-name="${name}">🗑</span>
             `;
 
             // Клик по карточке

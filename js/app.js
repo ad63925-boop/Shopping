@@ -48,7 +48,12 @@ function showLogs() {
         .limitToLast(50)
         .once("value", snapshot => {
 
-            let html = "<h3>Журнал событий</h3>";
+            let html = `
+                <div class="logs-header">
+                    <h3>Журнал событий</h3>
+                    <button class="close-logs-btn" onclick="closeLogs()">✖</button>
+                </div>
+            `;
 
             const logs = [];
 
@@ -58,7 +63,7 @@ function showLogs() {
 
             logs.reverse().forEach(log => {
                 html += `
-                    <div style="border-bottom:1px solid #ccc; padding:5px;">
+                    <div class="log-item">
                         <b>${log.date}</b><br>
                         ${log.action}<br>
                         👤 ${log.user}
@@ -68,4 +73,10 @@ function showLogs() {
 
             container.innerHTML = html;
         });
+}
+
+//Закрыть журнал
+function closeLogs() {
+    const container = document.getElementById("logsContainer");
+    container.style.display = "none";
 }
