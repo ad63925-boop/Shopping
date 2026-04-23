@@ -149,13 +149,19 @@ function render() {
         });
     }
 
+    const totalCount = items.length;
+
+    const selectedCount = items.filter(item => item.completed).length;
+
     totalSumEl.innerText = total;
 
+    const totalEl = document.getElementById('totalCount');
+const selectedEl = document.getElementById('selectedCount');
+
+if (totalEl) totalEl.innerText = totalCount;
+if (selectedEl) selectedEl.innerText = selectedCount;
       // Обновляем отображение общего количества в headerCard
-  const totalQuantityEl = document.getElementById('totalQuantityCount');
-  if (totalQuantityEl) {
-    totalQuantityEl.innerText = totalQuantity;
-  }
+
 
     // Обновляем сумму отмеченных товаров
   if (summCheckedEl) {
