@@ -172,6 +172,19 @@ body {
     box-shadow: 1px 1px 5px;
 }
 
+.options-menu button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: left;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
 .item-actions {
     rotate: 90deg;
     font-weight: 900;
@@ -225,8 +238,17 @@ body {
     color: red;
 }
 
+.btnComment {
+    cursor:pointer;
+    font-size: 1.2rem;
+    border: none;
+    color: chocolate;
+}
 
-.unit,
+.unit {
+    font-size: 1.3rem;
+}
+
 .currency {
     font-size: 0.9em;
     color: #666;
@@ -241,9 +263,6 @@ body {
 }
 
 .item-number {
-    flex-shrink: 0; /* Фиксированная ширина, не сжимается */
-    width: 24px;
-    height: 24px;
     line-height: 24px;
     text-align: center;
     font-weight: bold;
@@ -314,6 +333,7 @@ input {
 .checked-sum {
     color: blue;
     background-color: white;
+    border-top: 1px solid;
 }
 /*Название категории*/
 .category-header { 
@@ -811,11 +831,11 @@ input[type="checkbox"] {
 
 .btnLog {
     border: none;
-    border-radius: 10px;
+    border-radius: 3px;
     text-decoration: none;
     color: white;
     background: #0B63F6;
-    box-shadow: 0 5px 0 #003CC5;
+    box-shadow: 0 2px 0 #003CC5;
 }
 
 .status-sync { 
@@ -897,10 +917,20 @@ input[type="checkbox"] {
 }
 
 .comment-wrapper {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.25s ease;
     width: 350px;
     display: flex;
     gap: 5px;
     justify-content: space-between;
+}
+
+.comment-wrapper.show {
+    max-height: 100px;
+    opacity: 1;
+    margin-top: 6px;
 }
 
 .comment-input {

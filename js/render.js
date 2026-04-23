@@ -93,6 +93,7 @@ function render() {
 
                 <div id="menu-${item.id}" class="options-menu">
                     <button class="btnDel" onclick="deleteItem('${item.id}')">🗑 Удалить</button>
+                    <button class="btnComment" onclick="toggleComment('${item.id}')">+Комментарий</button>
                 </div>
             </div>
 
@@ -105,7 +106,7 @@ function render() {
             step="0.01"
             value="${item.quantity}"
             onchange="updateItemQuantity('${item.id}', this.value)">
-                <span class="unit">шт</span>   
+                <span class="unit"> X </span>   
             </div>
 
             <div class="item-price-wrapper">
@@ -124,10 +125,10 @@ function render() {
             
 
             <!-- Поле для комментариев -->
-            <div class="comment-wrapper">
+            <div class="comment-wrapper ${item.comment ? 'show' : ''}" id="comment-${item.id}">
                 <input
                     class="comment-input"
-                    id="comment"
+                    
                     type="search"
                     max-length="46"
                     autocomplete="on"
@@ -137,6 +138,7 @@ function render() {
                     onblur="handleCommentSave('${item.id}', this)"
                     onkeydown="handleKeyPress(event, '${item.id}', this)">
                 </input>
+
                 <div class="save-status" id="status-${item.id}">✅</div>
             </div>
             <!-- Время с уникальным ID -->
@@ -159,8 +161,7 @@ function render() {
   if (summCheckedEl) {
     const checkedSum = calculateCheckedSum();
     summCheckedEl.innerText = checkedSum.toFixed(2);
-    console.log('Отмечено');
-    deletCheced.style.display = checkedSum > 0 ? 'block' : 'none'; // Показываем кнопку удаления только если есть отмеченные товары
+    btnDeletCheced.style.display = checkedSum > 2 ? 'block' : 'none'; // Показываем кнопку удаления только если есть отмеченные товары
   }
 
     // Логика цвета лимита

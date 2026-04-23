@@ -248,8 +248,9 @@ document.addEventListener('click', () => {
 });
 
 //Удаление всех отмеченных товаров
-var deletCheced = document.getElementById('deletCheced');
-deletCheced.addEventListener('click', deleteCheckedItems);
+var btnDeletCheced = document.getElementById('btnDeletCheced');
+
+btnDeletCheced.addEventListener('click', deleteCheckedItems);
 function deleteCheckedItems() {
     Swal.fire({
         title: "Удалить отмеченные?",
@@ -343,6 +344,18 @@ function handleKeyPress(event, itemId, input) {
 // Обработчик потери фокуса
 function handleCommentSave(itemId, input) {
     saveComment(itemId, input.value, input);
+}
+
+//показать/скрыть комментарий
+function toggleComment(id) {
+    const block = document.getElementById(`comment-${id}`);
+
+    if (!block) return;
+
+    block.classList.toggle('show');
+
+    // Закрываем меню после клика
+    document.getElementById(`menu-${id}`).classList.remove('show');
 }
 
 // Основная функция сохранения коментария с индикацией статуса
