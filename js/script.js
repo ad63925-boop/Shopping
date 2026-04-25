@@ -226,6 +226,14 @@ try {
     addLog("Добавлен товар: " + itemName);
 }
 
+var btnOpenMenu = document.querySelectorAll('.item-actions');
+btnOpenMenu.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const id = btn.id.split('-')[1]; // Получаем ID товара из атрибута id
+        toggleMenu(event, id);
+    });
+});
+
 //Пказать скрыть меню опций
 function toggleMenu(event, id) {
     event.stopPropagation(); // чтобы не закрывалось сразу

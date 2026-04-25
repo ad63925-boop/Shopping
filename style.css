@@ -137,7 +137,9 @@ body {
 
 .item-actions:hover {
     cursor: pointer;
+    scale: calc(1.2);
 }
+
 .menu-wrapper {
     position: relative;
     display: inline-block;

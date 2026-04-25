@@ -89,7 +89,7 @@ function render() {
             onchange="updateItemName('${item.id}', this.value)">
         
             <div class="menu-wrapper">
-                <div class="item-actions" onclick="toggleMenu(event, '${item.id}')">⋯</div>
+                <div id="actions-${item.id}" class="item-actions">⋯</div>
 
                 <div id="menu-${item.id}" class="options-menu">
                     <button class="btnDel" onclick="deleteItem('${item.id}')">🗑 Удалить</button>
@@ -193,7 +193,7 @@ function updateHeaderStyle() {
         headerCard.style.borderRadius = ''; // или конкретное значение, например '8px'
     }
 
-    
+bindMenuButtons();    
 }
 
 // Вызываем при загрузке страницы
@@ -210,6 +210,16 @@ window.addEventListener('scroll', updateHeaderStyle);
 var btnToggleList = document.getElementById('btnToggleList');
 
 btnToggleList.addEventListener('click', toggleList);
+
+// Функция для привязки событий к кнопкам меню после рендера
+function bindMenuButtons() {
+    document.querySelectorAll('.item-actions').forEach(btn => {
+        btn.onclick = function(e) {
+            const id = this.id.split('-')[1];
+            toggleMenu(e, id);
+        };
+    });
+}
 
 function toggleList() {
     const listNames = {
