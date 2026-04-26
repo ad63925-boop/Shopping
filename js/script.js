@@ -226,42 +226,89 @@ try {
     addLog("Добавлен товар: " + itemName);
 }
 
-var btnOpenMenu = document.querySelectorAll('.item-actions');
-btnOpenMenu.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        const id = btn.id.split('-')[1]; // Получаем ID товара из атрибута id
-        toggleMenu(event, id);
-    });
+
+//меню для каждого товара
+// открыть меню ...
+document.addEventListener('click', function(e) {
+
+    // Кнопка ...
+    const actionBtn = e.target.closest('.item-actions');
+
+    if (actionBtn) {
+        e.stopPropagation();
+
+        const id = actionBtn.id.split('-')[1];
+        const menu = document.getElementById(`menu-${id}`);
+        const isOpen = menu.style.display === 'block';
+
+        // закрыть все
+        document.querySelectorAll('.options-menu').forEach(m => {
+            m.style.display = 'none';
+        });
+
+        if (!isOpen) {
+            menu.style.display = 'block';
+        }
+
+        return;
+    }
+
+    // удалить товар
+    const deleteBtn = e.target.closest('.menu-delete');
+
+    if (deleteBtn) {
+        deleteItem(deleteBtn.dataset.id);
+        return;
+    }
+
+    // комментарий
+    const commentBtn = e.target.closest('.menu-comment');
+
+    if (commentBtn) {
+        toggleComment(commentBtn.dataset.id);
+        return;
+    }
+
+    // клик вне меню
+    if (!e.target.closest('.options-menu')) {
+        document.querySelectorAll('.options-menu').forEach(menu => {
+            menu.style.display = 'none';
+        });
+    }
+
 });
 
-//Пказать скрыть меню опций
-function toggleMenu(event, id) {
-    event.stopPropagation(); // чтобы не закрывалось сразу
+//функция комментария
+function toggleComment(id) {
+    const block = document.getElementById(`comment-${id}`);
+    if (!block) return;
 
-    const menu = document.getElementById(`menu-${id}`);
-
-    // закрыть все меню
-    document.querySelectorAll('.options-menu').forEach(m => {
-        if (m !== menu) m.classList.remove('show');
-    });
-
-    // переключить текущее
-    menu.classList.toggle('show');
+    block.classList.toggle('show');
+    closeAllMenus();
 }
-//Закрытие при клике вне меню
-document.addEventListener('click', () => {
+
+//Автозакрытие кнопки удаления отмеченных товаров
+function closeAllMenus() {
     document.querySelectorAll('.options-menu').forEach(menu => {
-        menu.classList.remove('show');
+        menu.style.display = 'none';
     });
-});
+}
 
 //Удаление всех отмеченных товаров
 var btnDeletCheced = document.getElementById('btnDeletCheced');
 
 btnDeletCheced.addEventListener('click', deleteCheckedItems);
 function deleteCheckedItems() {
+
+    // Формируем заголовок с количеством отмеченных товаров
+    let titleText = "Удалить отмеченные";
+    const selectedCount = items.filter(item => item.completed).length;
+    if (selectedCount > 0) {
+        titleText += ` (${selectedCount} шт.)`;
+    }
+
     Swal.fire({
-        title: "Удалить отмеченные?",
+        title: titleText,
         text: "Это действие нельзя отменить",
         icon: "warning",
         showCancelButton: true,
@@ -354,18 +401,6 @@ function handleCommentSave(itemId, input) {
     saveComment(itemId, input.value, input);
 }
 
-//показать/скрыть комментарий
-function toggleComment(id) {
-    const block = document.getElementById(`comment-${id}`);
-
-    if (!block) return;
-
-    block.classList.toggle('show');
-
-    // Закрываем меню после клика
-    document.getElementById(`menu-${id}`).classList.remove('show');
-}
-
 // Основная функция сохранения коментария с индикацией статуса
 async function saveComment(itemId, comment, input) {
     const statusEl = document.getElementById(`status-${itemId}`);
@@ -438,7 +473,7 @@ function getHistoryDb() {
     return firebase.database().ref("suggestions_history");
 }
 
-// Функция удаления из истории (тот самый крестик)
+// Функция удаления из истории (выпадающий список подсказок)
 function deleteFromHistory(name) {
     // Проверка на пустоту имени
     if (!name || name.trim() === '') {
@@ -495,7 +530,7 @@ function calculateCheckedSum() {
   }, 0);
 }
 
-//Удаление с подтверждением
+
 function deleteItem(id) {
     // Находим товар по ID
     const itemToDelete = items.find(item => item.id === id);
@@ -537,6 +572,7 @@ function deleteItem(id) {
         });
     }
 });
+closeAllMenus(); // Закрываем все меню после удаления
 addLog("Удален товар: " + itemName);
 }
 

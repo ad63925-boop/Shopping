@@ -146,6 +146,7 @@ body {
 }
 
 .options-menu {
+    display: none;
     position: absolute;
     top: 100%;
     right: 0;
@@ -159,12 +160,12 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 
     /* анимация */
-    opacity: 0;
+   
     transform: translateY(-10px) scale(0.95);
     pointer-events: none;
 
     transition: all 0.2s ease;
-    z-index: 100;
+    z-index: 9999;
 }
 
 .options-menu.show {
@@ -176,6 +177,7 @@ body {
 
 .options-menu button {
     display: block;
+    pointer-events: auto;
     width: 100%;
     padding: 8px 12px;
     background: none;
@@ -185,6 +187,12 @@ body {
     font-size: 1rem;
     cursor: pointer;
     transition: background 0.2s;
+}
+
+.options-menu button:hover {
+    background: #f0f0f0;
+    color: var(--primary);
+    background-color: #2196F3;
 }
 
 .item-actions {
