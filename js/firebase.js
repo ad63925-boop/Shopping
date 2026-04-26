@@ -201,9 +201,9 @@ function updateDailyLimitDisplay(weekLimitValue) {
 
     // ✅ Проверка лимита
     if (budgetLimit > 0 && dailyLimit > budgetLimit) {
-        limitOfWeekOutput.style.color = '#f44336'; // 🔴 красный
+        limitOfWeekOutput.style.color = '#4caf50'; 
     } else {
-        limitOfWeekOutput.style.color = '#4caf50'; // 🟢 зелёный
+        limitOfWeekOutput.style.color = 'hsl(4, 90%, 58%)'; 
     }
 }
 
