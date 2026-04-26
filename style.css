@@ -1,8 +1,10 @@
 /* Весь предыдущий CSS стиль здесь сохраняется */
 :root { --primary: #6200ee; --bg: #f8f9fa; --surface: #ffffff; }
 body { 
-    font-family: sans-serif; 
-    background: #c9c6c6; 
+    background-image: url('foto/background.jpg');
+    background-repeat: repeat;
+    background-attachment: fixed;    
+    font-family: sans-serif;
     padding: 5px; 
     margin: 0;
     display: flex; 
@@ -12,7 +14,6 @@ body {
     border-bottom: none;
     margin-bottom: 30px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #f5f7fa;
     margin: 0;
     padding: 15px;
     color: #1f2937;
@@ -65,8 +66,17 @@ body {
 .contents {
     display: flex;
     flex-direction: column;
+    background: #ffffff;
     align-items: center;
     width: 368px;
+    transition: transform 0.3s ease; /* Плавный переход */
+}
+
+@media (min-width: 450px) {
+  .contents {
+    margin-top: 90px;
+    transform: scale(1.2);
+  }
 }
 
 .header-card, .input-card { 

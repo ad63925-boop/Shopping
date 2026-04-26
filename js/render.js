@@ -93,7 +93,7 @@ function render() {
 
             <div id="menu-${item.id}" class="options-menu">
                 <button class="btnDel menu-delete" data-id="${item.id}">🗑 Удалить</button>
-                <button class="btnComment menu-comment" data-id="${item.id}">💬 Комментарий</button>
+                <button class="btnComment menu-comment" data-id="${item.id}">+Комментарий</button>
             </div>
             </div>
 
