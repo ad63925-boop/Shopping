@@ -311,9 +311,12 @@ function deleteCheckedItems() {
         title: titleText,
         text: "Это действие нельзя отменить",
         icon: "warning",
+        iconColor: "red",
         showCancelButton: true,
+        cancelButtonText: "Отмена",
+        cancelButtonColor: "blue",
         confirmButtonText: "Да, удалить",
-        cancelButtonText: "Отмена"
+        confirmButtonColor: "red"
     }).then(result => {
         if (!result.isConfirmed) return;
 

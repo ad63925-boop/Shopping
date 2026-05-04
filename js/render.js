@@ -1,5 +1,8 @@
 // Функция рендера списка с группировкой по категориям
 function render() {
+    //deferredList - ОСНОВНОЙ СПИСОК
+    //shoppingList - ДОП СПИСОК
+    console.log('Загружается список:', currentList);
 
     const ref = firebase.database().ref(currentList); // убираем старый listener
 
@@ -7,6 +10,9 @@ function render() {
 
     ref.on("value", snapshot => {
     
+    console.log('Данные пришли из списка:', currentList);
+    console.log('Snapshot:', snapshot.val());
+
          items = [];
 
     snapshot.forEach(child => {
@@ -209,6 +215,7 @@ window.addEventListener('scroll', updateHeaderStyle);
 var btnToggleList = document.getElementById('btnToggleList');
 
 btnToggleList.addEventListener('click', toggleList);
+
 
 function toggleList() {
     const listNames = {
