@@ -187,17 +187,16 @@ function updateUIAfterLogin(user) {
 };
 
   // Информация о пользователе
-  const userInfo = createSafeElement('div',{},[`🛒Список покупок🛍️`]);
+  const userInfo = createSafeElement('div',{},[``]);
   userInfo.className = 'user-info';
   const name = createSafeElement('div', {
-      }, [`Добро пожаловать!`]);
+      }, [``]);
       //console.log('Пользователь:', name.textContent);
   name.className = 'user-name';
   const email = createSafeElement('div', {
   }, [user.email]);
   email.className = 'user-email';
-
-  userInfo.appendChild(name);
+  userInfo.appendChild(avatar);
   userInfo.appendChild(email);
 
   profileContainer.appendChild(avatar);

@@ -229,7 +229,7 @@ function toggleList() {
     // Устанавливаем цвет в зависимости от текущего списка
     btnToggleList.style.backgroundColor =
         currentList === "shoppingList" ? "#3f51b5" : "#2196f3";
-
+        
     btnToggleList.textContent = listNames[currentList];
     render();
 }
