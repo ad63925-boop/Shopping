@@ -472,6 +472,18 @@ function selectSuggestion(name, cat, price, quantity) {
     autoList.style.display = 'none';
 }
 
+//Скрытие списка при клике вне его
+// Скрываем подсказки при клике вне списка автодополнения
+document.addEventListener('click', (e) => {
+  const autoList = document.getElementById('autocompleteList');
+  const nameInput = document.getElementById('itemName');
+
+  // Если клик не по полю ввода и не по списку подсказок — скрываем
+  if (!nameInput.contains(e.target) && !autoList.contains(e.target)) {
+    autoList.style.display = 'none';
+  }
+});
+
 function getHistoryDb() {
     return firebase.database().ref("suggestions_history");
 }
