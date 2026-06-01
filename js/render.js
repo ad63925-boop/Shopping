@@ -76,7 +76,7 @@ function render() {
         // Добавляем заголовок категории
         const catDiv = document.createElement('div');
         catDiv.className = 'category-header';
-        catDiv.innerText = cat;
+        catDiv.innerHTML = `${getCategoryIcon(cat)} ${cat}`;
         listContainer.appendChild(catDiv);
 
         groups[cat].forEach(item => {
@@ -220,7 +220,7 @@ btnToggleList.addEventListener('click', toggleList);
 function toggleList() {
     const listNames = {
         shoppingList: "📦 Доп список",
-        deferredList: "🛒 Основной список"
+        deferredList: '<i class="fa-solid fa-box"></i> Основной список'
     };
 
     // Переключаем список
@@ -230,6 +230,6 @@ function toggleList() {
     btnToggleList.style.backgroundColor =
         currentList === "shoppingList" ? "#3f51b5" : "#2196f3";
         
-    btnToggleList.textContent = listNames[currentList];
+    btnToggleList.innerHTML = listNames[currentList];
     render();
 }

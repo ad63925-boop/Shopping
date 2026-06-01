@@ -17,7 +17,7 @@ nameInput.addEventListener('focus', () => {
             div.innerHTML = `
                 <div class="suggestion-info">
                     <span class="suggestion-name">${name.charAt(0).toUpperCase() + name.slice(1)}</span>
-                    <span class="suggestion-cat">${category}</span>
+                    <span class="suggestion-cat">${getCategoryIcon(category)} ${category}</span>
             ${lastPrice ? `<span class="suggestion-price">(${lastPrice} ₽)</span>` : ''}
             ${lastQuantity ? `<span class="suggestion-qty">${lastQuantity}</span>` : ''}
                 </div>
@@ -57,7 +57,7 @@ nameInput.addEventListener('input', () => {
             div.innerHTML = `
                 <div class="suggestion-info">
                     <span class="suggestion-name">${name.charAt(0).toUpperCase() + name.slice(1)}</span>
-                    <span class="suggestion-cat">${category}</span>
+                    <span class="suggestion-cat">${getCategoryIcon(category)} ${category}</span>
                     ${lastPrice ? `<span class="suggestion-price">( ${lastPrice} ₽ )</span>` : ''}
                 </div>
                 <span class="suggestion-delete" data-name="${name}">🗑</span>

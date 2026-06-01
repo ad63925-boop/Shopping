@@ -78,7 +78,7 @@ function updateSuggestions() {
             div.innerHTML = `
                 <div class="suggestion-info">
                     <span class="suggestion-name">${name.charAt(0).toUpperCase() + name.slice(1)}</span>
-            <span class="suggestion-cat">${category}</span>
+            <span class="suggestion-cat">${getCategoryIcon(category)} ${category}</span>
             ${lastPrice ? `<span class="suggestion-price">(${lastPrice} ₽)</span>` : ''}
             ${lastQuantity ? `<span class="suggestion-qty">${lastQuantity}</span>` : ''}
                 </div>
@@ -103,7 +103,7 @@ options.forEach(option => {
         const val = this.getAttribute('data-value');
         
         // Обновляем текст и скрытый инпут
-        selectedText.innerText = val;
+        selectedText.innerHTML = `${getCategoryIcon(val)} ${val}`;
         hiddenInput.value = val;
         
         // Закрываем список
@@ -258,6 +258,14 @@ document.addEventListener('click', function(e) {
 
     if (deleteBtn) {
         deleteItem(deleteBtn.dataset.id);
+        return;
+    }
+
+    // удалить подсказку из истории
+    const suggestionDeleteBtn = e.target.closest('.suggestion-delete');
+
+    if (suggestionDeleteBtn) {
+        deleteFromHistory(suggestionDeleteBtn.dataset.name);
         return;
     }
 
@@ -457,7 +465,7 @@ function selectSuggestion(name, cat, price, quantity) {
     const hiddenInput = document.getElementById('itemCat');
     const selectedText = document.getElementById('selectedCatText');
     if (hiddenInput) hiddenInput.value = cat;
-    if (selectedText) selectedText.innerText = cat;
+    if (selectedText) selectedText.innerHTML = `${getCategoryIcon(cat)} ${cat}`;
 
     // Подставляем цену из истории (если есть)
     if (price !== undefined) {

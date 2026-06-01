@@ -16,6 +16,10 @@ if (!isset($_SESSION['user_id'])) {
 <body>
     <h1>Добро пожаловать, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
     <p>Вы успешно вошли в систему.</p>
-    <a href="logout.php">Выйти</a>
+    <a href="logout.php">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        Выйти
+    </a>
+    
 </body>
 </html>

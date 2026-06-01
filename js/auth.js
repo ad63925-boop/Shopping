@@ -205,7 +205,7 @@ function updateUIAfterLogin(user) {
 
   // Кнопка выхода
   const logoutBtn = createSafeElement('button', {
-    textContent: 'Выйти',
+    innerHTML: '<i class="fa-solid fa-arrow-right-from-bracket"></i>Выйти',
     className: 'google-btn',
     onclick: logout
   });

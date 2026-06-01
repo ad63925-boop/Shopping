@@ -21,7 +21,9 @@
 <body>
     <div class="contents">
 <header>
-    🛒Список покупок🛍️
+    <i class="fa-solid fa-cart-shopping"></i>
+        Список покупок
+    <i class="fa-solid fa-bag-shopping"></i>
 </header>
 
 <!-- Бургер -->
@@ -53,7 +55,7 @@
 </div>
 -->
 
-
+<div class="main-content">
 <div class="header-card" id="headerCard">
     
     <div class="total-limit">
@@ -119,37 +121,77 @@
 
     <div class="custom-select" id="customSelect">
         <div class="select-trigger">
-            <span id="selectedCatText" tabindex="5">🛒 Разное</span>
+            <span id="selectedCatText" tabindex="5"><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Разное</span>
             <div class="arrow"></div>
         </div>
         <div class="select-options">
-            <div class="option" data-value="🛒 Разное">🛒 Разное</div>
-            <div class="option" data-value="🥦 Овощи/Фрукты">🥦 Овощи/Фрукты</div>
-            <div class="option" data-value="🥛 Молочка">🥛 Молочка</div>
-            <div class="option" data-value="🧃 Вода/соки">🧃 Вода/соки</div>
-            <div class="option" data-value="🥩 Кобаса/сыр">🥩 Кобаса/сыр</div>
-            <div class="option" data-value="🍚 Крупы/пиво">🍚 Крупы/пиво</div>
-            <div class="option" data-value="🥫 Консервы">🥫 Консервы</div>
-            <div class="option" data-value="🌯 Приправы/сахар">🌯 Приправы/сахар</div>
-            <div class="option" data-value="🍞 Хлеб/булочки">🍞 Хлеб/булочки</div>
-            <div class="option" data-value="🍬 Конфеты/печенье">🍬 Конфеты/печенье</div>
-            <div class="option" data-value="🧊 Заморозка">🧊 Заморозка</div>
-            <div class="option" data-value="🍾 Вино/водка">🍾 Вино/водка</div>
-            <div class="option" data-value="🧴 Химия">🧴 Химия</div>
-            <div class="option" data-value="📚 Канцтовары">📚 Канцтовары</div>
-            <div class="option" data-value="🍭 Кассы">🍭 Кассы</div>
-            <div class="option" data-value="💊 Аптека">💊 Аптека</div>
+            <div class="option" data-value="Разное">
+  <i class="fa-solid fa-cart-shopping"></i> Разное
+            </div>
+            <div class="option" data-value="Овощи/Фрукты">
+  <i class="fa-solid fa-carrot"></i> Овощи/Фрукты
+            </div>
+            <div class="option" data-value="Молочка">
+  <i class="fa-solid fa-cow"></i> Молочка
+            </div>
+            <div class="option" data-value="Вода/соки">
+  <i class="fa-solid fa-bottle-water"></i> Вода/соки
+            </div>
+            <div class="option" data-value="Кобаса/сыр">
+  <i class="fa-solid fa-drumstick-bite"></i> Кобаса/сыр
+            </div>
+            <div class="option" data-value="Крупы/пиво">
+  <i class="fa-solid fa-wheat-awn"></i> Крупы/пиво
+            </div>
+            <div class="option" data-value="Консервы">
+  <i class="fa-solid fa-box-archive"></i> Консервы
+            </div>
+            <div class="option" data-value="Приправы/сахар">
+  <i class="fa-solid fa-mortar-pestle"></i> Приправы/сахар
+            </div>
+            <div class="option" data-value="Хлеб/булочки">
+  <i class="fa-solid fa-bread-slice"></i> Хлеб/булочки
+            </div>
+            <div class="option" data-value="Конфеты/печенье">
+  <i class="fa-solid fa-cookie-bite"></i> Конфеты/печенье
+            </div>
+            <div class="option" data-value="Заморозка">
+  <i class="fa-solid fa-snowflake"></i> Заморозка
+            </div>
+            <div class="option" data-value="Вино/водка">
+  <i class="fa-solid fa-wine-bottle"></i> Вино/водка
+            </div>
+            <div class="option" data-value="Химия">
+  <i class="fa-solid fa-pump-soap"></i> Химия
+            </div>
+            <div class="option" data-value="Канцтовары">
+  <i class="fa-solid fa-book"></i> Канцтовары
+            </div>
+            <div class="option" data-value="Кассы">
+  <i class="fa-solid fa-cash-register"></i> Кассы
+            </div>
+            <div class="option" data-value="Аптека">
+  <i class="fa-solid fa-pills"></i> Аптека
+            </div>
         </div>
-        <input type="hidden" id="itemCat" value="🛒 Разное">
+        <input type="hidden" id="itemCat" value="Разное">
     </div>
 
     <button class="add-btn" onclick="addItem()">Добавить</button>
 </div>
+
+</div>
+
     <div id="visit" class="visiteSite">Добрый день!<br>Для того чобы увидеть список неоходимо авторизоваться...</div> 
     
-    <button id="btnDeletCheced" class="del-btn" onclick="deleteCheckedItems()" title="Удалить отмеченные">🗑</button>
+    <button id="btnDeletCheced" class="del-btn" onclick="deleteCheckedItems()" title="Удалить отмеченные">
+        <i class="fa-solid fa-trash"></i>
+    </button>
 
-    <button id="btnToggleList" class="toggle-list-btn">📦Основной список</button>
+    <button id="btnToggleList" class="toggle-list-btn">
+        <i class="fa-solid fa-box"></i>
+        Основной список
+    </button>
 
     <div id="shoppingList" class="shoppingLists"></div>
 
@@ -165,6 +207,7 @@
     <div id="notification" class="notification"></div>
 </div>
 
+<script src="js/categoryIcons.js"></script>
 <script src="js/script.js" defer></script>
 <script src="js/app.js"></script>
 <script src="js/auth.js"></script>
