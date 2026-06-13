@@ -344,6 +344,7 @@ function deleteCheckedItems() {
     });
 }
 
+
 //КОМЕНТАРИИ к товарам
 async function updateItemComment(itemId, comment) {
     const item = items.find(i => i.id === itemId);

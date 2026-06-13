@@ -381,5 +381,85 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   document.getElementById('closeProfilePanel')?.addEventListener('click', closeProfilePanel);
   document.getElementById('saveProfileBtn')?.addEventListener('click', saveProfilePanelData);
+  // Меню-панель: открытие/закрытие
+  document.getElementById('menu')?.addEventListener('click', event => {
+    event.preventDefault();
+    toggleMenuPanel();
+  });
+  document.getElementById('closeMenuPanel')?.addEventListener('click', closeMenuPanel);
+  document.getElementById('shareBtn')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    await shareCurrentList();
+  });
   await loadGoogleAuthScript();
 });
+
+// Меню-панель: функции управления
+function openMenuPanel() {
+  const panel = document.getElementById('menuPanel');
+  if (!panel) return;
+  panel.classList.remove('hidden');
+  panel.classList.add('open');
+  panel.setAttribute('aria-hidden', 'false');
+}
+
+// Функция шаринга текущего списка
+async function shareCurrentList() {
+  try {
+    const listItems = (typeof items !== 'undefined' && Array.isArray(items)) ? items : (Array.isArray(window.items) ? window.items : []);
+    if (listItems.length === 0) {
+      showNotification('Список пуст', 'error');
+      return;
+    }
+
+    const lines = [];
+    lines.push('Список покупок:');
+    let total = 0;
+    listItems.forEach((it, idx) => {
+      const qty = Number(it.quantity) || 1;
+      const price = Number(it.price) || 0;
+      const itemTotal = qty * price;
+      total += itemTotal;
+      lines.push(`${idx + 1}. ${it.name} — ${qty} x ${price} ₽ = ${itemTotal.toFixed(2)} ₽`);
+    });
+    lines.push('Итого: ' + total.toFixed(2) + ' ₽');
+
+    const text = lines.join('\n');
+
+    if (navigator.share) {
+      await navigator.share({ title: 'Список покупок', text });
+      showNotification('Список отправлен', 'success');
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      showNotification('Список скопирован в буфер обмена', 'success');
+    } else {
+      // last resort: открыть окно с текстом для ручного копирования
+      const win = window.open('', '_blank');
+      if (win) {
+        win.document.write('<pre>' + text.replace(/</g, '&lt;') + '</pre>');
+        win.document.title = 'Список покупок';
+      }
+      showNotification('Шэринг недоступен — открылось окно с текстом', 'info');
+    }
+
+    // Закрываем меню после успешного шаринга
+    closeMenuPanel();
+  } catch (err) {
+    console.error('Ошибка шаринга списка:', err);
+    showNotification('Не удалось поделиться списком', 'error');
+  }
+}
+
+function closeMenuPanel() {
+  const panel = document.getElementById('menuPanel');
+  if (!panel) return;
+  panel.classList.add('hidden');
+  panel.classList.remove('open');
+  panel.setAttribute('aria-hidden', 'true');
+}
+
+function toggleMenuPanel() {
+  const panel = document.getElementById('menuPanel');
+  if (!panel) return;
+  if (panel.classList.contains('open')) closeMenuPanel(); else openMenuPanel();
+}

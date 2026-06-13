@@ -186,8 +186,6 @@
         <i class="fa-solid fa-trash"></i>
     </button>
 
-
-
     <div id="shoppingList" class="shoppingLists"></div>
 
     <div id="logsContainer" class="logs-container" style="display:none;"></div>
@@ -218,6 +216,25 @@
         <textarea id="profileComment" class="profile-textarea" rows="3" placeholder="Ваш комментарий"></textarea>
         <div class="profile-panel-footer">
             <button id="saveProfileBtn" class="profile-save-btn" type="button">Сохранить</button>
+        </div>
+    </div>
+
+    <div id="menuPanel" class="menu-panel hidden" aria-hidden="true">
+        <div class="menu-panel-header">
+            <span>Меню</span>
+            <button id="closeMenuPanel" class="menu-panel-close" aria-label="Закрыть меню">×</button>
+        </div>
+        <div class="menu-panel-body">
+            <!-- Кнопки меню -->
+            <button id="shareBtn" class="btn" type="button">Поделиться</button>
+            
+            <a class="btn" href="intent://apb#Intent;scheme=apb;package=com.apb.mobile;end">Открыть Агропромбанк</a>
+            
+            <a class="btn" href="intent://#Intent;scheme=cleverpay;package=com.itb.cleverpay;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.itb.cleverpay;end">Открыть KleverPay</a>    
+            
+            <a class="btn" href="https://play.google.com/store/apps/details?id=com.apb.mobile">Агропромбанк в Play Market</a>
+            
+            <a class="btn" href="https://play.google.com/store/search?q=%D0%BA%D0%BB%D0%B5%D0%B2%D0%B5%D1%80+%D0%BF%D1%8D%D0%B9&c=apps">KleverPay в Play Market</a>            
         </div>
     </div>
 

@@ -1222,6 +1222,39 @@ input[type="checkbox"] {
             min-height: 18px;
         }
 
+        /* Меню-панель (аналогично панели профиля) */
+        .menu-panel {
+            position: fixed;
+            left: 50%;
+            bottom: 112px;
+            transform: translateX(-50%) translateY(40px);
+            width: 325px;
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            border-radius: 18px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+            padding: 16px;
+            z-index: 1003;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
+        }
+
+        .menu-panel.hidden { transform: translateX(-50%) translateY(40px); }
+        .menu-panel.open {
+            opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0);
+        }
+
+        .menu-panel-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-weight:700; }
+        .menu-panel-close { border:none; background:transparent; font-size:1.4rem; cursor:pointer; }
+        
+        .menu-panel-body { 
+            display:flex; flex-direction:column;  
+        }
+
+        .menu-panel .btn { display:inline-block; padding:10px 12px; background:#1e659e; color:#fff; border-radius:8px; text-decoration:none; text-align:center; }
+
         .bottom-nav button {
             background: #1e659e;
             border: none;
