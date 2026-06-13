@@ -50,7 +50,8 @@ function showLogs() {
 
             let html = `
                 <div class="logs-header">
-                    <h3>Журнал событий</h3>
+                    <h3>Журнал событий 
+                    <i class="fa-solid fa-book"></i></h3>
                     <button class="close-logs-btn" onclick="closeLogs()">✖</button>
                 </div>
             `;

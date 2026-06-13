@@ -62,7 +62,7 @@
     <i class="fa-solid fa-arrows-rotate sync-spin"></i>
     Синхронизация
     </div>
-    <button class="btnLog" onclick="showLogs()">Журнал</button>
+
     </div>
         <div class="limits">
             <label class="total-summ-label">Итого / Лимит</label><br>
@@ -199,6 +199,28 @@
         </button>
     </div>
 
+    <div id="profilePanel" class="profile-panel hidden" aria-hidden="true">
+        <div class="profile-panel-header">
+            <span>Профиль</span>
+            <button id="closeProfilePanel" class="profile-panel-close" aria-label="Закрыть профиль">×</button>
+        </div>
+        <div class="profile-panel-body">
+            <img id="profilePhoto" class="profile-photo" src="/default-avatar.png" alt="Фото профиля">
+            <div class="profile-text-block">
+                <div id="profileName" class="profile-name">Гость</div>
+                <div id="profileEmail" class="profile-email">Не авторизован</div>
+            </div>
+        </div>
+        <div id="profileLoginNotice" class="profile-login-notice">Чтобы увидеть имя и почту, войдите через Google.</div>
+        <label class="profile-field-label" for="profilePhone">Номер телефона</label>
+        <input id="profilePhone" type="tel" class="profile-input" placeholder="+7 (999) 123-45-67">
+        <label class="profile-field-label" for="profileComment">Комментарий</label>
+        <textarea id="profileComment" class="profile-textarea" rows="3" placeholder="Ваш комментарий"></textarea>
+        <div class="profile-panel-footer">
+            <button id="saveProfileBtn" class="profile-save-btn" type="button">Сохранить</button>
+        </div>
+    </div>
+
     <div id="notification" class="notification"></div>
 </div>
 
@@ -218,15 +240,15 @@
         </button>
 
         <!-- Избранное (сердечко) -->
-        <button id="favorites" class="nav-item">
-            <i class="fa-solid fa-heart"></i>
-            <span class="nav-label">Избранное</span>
+        <button onclick="showLogs()" class="nav-item">
+            <i class="fa-solid fa-book"></i>
+            <span class="nav-label">Журнал</span>
         </button>
 
-        <!-- Войти (силуэт пользователя) -->
+        <!-- Профиль (силуэт пользователя) -->
         <button id="login" class="nav-item">
             <i class="fa-solid fa-user"></i>
-            <span class="nav-label">Войти</span>
+            <span class="nav-label">Профиль</span>
         </button>
 
         <button id="cart" class="nav-item">

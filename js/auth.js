@@ -253,6 +253,78 @@ function checkAuthOnLoad() {
   }
 }
 
+function getStoredUser() {
+  const savedUser = localStorage.getItem('user');
+  if (!savedUser) return {};
+  try {
+    return JSON.parse(savedUser);
+  } catch (e) {
+    console.error('Ошибка парсинга данных пользователя:', e);
+    return {};
+  }
+}
+
+function loadProfilePanelFields() {
+  const user = getStoredUser();
+  const photo = document.getElementById('profilePhoto');
+  const name = document.getElementById('profileName');
+  const email = document.getElementById('profileEmail');
+  const phone = document.getElementById('profilePhone');
+  const comment = document.getElementById('profileComment');
+  const notice = document.getElementById('profileLoginNotice');
+
+  if (photo) {
+    photo.src = user.picture || '/default-avatar.png';
+    photo.alt = user.name ? `Фото ${user.name}` : 'Фото профиля';
+    photo.onerror = () => { photo.src = '/default-avatar.png'; };
+  }
+
+  if (name) name.textContent = user.name || 'Гость';
+  if (email) email.textContent = user.email || 'Не авторизован';
+  if (phone) phone.value = localStorage.getItem('profilePhone') || '';
+  if (comment) comment.value = localStorage.getItem('profileComment') || '';
+  if (notice) notice.textContent = user.email ? '' : 'Чтобы получить имя и почту, войдите через Google.';
+}
+
+function saveProfilePanelData() {
+  const phoneInput = document.getElementById('profilePhone');
+  const commentInput = document.getElementById('profileComment');
+  if (!phoneInput || !commentInput) return;
+
+  const phone = sanitizeInput(phoneInput.value.trim());
+  const comment = sanitizeInput(commentInput.value.trim());
+  localStorage.setItem('profilePhone', phone);
+  localStorage.setItem('profileComment', comment);
+  showNotification('Данные профиля сохранены локально.', 'success');
+}
+
+function openProfilePanel() {
+  const panel = document.getElementById('profilePanel');
+  if (!panel) return;
+  panel.classList.remove('hidden');
+  panel.classList.add('open');
+  panel.setAttribute('aria-hidden', 'false');
+  loadProfilePanelFields();
+}
+
+function closeProfilePanel() {
+  const panel = document.getElementById('profilePanel');
+  if (!panel) return;
+  panel.classList.add('hidden');
+  panel.classList.remove('open');
+  panel.setAttribute('aria-hidden', 'true');
+}
+
+function toggleProfilePanel() {
+  const panel = document.getElementById('profilePanel');
+  if (!panel) return;
+  if (panel.classList.contains('open')) {
+    closeProfilePanel();
+  } else {
+    openProfilePanel();
+  }
+}
+
 // Загрузка Google Identity Services и инициализация
 async function loadGoogleAuthScript(retries = 3) {
   for (let i = 0; i < retries; i++) {
@@ -303,5 +375,11 @@ function showError(message) {
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', async () => {
   checkAuthOnLoad();
+  document.getElementById('login')?.addEventListener('click', event => {
+    event.preventDefault();
+    toggleProfilePanel();
+  });
+  document.getElementById('closeProfilePanel')?.addEventListener('click', closeProfilePanel);
+  document.getElementById('saveProfileBtn')?.addEventListener('click', saveProfilePanelData);
   await loadGoogleAuthScript();
 });
