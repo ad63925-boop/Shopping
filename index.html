@@ -205,7 +205,7 @@
         <div class="profile-panel-body">
             <img id="profilePhoto" class="profile-photo" src="/default-avatar.png" alt="Фото профиля">
             <div class="profile-text-block">
-                <div id="profileName" class="profile-name">Гость</div>
+                <div id="profileName" class="profile-name" contenteditable="true" tabindex="0" aria-label="Имя профиля">Гость</div>
                 <div id="profileEmail" class="profile-email">Не авторизован</div>
             </div>
         </div>
@@ -226,15 +226,17 @@
         </div>
         <div class="menu-panel-body">
             <!-- Кнопки меню -->
+            <button id="selectAllBtn" class="btn" type="button">Выбрать все</button>
+            <br>
             <button id="shareBtn" class="btn" type="button">Поделиться</button>
+                        
+            <a class="btn" href="https://play.google.com/store/apps/details?id=com.apb.mobile">Агропромбанк в Play Market</a>
+            
+            <a class="btn" href="https://play.google.com/store/search?q=%D0%BA%D0%BB%D0%B5%D0%B2%D0%B5%D1%80+%D0%BF%D1%8D%D0%B9&c=apps">KleverPay в Play Market</a>      
             
             <a class="btn" href="intent://apb#Intent;scheme=apb;package=com.apb.mobile;end">Открыть Агропромбанк</a>
             
-            <a class="btn" href="intent://#Intent;scheme=cleverpay;package=com.itb.cleverpay;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.itb.cleverpay;end">Открыть KleverPay</a>    
-            
-            <a class="btn" href="https://play.google.com/store/apps/details?id=com.apb.mobile">Агропромбанк в Play Market</a>
-            
-            <a class="btn" href="https://play.google.com/store/search?q=%D0%BA%D0%BB%D0%B5%D0%B2%D0%B5%D1%80+%D0%BF%D1%8D%D0%B9&c=apps">KleverPay в Play Market</a>            
+            <a class="btn" href="intent://#Intent;scheme=cleverpay;package=com.itb.cleverpay;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.itb.cleverpay;end">Открыть KleverPay</a>
         </div>
     </div>
 

@@ -1248,9 +1248,10 @@ input[type="checkbox"] {
 
         .menu-panel-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-weight:700; }
         .menu-panel-close { border:none; background:transparent; font-size:1.4rem; cursor:pointer; }
-        
+
         .menu-panel-body { 
-            display:flex; flex-direction:column;  
+            display:flex; flex-direction:column;
+            gap: 5px;  
         }
 
         .menu-panel .btn { display:inline-block; padding:10px 12px; background:#1e659e; color:#fff; border-radius:8px; text-decoration:none; text-align:center; }

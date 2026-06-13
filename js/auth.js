@@ -228,6 +228,9 @@ function updateUIAfterLogin(user) {
 
 // Выход из аккаунта
 function logout() {
+  const stored = getStoredUser();
+  const email = stored.email || 'Неизвестно';
+  addLog('Вышел из аккаунта: ' + email);
   localStorage.removeItem('user');
   localStorage.removeItem('googleToken');
 
@@ -279,7 +282,9 @@ function loadProfilePanelFields() {
     photo.onerror = () => { photo.src = '/default-avatar.png'; };
   }
 
-  if (name) name.textContent = user.name || 'Гость';
+  // Приоритет: локально сохранённое имя пользователя, затем Google, затем 'Гость'
+  const localName = localStorage.getItem('profileName');
+  if (name) name.textContent = localName || user.name || 'Гость';
   if (email) email.textContent = user.email || 'Не авторизован';
   if (phone) phone.value = localStorage.getItem('profilePhone') || '';
   if (comment) comment.value = localStorage.getItem('profileComment') || '';
@@ -295,7 +300,21 @@ function saveProfilePanelData() {
   const comment = sanitizeInput(commentInput.value.trim());
   localStorage.setItem('profilePhone', phone);
   localStorage.setItem('profileComment', comment);
+  // Сохраняем редактируемое имя профиля
+  const profileNameEl = document.getElementById('profileName');
+  if (profileNameEl) {
+    const savedName = sanitizeInput(profileNameEl.textContent.trim()) || 'Гость';
+    localStorage.setItem('profileName', savedName);
+    // Обновляем поле в хранилище user, если он есть
+    const stored = getStoredUser();
+    if (stored && stored.email) {
+      stored.name = savedName;
+      try { localStorage.setItem('user', JSON.stringify(stored)); } catch (e) { /* ignore */ }
+    }
+    addLog(`Сохранено имя профиля: ${savedName}`);
+  }
   showNotification('Данные профиля сохранены локально.', 'success');
+  addLog(`Сохранены данные профиля: телефон=${phone || 'пусто'}, коммент="${comment ? comment.slice(0,50) : ''}"`);
 }
 
 function openProfilePanel() {
@@ -305,6 +324,7 @@ function openProfilePanel() {
   panel.classList.add('open');
   panel.setAttribute('aria-hidden', 'false');
   loadProfilePanelFields();
+  addLog('Открыт профиль');
 }
 
 function closeProfilePanel() {
@@ -313,6 +333,7 @@ function closeProfilePanel() {
   panel.classList.add('hidden');
   panel.classList.remove('open');
   panel.setAttribute('aria-hidden', 'true');
+  addLog('Закрыт профиль');
 }
 
 function toggleProfilePanel() {
@@ -381,6 +402,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   document.getElementById('closeProfilePanel')?.addEventListener('click', closeProfilePanel);
   document.getElementById('saveProfileBtn')?.addEventListener('click', saveProfilePanelData);
+  // Позволяем править имя прямо в панели: сохраняем при blur и при Enter
+  const profileNameEl = document.getElementById('profileName');
+  if (profileNameEl) {
+    profileNameEl.addEventListener('blur', () => {
+      const val = sanitizeInput(profileNameEl.textContent.trim()) || 'Гость';
+      localStorage.setItem('profileName', val);
+      // Обновляем user.name, если есть
+      const stored = getStoredUser();
+      if (stored && stored.email) {
+        stored.name = val;
+        try { localStorage.setItem('user', JSON.stringify(stored)); } catch (e) {}
+      }
+      showNotification('Имя сохранено локально', 'success');
+      addLog('Сохранено имя профиля: ' + val);
+    });
+    profileNameEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); profileNameEl.blur(); }
+    });
+  }
   // Меню-панель: открытие/закрытие
   document.getElementById('menu')?.addEventListener('click', event => {
     event.preventDefault();
@@ -390,6 +430,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('shareBtn')?.addEventListener('click', async (e) => {
     e.preventDefault();
     await shareCurrentList();
+  });
+  document.getElementById('selectAllBtn')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    await toggleSelectAll();
   });
   await loadGoogleAuthScript();
 });
@@ -401,6 +445,7 @@ function openMenuPanel() {
   panel.classList.remove('hidden');
   panel.classList.add('open');
   panel.setAttribute('aria-hidden', 'false');
+  addLog('Открылось меню');
 }
 
 // Функция шаринга текущего списка
@@ -429,9 +474,11 @@ async function shareCurrentList() {
     if (navigator.share) {
       await navigator.share({ title: 'Список покупок', text });
       showNotification('Список отправлен', 'success');
+      addLog('Список отправлен через Web Share API');
     } else if (navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText(text);
       showNotification('Список скопирован в буфер обмена', 'success');
+      addLog('Список скопирован в буфер обмена');
     } else {
       // last resort: открыть окно с текстом для ручного копирования
       const win = window.open('', '_blank');
@@ -440,6 +487,7 @@ async function shareCurrentList() {
         win.document.title = 'Список покупок';
       }
       showNotification('Шэринг недоступен — открылось окно с текстом', 'info');
+      addLog('Шэринг: открыт терминальный просмотр списка');
     }
 
     // Закрываем меню после успешного шаринга
@@ -456,10 +504,42 @@ function closeMenuPanel() {
   panel.classList.add('hidden');
   panel.classList.remove('open');
   panel.setAttribute('aria-hidden', 'true');
+  addLog('Закрыто меню');
 }
 
 function toggleMenuPanel() {
   const panel = document.getElementById('menuPanel');
   if (!panel) return;
   if (panel.classList.contains('open')) closeMenuPanel(); else openMenuPanel();
+}
+
+// Отметить/снять отметки для всех товаров текущего списка
+async function toggleSelectAll() {
+  try {
+    const listItems = (typeof items !== 'undefined' && Array.isArray(items)) ? items : (Array.isArray(window.items) ? window.items : []);
+    if (listItems.length === 0) {
+      showNotification('Список пуст', 'error');
+      return;
+    }
+
+    const allSelected = listItems.every(it => !!it.completed);
+    const setTo = !allSelected;
+
+    const promises = listItems.map(it => {
+      try {
+        return getDb().child(it.id).update({ completed: setTo });
+      } catch (err) {
+        return Promise.resolve();
+      }
+    });
+
+    await Promise.all(promises);
+    showNotification(setTo ? 'Все товары отмечены' : 'Выделения сняты', 'success');
+    addLog(setTo ? 'Отмечены все товары' : 'Сняты отметки со всех товаров');
+    closeMenuPanel();
+    render();
+  } catch (err) {
+    console.error('Ошибка при массовой отметке:', err);
+    showNotification('Не удалось отметить все товары', 'error');
+  }
 }

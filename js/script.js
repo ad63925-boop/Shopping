@@ -479,6 +479,7 @@ function selectSuggestion(name, cat, price, quantity) {
     }
 
     autoList.style.display = 'none';
+    addLog('Выбрана подсказка: ' + name);
 }
 
 //Скрытие списка при клике вне его
@@ -537,11 +538,12 @@ function toggleComplete(id) {
 
     if (!item) return;
 
+    const newState = !item.completed;
     getDb().child(id).update({
-        completed: !item.completed
+        completed: newState
     });
 
-    addLog("Товар отмечен: " + item.name);
+    addLog((newState ? 'Товар отмечен: ' : 'Снята отметка: ') + item.name);
 }
 
 //Сумма отмеченных товаров

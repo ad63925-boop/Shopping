@@ -224,6 +224,7 @@ function toggleList() {
     };
 
     // Переключаем список
+    const prev = currentList;
     currentList = currentList === "shoppingList" ? "deferredList" : "shoppingList";
 
     // Устанавливаем цвет в зависимости от текущего списка
@@ -231,5 +232,6 @@ function toggleList() {
         currentList === "shoppingList" ? "#3f51b5" : "#2196f3";*/
         
     btnToggleList.innerHTML = listNames[currentList];
+    addLog('Переключен список: ' + currentList + ' (ранее: ' + prev + ')');
     render();
 }
