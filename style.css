@@ -1,9 +1,6 @@
 /* Весь предыдущий CSS стиль здесь сохраняется */
 :root { --primary: #6200ee; --bg: #f8f9fa; --surface: #ffffff; }
-body { 
-    background-image: url('foto/background.jpg');
-    background-repeat: repeat;
-    background-attachment: fixed;    
+body {    
     font-family: sans-serif;
     padding: 5px; 
     margin: 0;
@@ -60,6 +57,7 @@ body {
     align-items: center;
     width: 100%;
     transition: transform 0.3s ease; /* Плавный переход */
+    padding-bottom: 140px; /* Отступ для фиксированных навигации и футера */
 }
 
 .main-content {
@@ -358,6 +356,9 @@ input:hover, input:active {
 }
 /*Название категории*/
 .category-header { 
+    position: sticky;
+    top: 0;
+    z-index: 10;
     background: #385ef7; 
     padding: 5px 12px; 
     font-weight: bold; 
@@ -582,7 +583,7 @@ input:hover, input:active {
 .del-btn {
     display: none;
     position: fixed;
-    bottom: 60px;
+    bottom: 100px;
     left: 20px;
     width: 40px;
     height: 40px;
@@ -644,8 +645,16 @@ footer{
     text-align: center;
     position: fixed;
     bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 48px;
+    line-height: 48px;
     background: radial-gradient(circle, rgba(238, 174, 202, 1) 6%, rgba(148, 187, 233, 1) 100%);
-    width: -webkit-fill-available;
+    z-index: 1000;
+}
+
+footer p {
+    margin: 0;
 }
 
 header {
@@ -1065,3 +1074,66 @@ input[type="checkbox"] {
     border-bottom: 1px solid #ccc;
     padding: 5px;
 }
+
+/*Нижняя панель навигации*/
+/* Контейнер нижнего меню */
+        .bottom-nav {
+            position: fixed;
+            bottom: 48px;
+            left: 0;
+            width: 100%;
+            height: 45px; /* Оптимальная высота для тапа пальцем */
+            background-color: #1e659e; /* Синий цвет как на скриншоте */
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            padding: 0 8px;
+        }
+
+        .bottom-nav button {
+            background: #1e659e;
+            border: none;
+            color: white;
+        }
+
+        /* Элемент меню (кнопка) */
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-decoration: none;
+            color: #ffffff;
+            transition: background-color 0.2s ease, opacity 0.2s ease;
+            -webkit-tap-highlight-color: transparent; /* Убираем темную рамку при тапе на смартфонах */
+        }
+
+        .nav-item:hover {
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Эффект при нажатии */
+        .nav-item:active {
+            opacity: 0.7;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Стили для иконок */
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            stroke-width: 2.2; /* Толщина линий иконки */
+        }
+
+        /* Стили для текста под иконкой */
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+        }

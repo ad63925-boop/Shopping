@@ -15,8 +15,6 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-
 </head>
 <body>
     <div class="contents">
@@ -188,10 +186,7 @@
         <i class="fa-solid fa-trash"></i>
     </button>
 
-    <button id="btnToggleList" class="toggle-list-btn">
-        <i class="fa-solid fa-box"></i>
-        Основной список
-    </button>
+
 
     <div id="shoppingList" class="shoppingLists"></div>
 
@@ -207,7 +202,39 @@
     <div id="notification" class="notification"></div>
 </div>
 
+<!-- Блок навигации -->
+<div class="navigation">
+    <nav class="bottom-nav">
+        <!-- Меню (бургер-меню из трех полосок) -->
+        <button id="menu" class="nav-item">
+            <i class="fa-solid fa-bars"></i>
+            <span class="nav-label">Меню</span>
+        </button>
 
+        <!-- Списки (плитка/сетка из 4-х квадратов) -->
+        <button id="btnToggleList" class="nav-item">
+            <i class="fa-solid fa-box"></i>
+            <span class="nav-label"></span>Основной</span>
+        </button>
+
+        <!-- Избранное (сердечко) -->
+        <button id="favorites" class="nav-item">
+            <i class="fa-solid fa-heart"></i>
+            <span class="nav-label">Избранное</span>
+        </button>
+
+        <!-- Войти (силуэт пользователя) -->
+        <button id="login" class="nav-item">
+            <i class="fa-solid fa-user"></i>
+            <span class="nav-label">Войти</span>
+        </button>
+
+        <button id="cart" class="nav-item">
+            <i class="fa-solid fa-gear"></i>
+            <span class="nav-label">Настройки</span>
+        </button>
+    </nav>
+</div>
 
 <footer>
 	<p>alex_demidenk0</p>
