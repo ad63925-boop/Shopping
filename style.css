@@ -143,6 +143,11 @@ body {
     scale: calc(1.2);
 }
 
+
+.edit-name-input:focus-visible, .edit-qty-input:focus-visible, .edit-price-input:focus-visible {
+    outline: none;
+}
+
 .menu-wrapper {
     position: relative;
     display: inline-block;
@@ -276,11 +281,9 @@ body {
 }
 
 .item-number {
-    line-height: 24px;
     text-align: center;
     font-weight: bold;
     color: #666;
-    background-color: white;
     border-radius: 5px;
     font-size: 1.5rem;
     padding: 3px; 
@@ -355,12 +358,12 @@ input:hover, input:active {
 }
 /*Название категории*/
 .category-header { 
-    background: #ffc107a6; 
+    background: #385ef7; 
     padding: 5px 12px; 
     font-weight: bold; 
     border-radius: 4px; 
     margin: 8px 0 0 0; 
-    color: cornflowerblue;
+    color: white;
     transition: all 0.3s;
 }
 
@@ -372,12 +375,12 @@ input:hover, input:active {
     padding: 4px 0 0 3px;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
-    border-left: 2px solid #ffac00;
-    border-bottom: 2px solid #ffac00;
+    border-left: 2px solid #2196F3;
+    border-bottom: 2px solid #2196F3;
     flex-wrap: wrap; /* Разрешаем перенос элементов на новую строку */
     padding-bottom: 5px;
     background: #d8f3f7;
-    box-shadow: 0px 3px 9px 2px rgb(184 171 171 / 75%);
+    box-shadow: 1px 0px 5px 1px rgb(184 171 171 / 75%);
     border-radius: 10px;
 }
 
@@ -593,9 +596,11 @@ input:hover, input:active {
 }
 
 .toggle-list-btn {
-    width: 90%;
+    width: 350px;
+    border-radius: 7px;
     background: #2196F3;
     color: white;
+    box-shadow: 1px 2px 3px black;
     border: none;
     padding: 10px 15px;
     margin-top: 5px;
