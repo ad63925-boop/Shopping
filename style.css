@@ -568,12 +568,12 @@ input:hover, input:active {
 
 /* Кнопка Добавить */
 .add-btn {
-    background: #08a609;
+    background: #2196F3;
     color: white;
     border: none;
-    padding: 14px;
+    padding: 10px;
     border-radius: 12px;
-    font-size: 1rem;
+    font-size: 1.5rem;
     font-weight: 500;
     cursor: pointer;
     transition: background 0.3s;
@@ -1254,7 +1254,17 @@ input[type="checkbox"] {
             gap: 5px;  
         }
 
-        .menu-panel .btn { display:inline-block; padding:10px 12px; background:#1e659e; color:#fff; border-radius:8px; text-decoration:none; text-align:center; }
+        .menu-panel .btn { display:inline-block; padding:10px 12px; background:#1e659e; color:#fff; border-radius:8px; text-decoration:none; text-align:center; border:none; cursor:pointer; }
+        .menu-panel .btn:hover { background:#17548a; }
+        .menu-panel .btn-delete-category { background:#d23c3c; }
+        .menu-panel .btn-delete-category:hover { background:#a82d2d; }
+
+        .category-editor-list { display:flex; flex-direction:column; gap:10px; margin-bottom:12px; }
+        .category-editor-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+        .category-editor-input { flex:1 1 120px; min-width:120px; padding:10px 12px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; color:#111827; }
+        .category-editor-preview { width:44px; height:44px; display:flex; justify-content:center; align-items:center; border:1px solid #cbd5e1; border-radius:12px; background:#f9fafb; }
+        .add-category-row { gap:8px; }
+        .category-editor-hint { font-size:0.82rem; color:#6b7280; margin-top:8px; }
 
         .bottom-nav button {
             background: #1e659e;

@@ -14,7 +14,8 @@ window.categoryIcons = {
   "Химия": "fa-pump-soap",
   "Канцтовары": "fa-book",
   "Кассы": "fa-cash-register",
-  "Аптека": "fa-pills"
+  "Аптека": "fa-pills",
+  "Детское" : "fa-baby-carriage"
 };
 
 window.getCategoryIcon = function getCategoryIcon(category) {

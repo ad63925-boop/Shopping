@@ -171,6 +171,9 @@
             <div class="option" data-value="Аптека">
   <i class="fa-solid fa-pills"></i> Аптека
             </div>
+            <div class="option" data-value="Детское">
+  <i class="fa-solid fa-baby-carriage"></i> Детское
+            </div>
         </div>
         <input type="hidden" id="itemCat" value="Разное">
     </div>
@@ -227,22 +230,42 @@
         <div class="menu-panel-body">
             <!-- Кнопки меню -->
             <button id="selectAllBtn" class="btn" type="button">Выбрать все</button>
-            <br>
+            
             <button id="shareBtn" class="btn" type="button">Поделиться</button>
-                        
-            <a class="btn" href="https://play.google.com/store/apps/details?id=com.apb.mobile">Агропромбанк в Play Market</a>
-            
-            <a class="btn" href="https://play.google.com/store/search?q=%D0%BA%D0%BB%D0%B5%D0%B2%D0%B5%D1%80+%D0%BF%D1%8D%D0%B9&c=apps">KleverPay в Play Market</a>      
-            
-            <a class="btn" href="intent://apb#Intent;scheme=apb;package=com.apb.mobile;end">Открыть Агропромбанк</a>
-            
-            <a class="btn" href="intent://#Intent;scheme=cleverpay;package=com.itb.cleverpay;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.itb.cleverpay;end">Открыть KleverPay</a>
+        
+        </div>
+    </div>
+
+    <div id="settingsPanel" class="menu-panel hidden" aria-hidden="true">
+        <div class="menu-panel-header">
+            <span>Настройки</span>
+            <button id="closeSettingsPanel" class="menu-panel-close" aria-label="Закрыть настройки">×</button>
+        </div>
+        <div class="menu-panel-body">
+            <button id="editCategoriesBtn" class="btn" type="button">Редактировать категории</button>
+        </div>
+    </div>
+
+    <div id="categoryEditorPanel" class="menu-panel hidden" aria-hidden="true">
+        <div class="menu-panel-header">
+            <span>Категории</span>
+            <button id="closeCategoryEditorPanel" class="menu-panel-close" aria-label="Закрыть категории">×</button>
+        </div>
+        <div class="menu-panel-body">
+            <div id="categoryEditorList" class="category-editor-list"></div>
+            <div class="category-editor-row add-category-row">
+                <div id="newCategoryPreview" class="category-editor-preview"><i class="fa-solid fa-cart-shopping"></i></div>
+                <input id="newCategoryName" type="text" class="category-editor-input" placeholder="Новая категория" aria-label="Название категории">
+                <input id="newCategoryIcon" type="text" class="category-editor-input" placeholder="Иконка, например fa-carrot" aria-label="Иконка категории">
+                <button id="addCategoryBtn" class="btn" type="button">Добавить</button>
+            </div>
+            <p class="category-editor-hint">Для иконки укажите название класса FontAwesome, например <code>fa-carrot</code>.</p>
         </div>
     </div>
 
     <div id="notification" class="notification"></div>
 </div>
-
+ 
 <!-- Блок навигации -->
 <div class="navigation">
     <nav class="bottom-nav">
@@ -255,7 +278,7 @@
         <!-- Списки (плитка/сетка из 4-х квадратов) -->
         <button id="btnToggleList" class="nav-item">
             <i class="fa-solid fa-box"></i>
-            <span class="nav-label"></span>Основной</span>
+            <span class="nav-label">Основной</span>
         </button>
 
         <!-- Избранное (сердечко) -->
@@ -283,13 +306,13 @@
 
 <script src="js/categoryIcons.js"></script>
 <script src="js/script.js" defer></script>
-<script src="js/app.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/firebase.js"></script>
-<script src="js/render.js"></script>
-<script src="js/categorySelector.js"></script>
-<script src="js/autocomplete.js"></script>
-<script src="js/validation.js"></script>
+<script src="js/app.js" defer></script>
+<script src="js/auth.js" defer></script>
+<script src="js/firebase.js" defer></script>
+<script src="js/render.js" defer></script>
+<script src="js/categorySelector.js" defer></script>
+<script src="js/autocomplete.js" defer></script>
+<script src="js/validation.js" defer></script>
 <script src="../burgerMenu/menu.js" defer></script>
 
 </div>
