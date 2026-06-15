@@ -885,8 +885,8 @@ input[type="checkbox"] {
     background-color: white;
     border: 1px solid #34a853;
     border-radius: 5px; 
-    text-align: center; 
-    margin-bottom: 3px; 
+    text-align: center;
+    margin-top: 15px; 
     padding: 3px;
 }
 
@@ -898,10 +898,8 @@ input[type="checkbox"] {
 }
 
 .limits {
+    margin-top: 10px;
     width: 170px;
-    display: flex;
-    flex-wrap: wrap;justify-content: center;
-    align-items: center;
     font-size: 1rem;
     border-radius: 5px;
     background-color: cornsilk;

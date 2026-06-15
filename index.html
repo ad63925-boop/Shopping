@@ -65,10 +65,9 @@
 
     </div>
         <div class="limits">
-            <label class="total-summ-label">Итого / Лимит</label><br>
-            <div class="total-summ">
-            <span id="totalSum">0</span> ₽</div>
+            <label class="total-summ-label">Лимит:</label>            
             <input type="number" id="budgetLimit" class="budget-limit" placeholder="Лимит" oninput="updateLimit()">
+<!-- Сумма на неделю -->
             <div class="weekSumm">
                 <input type="number" id="weekLimit" class="week-limit" placeholder="сумма">
                 <div id="limitOfWeek" class="limit-of-week">0<span> ₽</span></div>
@@ -78,7 +77,12 @@
               Выбрано: 
                 <span id="selectedCount">0</span> / 
                 <span id="totalCount">0</span>
-        <span class="checked-sum">Сумма: <span id="summChecked" class="summChecked">0</span> р.</span></span>
+
+        <span class="checked-sum">Выбрано: <span id="summChecked" class="summChecked">0</span> р.</span><br>
+        <span class="checked-sum">Из Всего:
+        <span id="totalSum" class="summChecked">0</span> ₽ </span>
+    </span>
+        
     </div>
 </div>
 
