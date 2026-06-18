@@ -778,9 +778,8 @@ header {
 }
 
 .notification.success {
-    background-color: #28a745;
+    background-color: #457fe3;
     color: white;
-    border: 1px solid #218837;
 }
 
 .notification.error {

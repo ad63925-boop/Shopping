@@ -212,7 +212,7 @@ historyDb
 try {
         getDb().child(newItem.id).set(newItem);
         // Успешное оповещение
-        showNotification(`Товар "${itemName}" успешно добавлен!`, 'success');
+        showNotification(`Товар " ${itemName} " успешно добавлен!`, 'success');
         // Очищаем поля ввода
         nameInput.value = '';
         priceInput.value = '';
@@ -521,7 +521,7 @@ function deleteFromHistory(name) {
         }
 
         // Успешное удаление
-        showNotification(`Товар "${name}" успешно удалён из истории!`, 'success');
+        showNotification(`Товар " ${name} " успешно удалён из истории!`, 'success');
         console.log('Товар успешно удалён из истории:', name);
         addLog(`Удален товар из истории: ${name}`);
 
@@ -565,7 +565,7 @@ function deleteItem(id) {
 
     Swal.fire({
         title: 'Вы уверены?',
-        text: `Вы хотите удалить "${itemName}"?`,
+        text: `Вы хотите удалить " ${itemName} "?`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Да, удалить!',
@@ -582,7 +582,7 @@ function deleteItem(id) {
                 .then(() => {
                     Swal.fire({
                 title: 'Удалено!',
-                text: `"${itemName}" успешно удалён из списка.`,
+                text: `" ${itemName} " успешно удалён из списка.`,
                 icon: 'success',
                 timer: 1500,
                 showConfirmButton: false
