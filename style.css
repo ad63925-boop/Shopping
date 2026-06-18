@@ -339,7 +339,7 @@ input:hover, input:active {
     font-weight: bold;
     text-align: center;
     margin-left: 5px;
-    border: none;
+    border: 3px solid white;
     color: #2196f3;
     padding-bottom: 0;
 }
@@ -920,11 +920,7 @@ input[type="checkbox"] {
 }
 
 .total-summ-label {
-    width: 120px;
-    font-size: 0.7rem;
-    color: #3f3636;
-    margin-bottom: 2px;
-    border-bottom: 1px solid #3f3636;
+    font-size: 0.8rem;
 }
 
 .total-summ {
@@ -939,7 +935,7 @@ input[type="checkbox"] {
     font-weight: bold;
     text-align: center;
     margin-left: 10px;
-    border: none;
+    border: 3px solid white;
     color: red;
 }
 

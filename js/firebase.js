@@ -13,7 +13,7 @@ function updateSuggestions() {
     }
 
     // Фильтруем ключи из объекта history, который синхронизируется с Firebase
-    const matches = Object.keys(history).filter(name => name.startsWith(val));
+    const matches = Object.keys(history).filter(name => name.includes(val));
 
     if (matches.length > 0) {
         matches.forEach(name => {
