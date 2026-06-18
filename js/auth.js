@@ -187,16 +187,19 @@ function updateUIAfterLogin(user) {
 };
 
   // Информация о пользователе
-  const userInfo = createSafeElement('div',{},[``]);
-  userInfo.className = 'user-info';
+  const userInfo = createSafeElement('div', {
+    className: 'user-info'
+  });
+
   const name = createSafeElement('div', {
-      }, [``]);
-      //console.log('Пользователь:', name.textContent);
-  name.className = 'user-name';
+    className: 'user-name'
+  }, [user.name || 'Гость']);
+
   const email = createSafeElement('div', {
-  }, [user.email]);
-  email.className = 'user-email';
-  userInfo.appendChild(avatar);
+    className: 'user-email'
+  }, [user.email || 'Неизвестно']);
+
+  userInfo.appendChild(name);
   userInfo.appendChild(email);
 
   profileContainer.appendChild(avatar);
@@ -228,18 +231,43 @@ function updateUIAfterLogin(user) {
 
 // Выход из аккаунта
 function logout() {
-  const stored = getStoredUser();
-  const email = stored.email || 'Неизвестно';
-  addLog('Вышел из аккаунта: ' + email);
-  localStorage.removeItem('user');
-  localStorage.removeItem('googleToken');
+  Swal.fire({
+    title: 'Вы уверены?',
+    text: 'Вы действительно хотите выйти из аккаунта?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Да, выйти',
+    cancelButtonText: 'Отмена',
+    reverseButtons: true,
+    customClass: {
+      confirmButton: 'swal2-btn-confirm',
+      cancelButton: 'swal2-btn-cancel'
+    },
+    buttonsStyling: false
+  }).then((result) => {
+    if (!result.isConfirmed) return;
 
-  // Опционально: вызов Google logout
-  if (typeof google !== 'undefined') {
-    google.accounts.id.disableAutoSelect();
-  }
+    const stored = getStoredUser();
+    const email = stored.email || 'Неизвестно';
+    addLog('Вышел из аккаунта: ' + email);
+    localStorage.removeItem('user');
+    localStorage.removeItem('googleToken');
 
-  location.reload();
+    // Опционально: вызов Google logout
+    if (typeof google !== 'undefined') {
+      google.accounts.id.disableAutoSelect();
+    }
+
+    Swal.fire({
+      title: 'Вы вышли',
+      text: 'Вы успешно вышли из аккаунта.',
+      icon: 'success',
+      timer: 1200,
+      showConfirmButton: false
+    }).then(() => {
+      location.reload();
+    });
+  });
 }
 
 // Проверка авторизации при загрузке страницы

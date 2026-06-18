@@ -19,18 +19,24 @@ body {
 .profile-container {
     display: flex;
     text-align: left;
+    gap: 10px;
+     align-items: center;
+     justify-content: flex-start;
 }
 
 .profile-container img {
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     border: 2px solid #b2ebf2;
 }
 
+.user-email {
+    color: silver;
+}
+
 .user-name, .user-email {
     font-size: 1.1rem;
-    color: #4CAF50;
     font-style: normal;
     font-family: auto;
     text-shadow: none;
@@ -196,8 +202,7 @@ body {
 }
 
 .options-menu button:hover {
-    background: #f0f0f0;
-    color: var(--primary);
+    color: #f0f0f0;
     background-color: #2196F3;
 }
 
@@ -330,7 +335,6 @@ input:hover, input:active {
     font-size: 0.8rem;
     color: red;
     font-weight: bold;
-    margin-left: 5px;
     width: 50%;
 }
 
@@ -338,7 +342,6 @@ input:hover, input:active {
     width: 50%;
     font-weight: bold;
     text-align: center;
-    margin-left: 5px;
     border: 3px solid white;
     color: #2196f3;
     padding-bottom: 0;
@@ -678,7 +681,6 @@ header {
     top: -300px;
     padding: 5px;
     z-index: 0;
-    color: lightgreen;
     text-shadow: 2px 2px 4px black;
     text-align: center;
     transition: transform 0.3 opacity 0.35s ease;
@@ -858,24 +860,26 @@ input[type="checkbox"] {
 }
 
 .google-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  color: white;
-  background: #ff000078;
-  border: 1px solid;
-  padding: 3px;
-  margin: 10px;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #ff0202;
+    background: white;
+    border: 1px solid;
+    padding: 3px;
+    margin: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 1px 2px 3px;
 }
 
 .google-btn:hover {
+    color: white;
     background: red;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    box-shadow: 1px 2px 3px red;
     transform: translateY(-1px);
     padding: 3px;
 }
@@ -996,7 +1000,7 @@ input[type="checkbox"] {
 .comment-input {
     width: 330px;
     padding: 3px;
-    border: 1px solid #070707;
+    border: 3px solid #456dff;
     border-radius: 4px;
 }
 

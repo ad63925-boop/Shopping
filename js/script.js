@@ -213,10 +213,14 @@ try {
         getDb().child(newItem.id).set(newItem);
         // Успешное оповещение
         showNotification(`Товар " ${itemName} " успешно добавлен!`, 'success');
-        // Очищаем поля ввода
+        // Очищаем поля ввода и возвращаем категорию к значению по умолчанию
         nameInput.value = '';
         priceInput.value = '';
         qtyInput.value = '';
+        catInput.value = 'Разное';
+        if (selectedText) {
+            selectedText.innerHTML = `${getCategoryIcon('Разное')} Разное`;
+        }
     } catch (error) {
         console.error('Ошибка при добавлении товара:', error);
         // Оповещение об ошибке
