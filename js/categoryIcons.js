@@ -1,21 +1,23 @@
 window.categoryIcons = {
   "Разное": "fa-cart-shopping",
-  "Овощи/Фрукты": "fa-carrot",
+  "Овощи": "fa-carrot",
   "Молочка": "fa-cow",
-  "Вода/соки": "fa-bottle-water",
+  "Вода": "fa-bottle-water",
   "Колбаса/сыр": "fa-drumstick-bite",
-  "Крупы/пиво": "fa-wheat-awn",
+  "Крупы": "fa-wheat-awn",
   "Консервы": "fa-box-archive",
-  "Приправы/сахар": "fa-mortar-pestle",
-  "Хлеб/булочки": "fa-bread-slice",
-  "Конфеты/печенье": "fa-cookie-bite",
+  "Приправы": "fa-mortar-pestle",
+  "Хлеб": "fa-bread-slice",
+  "Сладкое": "fa-cookie-bite",
   "Заморозка": "fa-snowflake",
-  "Вино/водка": "fa-wine-bottle",
+  "Алко": "fa-wine-bottle",
   "Химия": "fa-pump-soap",
-  "Канцтовары": "fa-book",
+  "Канцтов": "fa-book",
   "Кассы": "fa-cash-register",
   "Аптека": "fa-pills",
-  "Детское" : "fa-baby-carriage"
+  "Детское" : "fa-baby-carriage",
+  "Авто": "fa-car",
+  "Техно": "fa-laptop"
 };
 
 window.getCategoryIcon = function getCategoryIcon(category) {
