@@ -13,11 +13,12 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="finance/style.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-    <div class="contents">
+    <div id="mainAppScreen" class="contents">
 <header>
     <i class="fa-solid fa-cart-shopping"></i>
         Список покупок
@@ -206,6 +207,8 @@
 
     <div id="logsContainer" class="logs-container" style="display:none;"></div>
     
+    <div id="financeScreen" class="finance-screen hidden"></div>
+
     <div class="google-auth">
         <button id="googleSignIn" class="google-btn">
         <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google logo" width="20">
@@ -304,6 +307,11 @@
             <span class="nav-label">Журнал</span>
         </button>
 
+        <button id="financeBtn" class="nav-item">
+            <i class="fa-solid fa-wallet"></i>
+            <span class="nav-label">Finance</span>
+        </button>
+
         <!-- Профиль (силуэт пользователя) -->
         <button id="login" class="nav-item">
             <i class="fa-solid fa-user"></i>
@@ -330,6 +338,7 @@
 <script src="js/categorySelector.js" defer></script>
 <script src="js/autocomplete.js" defer></script>
 <script src="js/validation.js" defer></script>
+<script src="finance/finance.js" defer></script>
 <script src="../burgerMenu/menu.js" defer></script>
 
 </div>

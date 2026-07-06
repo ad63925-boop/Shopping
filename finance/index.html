@@ -1,0 +1,82 @@
+<div id="financeScreen" class="finance-screen hidden">
+  <div class="finance-header">
+    <h2>Finance</h2>
+    <button id="financeCloseBtn">✖</button>
+  </div>
+  <div class="finance-panel-tabs">
+    <button id="financeNavDashboard" class="active">Обзор</button>
+    <button id="financeNavWallets">Счета</button>
+    <button id="financeNavIncome">Доходы</button>
+    <button id="financeNavExpenses">Расходы</button>
+    <button id="financeNavTransfers">Переводы</button>
+    <button id="financeNavHistory">История</button>
+  </div>
+
+  <div id="financePanel-dashboard" class="finance-panel">
+    <div id="financeDashboard"></div>
+  </div>
+
+  <div id="financePanel-wallets" class="finance-panel hidden">
+    <div class="finance-buttons-row">
+      <button onclick="addFinanceWallet()">Добавить кошелек</button>
+      <button onclick="addFinanceCategory()">Добавить категорию</button>
+    </div>
+    <div id="financeWalletList"></div>
+    <div id="financeCategoryList"></div>
+  </div>
+
+  <div id="financePanel-income" class="finance-panel hidden">
+    <div class="finance-form">
+      <div class="form-row">
+        <input id="incomeName" placeholder="Название дохода">
+        <select id="incomeCurrency"></select>
+      </div>
+      <div class="form-row">
+        <select id="incomeCategory"></select>
+        <input id="incomeAmount" type="number" placeholder="Сумма">
+      </div>
+      <textarea id="incomeComment" placeholder="Комментарий"></textarea>
+      <button onclick="saveFinanceTransaction('income')">Сохранить доход</button>
+    </div>
+    <div id="financeTransactionList"></div>
+  </div>
+
+  <div id="financePanel-expenses" class="finance-panel hidden">
+    <div class="finance-form">
+      <div class="form-row">
+        <input id="expenseName" placeholder="Название расхода">
+        <select id="expenseCurrency"></select>
+      </div>
+      <div class="form-row">
+        <select id="expenseCategory"></select>
+        <input id="expenseAmount" type="number" placeholder="Сумма">
+      </div>
+      <textarea id="expenseComment" placeholder="Комментарий"></textarea>
+      <button onclick="saveFinanceTransaction('expense')">Сохранить расход</button>
+    </div>
+    <div id="financeTransactionListExpense"></div>
+  </div>
+
+  <div id="financePanel-transfers" class="finance-panel hidden">
+    <div class="finance-form">
+      <div class="form-row">
+        <select id="transferFrom"></select>
+        <select id="transferTo"></select>
+      </div>
+      <div class="form-row">
+        <select id="transferCurrency"></select>
+        <input id="transferAmount" type="number" placeholder="Сумма">
+      </div>
+      <textarea id="transferComment" placeholder="Комментарий"></textarea>
+      <button onclick="saveFinanceTransaction('transfer')">Сохранить перевод</button>
+    </div>
+    <div id="financeTransferPreview"></div>
+  </div>
+
+  <div id="financePanel-history" class="finance-panel hidden">
+    <div class="finance-search-row">
+      <input id="financeSearchInput" placeholder="Поиск по операциям...">
+    </div>
+    <div id="financeHistoryList"></div>
+  </div>
+</div>
