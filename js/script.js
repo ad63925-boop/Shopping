@@ -57,7 +57,16 @@ function applyCategoryColorsToOptions() {
     });
 }
 
+function updateSelectTriggerStyle(category) {
+    const color = getCategoryColor(category);
+    trigger.style.background = color;
+    trigger.style.color = '#fff';
+    trigger.style.borderColor = color;
+    trigger.querySelector('.arrow').style.borderColor = '#fff';
+}
+
 applyCategoryColorsToOptions();
+updateSelectTriggerStyle(hiddenInput.value || 'Разное');
 
 // Открыть/закрыть список
 trigger.addEventListener('click', () => {
@@ -116,6 +125,7 @@ options.forEach(option => {
         // Обновляем текст и скрытый инпут
         selectedText.innerHTML = `${getCategoryIcon(val)} ${val}`;
         hiddenInput.value = val;
+        updateSelectTriggerStyle(val);
         
         // Закрываем список
         customSelect.classList.remove('active');
@@ -237,6 +247,7 @@ try {
         if (selectedText) {
             selectedText.innerHTML = `${getCategoryIcon('Разное')} Разное`;
         }
+        updateSelectTriggerStyle('Разное');
     } catch (error) {
         console.error('Ошибка при добавлении товара:', error);
         // Оповещение об ошибке
@@ -324,6 +335,25 @@ function closeAllMenus() {
 
 //Удаление всех отмеченных товаров
 var btnDeletCheced = document.getElementById('btnDeletCheced');
+
+const toTopBtn = document.getElementById('toTopBtn');
+
+if (toTopBtn) {
+    const toggleToTopButton = () => {
+        if (window.scrollY > 300) {
+            toTopBtn.classList.add('show');
+        } else {
+            toTopBtn.classList.remove('show');
+        }
+    };
+
+    toggleToTopButton();
+    window.addEventListener('scroll', toggleToTopButton, { passive: true });
+
+    toTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+}
 
 btnDeletCheced.addEventListener('click', deleteCheckedItems);
 function deleteCheckedItems() {

@@ -1,5 +1,6 @@
 /* Весь предыдущий CSS стиль здесь сохраняется */
 :root { --primary: #6200ee; --bg: #f8f9fa; --surface: #ffffff; }
+html { scroll-behavior: smooth; }
 body {    
     font-family: sans-serif;
     padding: 5px; 
@@ -71,6 +72,43 @@ body {
     flex-direction: column;
     align-items: center;
     margin: 5px;
+}
+
+.to-top-btn {
+    position: fixed;
+    right: 16px;
+    bottom: 100px;
+    width: 52px;
+    height: 52px;
+    border: none;
+    border-radius: 50%;
+    background: #2196f3;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgb(18 18 19);
+    cursor: pointer;
+    z-index: 600;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px);
+    transition: all 0.7s ease;
+}
+
+.to-top-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 12px 24px rgba(33, 150, 243, 0.35);
+}
+
+.to-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.to-top-btn i {
+    font-size: 1.1rem;
 }
 
 header {
