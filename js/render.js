@@ -76,6 +76,7 @@ function render() {
         // Добавляем заголовок категории
         const catDiv = document.createElement('div');
         catDiv.className = 'category-header';
+        catDiv.style.background = getCategoryColor(cat);
         catDiv.innerHTML = `${getCategoryIcon(cat)} ${cat}`;
         listContainer.appendChild(catDiv);
 
@@ -90,8 +91,9 @@ function render() {
             <span class="item-number">${globalIndex++}.</span>
         <input 
             type="text"
-            class="edit-name-input"
+            class="edit-name-input${item.name.includes('!') ? ' has-exclamation' : ''}"
             value="${item.name}"
+            oninput="toggleExclamationHighlight(this)"
             onchange="updateItemName('${item.id}', this.value)">
         
             <div class="menu-wrapper">

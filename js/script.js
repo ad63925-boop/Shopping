@@ -47,6 +47,17 @@ const options = customSelect.querySelectorAll('.option');
 const hiddenInput = document.getElementById('itemCat');
 const selectedText = document.getElementById('selectedCatText');
 
+function applyCategoryColorsToOptions() {
+    document.querySelectorAll('.option').forEach(option => {
+        const value = option.getAttribute('data-value');
+        const color = getCategoryColor(value);
+        option.style.background = color;
+        option.style.color = '#fff';
+        option.style.borderColor = color;
+    });
+}
+
+applyCategoryColorsToOptions();
 
 // Открыть/закрыть список
 trigger.addEventListener('click', () => {
@@ -147,6 +158,11 @@ function showNotification(message, type = 'success') {
             }
         }, 300);
     }, 3000);
+}
+
+function toggleExclamationHighlight(input) {
+    if (!input) return;
+    input.classList.toggle('has-exclamation', input.value.includes('!'));
 }
 
 // Функция для добавления товара

@@ -143,6 +143,12 @@ header, .header-card, .input-card {
     border: 3px solid white;
 }
 
+.edit-name-input.has-exclamation {
+    background-color: #e56e6e;
+    border-color: #e72f2f;
+    color: white;
+}
+
 /* Стили для элементов внутри item-details */
 .edit-qty-input {
     width: 55px;
