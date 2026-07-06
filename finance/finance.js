@@ -50,7 +50,7 @@ function loadFinanceScreen() {
   if (!screen) return;
   screen.classList.remove('hidden');
   screen.classList.add('open');
-  document.getElementById('mainAppScreen')?.classList.add('hidden');
+  //document.getElementById('mainAppScreen')?.classList.add('hidden');
 }
 
 function closeFinanceScreen() {
@@ -185,16 +185,36 @@ function renderFinanceWallets() {
     </div>
   `).join('');
   const categoryList = document.getElementById('financeCategoryList');
-  categoryList.innerHTML = financeState.categories.map(cat => `
-    <div class="finance-item-card">
-      <div><span class="finance-category-swatch" style="background:${cat.color || '#4f46e5'}"></span> ${cat.name}</div>
-      <div>${cat.type}</div>
-      <div class="finance-item-actions">
-        <button onclick="editFinanceCategory('${cat.id}')">✎</button>
-        <button onclick="removeFinanceCategory('${cat.id}')">🗑</button>
+  categoryList.innerHTML = `
+    <div class="finance-category-section">
+      <button type="button" id="financeCategoryToggle" class="finance-category-toggle" aria-expanded="false">
+        <span>Категории</span>
+        <span class="finance-category-toggle-icon">▸</span>
+      </button>
+      <div id="financeCategoryContent" class="finance-category-content hidden">
+        ${financeState.categories.map(cat => `
+          <div class="finance-item-card">
+            <div><span class="finance-category-swatch" style="background:${cat.color || '#4f46e5'}"></span> ${cat.name}</div>
+            <div>${cat.type}</div>
+            <div class="finance-item-actions">
+              <button onclick="editFinanceCategory('${cat.id}')">✎</button>
+              <button onclick="removeFinanceCategory('${cat.id}')">🗑</button>
+            </div>
+          </div>
+        `).join('') || '<div class="finance-item-card">Категорий пока нет</div>'}
       </div>
     </div>
-  `).join('');
+  `;
+
+  const categoryToggle = document.getElementById('financeCategoryToggle');
+  const categoryContent = document.getElementById('financeCategoryContent');
+  if (categoryToggle && categoryContent) {
+    categoryToggle.addEventListener('click', () => {
+      const isHidden = categoryContent.classList.toggle('hidden');
+      categoryToggle.setAttribute('aria-expanded', String(!isHidden));
+      categoryToggle.classList.toggle('expanded', !isHidden);
+    });
+  }
 }
 
 function renderFinanceIncome() {
