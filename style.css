@@ -20,8 +20,8 @@ body {
     display: flex;
     text-align: left;
     gap: 10px;
-     align-items: center;
-     justify-content: flex-start;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 .profile-container img {
@@ -73,12 +73,35 @@ body {
     margin: 5px;
 }
 
+header {
+    position: sticky;
+    top: -300px;
+    padding: 5px;
+    z-index: 0;
+    text-shadow: 2px 2px 4px black;
+    text-align: center;
+    transition: transform 0.3 opacity 0.35s ease;
+    background: none;
+    width: -webkit-fill-available;
+    border-radius: 5px;
+    font-family: cursive;
+    font-size: 2rem;
+    font-weight: bold;
+      font-size: 26px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
 .header-card, .input-card { 
-    width: 100%;
-    max-width: 368px;
     box-sizing: border-box;
     padding: 5px;
     border-radius: 16px; 
+}
+
+header, .header-card, .input-card {
+    width: 100%;
+    max-width: 368px;
 }
 
 .header-card, .limit-ok {
@@ -674,26 +697,6 @@ footer{
 
 footer p {
     margin: 0;
-}
-
-header {
-    position: sticky;
-    top: -300px;
-    padding: 5px;
-    z-index: 0;
-    text-shadow: 2px 2px 4px black;
-    text-align: center;
-    transition: transform 0.3 opacity 0.35s ease;
-    background: none;
-    width: -webkit-fill-available;
-    border-radius: 5px;
-    font-family: cursive;
-    font-size: 2rem;
-    font-weight: bold;
-      font-size: 26px;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 10px;
 }
 
 #itemPrice {
