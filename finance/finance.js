@@ -9,7 +9,13 @@ const financeState = {
   transactions: [],
   currencies: ['RUP', 'RUR', 'USD', 'EUR', 'MDL'],
   exchangeRates: {},
-  searchQuery: ''
+  searchQuery: '',
+  historyFilters: {
+    walletId: 'all',
+    date: '',
+    startDate: '',
+    endDate: ''
+  }
 };
 
 function initFinanceModule() {
@@ -25,7 +31,7 @@ function renderFinanceScreen() {
   if (!container) return;
   container.innerHTML = `
     <div class="finance-header">
-      <h2>Finance</h2>
+      <h2 ">Finance_Pro</h2>
       <button id="financeCloseBtn" class="finance-close-btn">✖</button>
     </div>
     <div class="finance-panel-tabs">
@@ -147,6 +153,7 @@ function renderFinancePanel() {
   renderFinanceHistory();
 }
 
+//Функция для рендеринга финансового дашборда, кошельков, доходов, расходов, переводов и истории
 function renderFinanceDashboard() {
   const panel = document.getElementById('financePanel-dashboard');
   if (!panel) return;
@@ -154,6 +161,7 @@ function renderFinanceDashboard() {
   const income = financeState.transactions.filter(tx => tx.type === 'income').reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
   const expenses = financeState.transactions.filter(tx => tx.type === 'expense').reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
   panel.innerHTML = `
+    <div class="finance-section-title"><span>Обзор</span></div>
     <div class="finance-dashboard-grid">
       <div class="finance-dashboard-card"><strong>Баланс</strong><span>${balance.toFixed(2)}</span></div>
       <div class="finance-dashboard-card"><strong>Доход</strong><span>${income.toFixed(2)}</span></div>
@@ -162,28 +170,34 @@ function renderFinanceDashboard() {
   `;
 }
 
+//Функция для рендеринга финансовых кошельков и категорий
 function renderFinanceWallets() {
   const panel = document.getElementById('financePanel-wallets');
   if (!panel) return;
   panel.innerHTML = `
+    <div class="finance-section-title"><span>Кошельки</span></div>
     <div class="finance-buttons-row">
       <button onclick="addFinanceWallet()">Добавить кошелек</button>
-      <button onclick="addFinanceCategory()">Добавить категорию</button>
     </div>
     <div id="financeWalletList"></div>
     <div id="financeCategoryList"></div>
   `;
+
+  // Рендеринг списка кошельков
   const list = document.getElementById('financeWalletList');
   list.innerHTML = financeState.wallets.map(wallet => `
     <div class="finance-item-card">
+    
       <div><strong>${wallet.name}</strong></div>
       <div>${wallet.type || 'Кошелек'} — ${wallet.currency} ${Number(wallet.balance || 0).toFixed(2)}</div>
       <div class="finance-item-actions">
-        <button onclick="editFinanceWallet('${wallet.id}')">✎</button>
-        <button onclick="removeFinanceWallet('${wallet.id}')">🗑</button>
+        <button class="btn-edit-wallet" onclick="editFinanceWallet('${wallet.id}')">✎ Редактировать</button>
+        <button class="btn-delete-wallet" onclick="removeFinanceWallet('${wallet.id}')">🗑 Удалить</button>
       </div>
     </div>
   `).join('');
+
+  // Рендеринг списка категорий
   const categoryList = document.getElementById('financeCategoryList');
   categoryList.innerHTML = `
     <div class="finance-category-section">
@@ -197,11 +211,12 @@ function renderFinanceWallets() {
             <div><span class="finance-category-swatch" style="background:${cat.color || '#4f46e5'}"></span> ${cat.name}</div>
             <div>${cat.type}</div>
             <div class="finance-item-actions">
-              <button onclick="editFinanceCategory('${cat.id}')">✎</button>
-              <button onclick="removeFinanceCategory('${cat.id}')">🗑</button>
+              <button style="background: #2563eb;" onclick="editFinanceCategory('${cat.id}')">✎ Редактировать</button>
+              <button style="background: #dc2626;" onclick="removeFinanceCategory('${cat.id}')">🗑 Удалить</button>
             </div>
           </div>
         `).join('') || '<div class="finance-item-card">Категорий пока нет</div>'}
+        <button type="button" class="finance-inline-action" onclick="addFinanceCategory()">Добавить категорию</button>
       </div>
     </div>
   `;
@@ -217,10 +232,12 @@ function renderFinanceWallets() {
   }
 }
 
+//Функция для рендеринга финансовых доходов
 function renderFinanceIncome() {
   const panel = document.getElementById('financePanel-income');
   if (!panel) return;
   panel.innerHTML = `
+    <div class="finance-section-title"><span style="color: green;">Доходы</span></div>
     <div class="finance-form">
       <div class="form-row">
         <input id="incomeName" type="text" placeholder="Название дохода">
@@ -235,7 +252,7 @@ function renderFinanceIncome() {
         <input id="incomeDate" type="date" value="${new Date().toISOString().slice(0, 10)}">
       </div>
       <textarea id="incomeComment" placeholder="Комментарий"></textarea>
-      <button onclick="saveFinanceTransaction('income')">Сохранить доход</button>
+      <button onclick="saveFinanceTransaction('income')">Создать доход</button>
     </div>
     <div id="financeTransactionListIncome"></div>
   `;
@@ -247,6 +264,7 @@ function renderFinanceExpenses() {
   const panel = document.getElementById('financePanel-expenses');
   if (!panel) return;
   panel.innerHTML = `
+    <div class="finance-section-title"><span style="color: #dc2626;">Расходы</span></div>
     <div class="finance-form">
       <div class="form-row">
         <input id="expenseName" type="text" placeholder="Название расхода">
@@ -261,7 +279,7 @@ function renderFinanceExpenses() {
         <input id="expenseDate" type="date" value="${new Date().toISOString().slice(0, 10)}">
       </div>
       <textarea id="expenseComment" placeholder="Комментарий"></textarea>
-      <button onclick="saveFinanceTransaction('expense')">Сохранить расход</button>
+      <button onclick="saveFinanceTransaction('expense')">Создать расход</button>
     </div>
     <div id="financeTransactionListExpense"></div>
   `;
@@ -273,6 +291,7 @@ function renderFinanceTransfers() {
   const panel = document.getElementById('financePanel-transfers');
   if (!panel) return;
   panel.innerHTML = `
+    <div class="finance-section-title"><span style="color: #2563eb;">Переводы</span></div>
     <div class="finance-form">
       <div class="form-row">
         <select id="transferFrom"></select>
@@ -286,55 +305,215 @@ function renderFinanceTransfers() {
         <input id="transferDate" type="date" value="${new Date().toISOString().slice(0, 10)}">
       </div>
       <textarea id="transferComment" placeholder="Комментарий"></textarea>
-      <button onclick="saveFinanceTransaction('transfer')">Сохранить перевод</button>
+      <button onclick="saveFinanceTransaction('transfer')">Создать перевод</button>
     </div>
     <div id="financeTransferPreview"></div>
   `;
   fillFinanceTransactionSelects('transfer');
 }
 
-function renderFinanceHistory() {
-  const panel = document.getElementById('financePanel-history');
-  if (!panel) return;
-  panel.innerHTML = `
-    <div class="finance-search-row">
-      <input id="financeSearchInput" placeholder="Поиск по операциям...">
-    </div>
-    <div id="financeHistoryList"></div>
-  `;
-  const input = document.getElementById('financeSearchInput');
-  if (input) {
-    input.oninput = event => {
-      financeState.searchQuery = event.target.value.toLowerCase();
-      renderFinanceHistory();
-    };
-    input.value = financeState.searchQuery;
-  }
-  const list = document.getElementById('financeHistoryList');
-  const filtered = financeState.transactions
+function getFilteredFinanceTransactions() {
+  const query = financeState.searchQuery.trim().toLowerCase();
+  const walletId = financeState.historyFilters.walletId;
+  const selectedDate = financeState.historyFilters.date;
+  const startDate = financeState.historyFilters.startDate;
+  const endDate = financeState.historyFilters.endDate;
+
+  return financeState.transactions
     .slice()
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .filter(tx => {
-      const query = financeState.searchQuery;
+      if (walletId !== 'all') {
+        if (tx.type === 'transfer') {
+          const isFrom = String(tx.fromWalletId) === String(walletId);
+          const isTo = String(tx.toWalletId) === String(walletId);
+          if (!isFrom && !isTo) return false;
+        } else if (String(tx.walletId) !== String(walletId)) {
+          return false;
+        }
+      }
+
+      if (selectedDate) {
+        const txDate = new Date(tx.date).toISOString().slice(0, 10);
+        if (txDate !== selectedDate) return false;
+      }
+
+      if (startDate || endDate) {
+        const txDate = new Date(tx.date).toISOString().slice(0, 10);
+        if (startDate && txDate < startDate) return false;
+        if (endDate && txDate > endDate) return false;
+      }
+
       if (!query) return true;
-      return [tx.name, tx.comment, tx.category, tx.type, tx.currency].some(field => String(field || '').toLowerCase().includes(query));
+      return [tx.name, tx.comment, tx.category, tx.type, tx.currency, tx.walletName, tx.fromWalletName, tx.toWalletName]
+        .some(field => String(field || '').toLowerCase().includes(query));
     });
+}
+
+function revertFinanceTransactionFromWallets(wallets, tx) {
+  return wallets.map(wallet => {
+    if (tx.type === 'transfer') {
+      if (wallet.id === tx.fromWalletId) {
+        const amount = convertCurrency(Number(tx.amount || 0), tx.currency, wallet.currency);
+        return { ...wallet, balance: Number(wallet.balance || 0) + amount };
+      }
+      if (wallet.id === tx.toWalletId) {
+        const amount = convertCurrency(Number(tx.amount || 0), tx.currency, wallet.currency);
+        return { ...wallet, balance: Number(wallet.balance || 0) - amount };
+      }
+      return { ...wallet };
+    }
+
+    if (wallet.id === tx.walletId) {
+      const delta = tx.type === 'income' ? -Number(tx.amount || 0) : Number(tx.amount || 0);
+      return { ...wallet, balance: Number(wallet.balance || 0) + delta };
+    }
+    return { ...wallet };
+  });
+}
+
+function applyFinanceTransactionToWallets(wallets, tx) {
+  return wallets.map(wallet => {
+    if (tx.type === 'transfer') {
+      if (wallet.id === tx.fromWalletId) {
+        const amount = convertCurrency(Number(tx.amount || 0), tx.currency, wallet.currency);
+        return { ...wallet, balance: Number(wallet.balance || 0) - amount };
+      }
+      if (wallet.id === tx.toWalletId) {
+        const amount = convertCurrency(Number(tx.amount || 0), tx.currency, wallet.currency);
+        return { ...wallet, balance: Number(wallet.balance || 0) + amount };
+      }
+      return { ...wallet };
+    }
+
+    if (wallet.id === tx.walletId) {
+      const delta = tx.type === 'income' ? Number(tx.amount || 0) : -Number(tx.amount || 0);
+      return { ...wallet, balance: Number(wallet.balance || 0) + delta };
+    }
+    return { ...wallet };
+  });
+}
+
+function buildFinanceWalletPayload(wallets) {
+  return wallets.reduce((acc, wallet) => {
+    acc[wallet.id] = {
+      name: wallet.name,
+      type: wallet.type,
+      currency: wallet.currency,
+      balance: Number(wallet.balance || 0)
+    };
+    return acc;
+  }, {});
+}
+
+function buildFinanceTransactionsPayload(transactions) {
+  return transactions.reduce((acc, tx) => {
+    acc[tx.id] = tx;
+    return acc;
+  }, {});
+}
+
+function renderFinanceHistoryList() {
+  const list = document.getElementById('financeHistoryList');
+  if (!list) return;
+  const filtered = getFilteredFinanceTransactions();
   const rows = filtered.map(tx => {
     const walletText = tx.type === 'transfer'
       ? `${tx.fromWalletName || ''}${tx.fromWalletName && tx.toWalletName ? ' → ' : ''}${tx.toWalletName || ''}`
       : tx.walletName || '';
+    const sign = tx.type === 'income' ? '+' : tx.type === 'expense' ? '-' : '';
+    const amountClass = tx.type === 'income' ? 'finance-amount-positive' : tx.type === 'expense' ? 'finance-amount-negative' : 'finance-amount-neutral';
     return `
       <div class="finance-item-card">
         <div><strong>${tx.type === 'transfer' ? 'Перевод' : tx.type === 'income' ? 'Доход' : 'Расход'}</strong></div>
         <div>${walletText}</div>
-        <div>${tx.currency} ${Number(tx.amount || 0).toFixed(2)}</div>
+        <div class="${amountClass}">${sign}${tx.currency} ${Number(tx.amount || 0).toFixed(2)}</div>
         <div>${tx.category || '-'}</div>
         <div>${tx.comment || ''}</div>
         <div>${new Date(tx.date).toLocaleString()}</div>
+        <div class="finance-item-actions">
+          <button class="btn-edit-wallet" onclick="editFinanceTransaction('${tx.id}')">✎ Редактировать</button>
+          <button class="btn-delete-wallet" onclick="removeFinanceTransaction('${tx.id}')">🗑 Удалить</button>
+        </div>
       </div>
     `;
   }).join('');
-  list.innerHTML = rows;
+  list.innerHTML = rows || '<div class="finance-item-card">Операции не найдены</div>';
+}
+
+function renderFinanceHistory() {
+  const panel = document.getElementById('financePanel-history');
+  if (!panel) return;
+  panel.innerHTML = `
+    <div class="finance-section-title"><span>История транзакций</span></div>
+    <div class="finance-history-filters">
+      <div class="finance-filter-group">
+        <label for="financeHistoryAccount">По счетам</label>
+        <select id="financeHistoryAccount">
+          <option value="all">Все счета</option>
+          ${financeState.wallets.map(wallet => `<option value="${wallet.id}" ${financeState.historyFilters.walletId === wallet.id ? 'selected' : ''}>${wallet.name} (${wallet.currency})</option>`).join('')}
+        </select>
+      </div>
+      <div class="finance-filter-group">
+        <label for="financeHistoryDate">По дате</label>
+        <input id="financeHistoryDate" type="date" value="${financeState.historyFilters.date || ''}">
+      </div>
+      <div class="finance-filter-group">
+        <label for="financeHistoryStartDate">Период с</label>
+        <input id="financeHistoryStartDate" type="date" value="${financeState.historyFilters.startDate || ''}">
+      </div>
+      <div class="finance-filter-group">
+        <label for="financeHistoryEndDate">Период по</label>
+        <input id="financeHistoryEndDate" type="date" value="${financeState.historyFilters.endDate || ''}">
+      </div>
+    </div>
+    <div class="finance-search-row">
+      <input id="financeSearchInput" placeholder="Поиск по операциям..." value="${financeState.searchQuery}">
+    </div>
+    <div id="financeHistoryList"></div>
+  `;
+
+  const input = document.getElementById('financeSearchInput');
+  if (input) {
+    input.oninput = event => {
+      financeState.searchQuery = event.target.value.toLowerCase();
+      renderFinanceHistoryList();
+    };
+  }
+
+  const accountSelect = document.getElementById('financeHistoryAccount');
+  if (accountSelect) {
+    accountSelect.onchange = event => {
+      financeState.historyFilters.walletId = event.target.value;
+      renderFinanceHistoryList();
+    };
+  }
+
+  const dateInput = document.getElementById('financeHistoryDate');
+  if (dateInput) {
+    dateInput.onchange = event => {
+      financeState.historyFilters.date = event.target.value;
+      renderFinanceHistoryList();
+    };
+  }
+
+  const startDateInput = document.getElementById('financeHistoryStartDate');
+  if (startDateInput) {
+    startDateInput.onchange = event => {
+      financeState.historyFilters.startDate = event.target.value;
+      renderFinanceHistoryList();
+    };
+  }
+
+  const endDateInput = document.getElementById('financeHistoryEndDate');
+  if (endDateInput) {
+    endDateInput.onchange = event => {
+      financeState.historyFilters.endDate = event.target.value;
+      renderFinanceHistoryList();
+    };
+  }
+
+  renderFinanceHistoryList();
 }
 
 function convertCurrency(amount, fromCurrency, toCurrency) {
@@ -376,29 +555,171 @@ function fillFinanceTransactionSelects(type) {
   }
 }
 
+//Функция для рендеринга списка финансовых транзакций
 function renderFinanceTransactionList(type, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
   const list = financeState.transactions
     .filter(tx => tx.type === type)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
-  container.innerHTML = list.map(tx => `
-    <div class="finance-item-card">
-      <div><strong>${tx.name || (type === 'income' ? 'Доход' : 'Расход')}</strong></div>
-      <div>${tx.walletName || ''}</div>
-      <div>${tx.currency} ${Number(tx.amount || 0).toFixed(2)}</div>
-      <div>${tx.category || '-'}</div>
-      <div>${tx.comment || ''}</div>
-      <div>${new Date(tx.date).toLocaleString()}</div>
-    </div>
-  `).join('');
+  container.innerHTML = list.map(tx => {
+    const sign = tx.type === 'income' ? '+' : tx.type === 'expense' ? '-' : '';
+    const amountClass = tx.type === 'income'
+      ? 'finance-amount-positive'
+      : tx.type === 'expense'
+        ? 'finance-amount-negative'
+        : 'finance-amount-neutral';
+    return `
+      <div class="finance-item-card">
+        <div><strong>${tx.name || (type === 'income' ? 'Доход' : 'Расход')}</strong></div>
+        <div>${tx.walletName || ''}</div>
+        <div class="${amountClass}">${sign}${tx.currency} ${Number(tx.amount || 0).toFixed(2)}</div>
+        <div>${tx.category || '-'}</div>
+        <div>${tx.comment || ''}</div>
+        <div>${new Date(tx.date).toLocaleString()}</div>
+      </div>
+    `;
+  }).join('');
 }
 
+function editFinanceTransaction(id) {
+  const tx = financeState.transactions.find(item => item.id === id);
+  if (!tx) return;
+
+  if (tx.type === 'transfer') {
+    const fromName = prompt('Счет отправления', tx.fromWalletName || '') || tx.fromWalletName || '';
+    const toName = prompt('Счет получения', tx.toWalletName || '') || tx.toWalletName || '';
+    const fromWallet = financeState.wallets.find(item => item.name === fromName) || financeState.wallets.find(item => item.id === tx.fromWalletId);
+    const toWallet = financeState.wallets.find(item => item.name === toName) || financeState.wallets.find(item => item.id === tx.toWalletId);
+    if (!fromWallet || !toWallet) {
+      alert('Выберите корректные счета для перевода');
+      return;
+    }
+
+    const amount = Number(prompt('Сумма', tx.amount || '0') || 0);
+    const currency = prompt('Валюта', tx.currency || 'RUP') || tx.currency || 'RUP';
+    const date = prompt('Дата (YYYY-MM-DD)', tx.date ? tx.date.slice(0, 10) : '') || tx.date || new Date().toISOString().slice(0, 10);
+    const comment = prompt('Комментарий', tx.comment || '') || tx.comment || '';
+
+    if (amount <= 0) {
+      alert('Сумма должна быть больше 0');
+      return;
+    }
+
+    const updatedWallets = applyFinanceTransactionToWallets(revertFinanceTransactionFromWallets(financeState.wallets.map(wallet => ({ ...wallet })), tx), {
+      ...tx,
+      amount,
+      currency,
+      date,
+      comment,
+      fromWalletId: fromWallet.id,
+      fromWalletName: fromWallet.name,
+      toWalletId: toWallet.id,
+      toWalletName: toWallet.name
+    });
+
+    const updatedTx = {
+      ...tx,
+      amount,
+      currency,
+      date,
+      comment,
+      fromWalletId: fromWallet.id,
+      fromWalletName: fromWallet.name,
+      toWalletId: toWallet.id,
+      toWalletName: toWallet.name
+    };
+
+    financeState.wallets = updatedWallets;
+    financeState.transactions = financeState.transactions.map(item => item.id === id ? updatedTx : item);
+    financeDb.child('wallets').set(buildFinanceWalletPayload(updatedWallets));
+    financeDb.child('transactions').set(buildFinanceTransactionsPayload(financeState.transactions));
+    renderFinancePanel();
+    return;
+  }
+
+  const walletName = prompt('Кошелек', tx.walletName || '') || tx.walletName || '';
+  const wallet = financeState.wallets.find(item => item.name === walletName) || financeState.wallets.find(item => item.id === tx.walletId);
+  if (!wallet) {
+    alert('Выберите корректный кошелек');
+    return;
+  }
+
+  const categoryName = prompt('Категория', tx.category || '') || tx.category || '';
+  const category = financeState.categories.find(item => item.name === categoryName) || financeState.categories.find(item => item.id === tx.categoryId);
+  const name = prompt('Название', tx.name || '') || tx.name || (tx.type === 'income' ? 'Доход' : 'Расход');
+  const amount = Number(prompt('Сумма', tx.amount || '0') || 0);
+  const currency = prompt('Валюта', tx.currency || 'RUP') || tx.currency || 'RUP';
+  const date = prompt('Дата (YYYY-MM-DD)', tx.date ? tx.date.slice(0, 10) : '') || tx.date || new Date().toISOString().slice(0, 10);
+  const comment = prompt('Комментарий', tx.comment || '') || tx.comment || '';
+
+  if (amount <= 0) {
+    alert('Сумма должна быть больше 0');
+    return;
+  }
+
+  const updatedWallets = applyFinanceTransactionToWallets(revertFinanceTransactionFromWallets(financeState.wallets.map(wallet => ({ ...wallet })), tx), {
+    ...tx,
+    name,
+    amount,
+    currency,
+    date,
+    comment,
+    walletId: wallet.id,
+    walletName: wallet.name,
+    category: category ? category.name : tx.category || '',
+    categoryId: category ? category.id : tx.categoryId || ''
+  });
+
+  const updatedTx = {
+    ...tx,
+    name,
+    amount,
+    currency,
+    date,
+    comment,
+    walletId: wallet.id,
+    walletName: wallet.name,
+    category: category ? category.name : tx.category || '',
+    categoryId: category ? category.id : tx.categoryId || ''
+  };
+
+  financeState.wallets = updatedWallets;
+  financeState.transactions = financeState.transactions.map(item => item.id === id ? updatedTx : item);
+  financeDb.child('wallets').set(buildFinanceWalletPayload(updatedWallets));
+  financeDb.child('transactions').set(buildFinanceTransactionsPayload(financeState.transactions));
+  renderFinancePanel();
+}
+
+function removeFinanceTransaction(id) {
+  const tx = financeState.transactions.find(item => item.id === id);
+  if (!tx) return;
+  if (!confirm('Удалить эту операцию?')) return;
+
+  const updatedWallets = revertFinanceTransactionFromWallets(financeState.wallets.map(wallet => ({ ...wallet })), tx);
+  const nextTransactions = financeState.transactions.filter(item => item.id !== id);
+  financeState.wallets = updatedWallets;
+  financeState.transactions = nextTransactions;
+  financeDb.child('wallets').set(buildFinanceWalletPayload(updatedWallets));
+  financeDb.child('transactions').set(buildFinanceTransactionsPayload(nextTransactions));
+  renderFinancePanel();
+}
+
+function promptFinanceCurrency(defaultCurrency = 'RUP') {
+  const currencies = financeState.currencies || ['RUP', 'RUR', 'USD', 'EUR', 'MDL'];
+  const value = prompt(`Валюта (${currencies.join(', ')})`, defaultCurrency || 'RUP');
+  if (!value) return defaultCurrency || 'RUP';
+
+  const normalized = value.trim().toUpperCase();
+  return currencies.includes(normalized) ? normalized : (defaultCurrency || 'RUP');
+}
+
+//Функции для добавления, редактирования и удаления кошельков и категорий
 function addFinanceWallet() {
   const name = prompt('Название кошелька/карты/счета');
   if (!name) return;
   const type = prompt('Тип (Кошелек/Карта/Счет)', 'Кошелек') || 'Кошелек';
-  const currency = prompt('Валюта (RUP,RUR,USD,EUR,MDL)', 'RUP') || 'RUP';
+  const currency = promptFinanceCurrency('RUP');
   const balance = Number(prompt('Баланс', '0') || 0);
   const id = `wallet-${Date.now()}`;
   const wallet = { name, type, currency, balance };
@@ -423,7 +744,7 @@ function editFinanceWallet(id) {
   if (!wallet) return;
   const name = prompt('Название кошелька/карты/счета', wallet.name) || wallet.name;
   const type = prompt('Тип (Кошелек/Карта/Счет)', wallet.type || 'Кошелек') || wallet.type;
-  const currency = prompt('Валюта (RUP,RUR,USD,EUR,MDL)', wallet.currency) || wallet.currency;
+  const currency = promptFinanceCurrency(wallet.currency || 'RUP');
   const balance = Number(prompt('Баланс', wallet.balance) || wallet.balance);
   const payload = financeState.wallets.reduce((acc, item) => ({ ...acc, [item.id]: item.id === id ? { name, type, currency, balance } : { name: item.name, type: item.type, currency: item.currency, balance: item.balance } }), {});
   financeDb.child('wallets').set(payload);
