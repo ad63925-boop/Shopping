@@ -44,6 +44,12 @@
     overflow: scroll;
 }
 
+.finance-category-section {
+    background: var(--finance-bg-income);
+    border-radius: var(--finance-radius-lg);
+    padding: 10px;
+}
+  
 /* Опционально: стили для заголовка-переключателя */
 .finance-history-header {
   cursor: pointer;

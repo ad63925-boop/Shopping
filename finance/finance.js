@@ -284,53 +284,105 @@ function renderFinanceWallets() {
   `).join('');
   }
 
-  //Функция для рендеринга финансовых кошельков и категорий
+  //Функция для рендеринга финансовых  и категорий
+//Функция для рендеринга финансовых кошельков и категорий
 function renderFinanceCategories() {
-  const panel = document.getElementById('financePanel-categories');
-  if (!panel) return;
-  panel.innerHTML = `
-    <div class="finance-section-title"><span>Категории</span></div>
-    <div class="finance-buttons-row">
-      <button onclick="addFinanceCategory()">Добавить категорию</button>
-    </div>
-    <div id="financeCategoryList"></div>
-  `;
+    const panel = document.getElementById('financePanel-categories');
+    if (!panel) return;
 
+    // Разделяем категории на доходы и расходы
+    const incomeCats = financeState.categories.filter(cat => cat.type === 'income');
+    const expenseCats = financeState.categories.filter(cat => cat.type === 'expense');
 
-  // Рендеринг списка категорий
-  const categoryList = document.getElementById('financeCategoryList');
-  categoryList.innerHTML = `
-    <div class="finance-category-section">
-      <button type="button" id="financeCategoryToggle" class="finance-category-toggle" aria-expanded="false">
-        <span>Категории</span>
-        <span class="finance-category-toggle-icon">▸</span>
-      </button>
-      <div id="financeCategoryContent" class="finance-category-content hidden">
-        ${financeState.categories.map(cat => `
-          <div class="finance-item-card">
-            <div><span class="finance-category-swatch" style="background:${cat.color || '#4f46e5'}"></span> ${cat.name}</div>
+    // Формируем HTML для доходов
+    const incomeHtml = incomeCats.map(cat => `
+        <div class="finance-item-card">
+            <div>
+                <span class="finance-category-swatch" style="background:${cat.color || '#22c55e'}"></span> ${cat.name}
+            </div>
             <div>${cat.type}</div>
             <div class="finance-item-actions">
-              <button style="background: #2563eb;" onclick="editFinanceCategory('${cat.id}')">✎ Редактировать</button>
-              <button style="background: #dc2626;" onclick="removeFinanceCategory('${cat.id}')">🗑 Удалить</button>
+                <button style="background: #2563eb;" onclick="editFinanceCategory('${cat.id}')">✎ Редактировать</button>
+                <button style="background: #dc2626;" onclick="removeFinanceCategory('${cat.id}')">🗑 Удалить</button>
             </div>
-          </div>
-        `).join('') || '<div class="finance-item-card">Категорий пока нет</div>'}
-        <button type="button" class="finance-inline-action" onclick="addFinanceCategory()">Добавить категорию</button>
-      </div>
-    </div>
-  `;
+        </div>
+    `).join('') || '<div class="finance-item-card">Нет категорий доходов</div>';
 
-  const categoryToggle = document.getElementById('financeCategoryToggle');
-  const categoryContent = document.getElementById('financeCategoryContent');
-  if (categoryToggle && categoryContent) {
-    categoryToggle.addEventListener('click', () => {
-      const isHidden = categoryContent.classList.toggle('hidden');
-      categoryToggle.setAttribute('aria-expanded', String(!isHidden));
-      categoryToggle.classList.toggle('expanded', !isHidden);
-    });
-  }
+    // Формируем HTML для расходов
+    const expenseHtml = expenseCats.map(cat => `
+        <div class="finance-item-card">
+            <div>
+                <span class="finance-category-swatch" style="background:${cat.color || '#ef4444'}"></span> ${cat.name}
+            </div>
+            <div>${cat.type}</div>
+            <div class="finance-item-actions">
+                <button style="background: #2563eb;" onclick="editFinanceCategory('${cat.id}')">✎ Редактировать</button>
+                <button style="background: #dc2626;" onclick="removeFinanceCategory('${cat.id}')">🗑 Удалить</button>
+            </div>
+        </div>
+    `).join('') || '<div class="finance-item-card">Нет категорий расходов</div>';
+
+    // Обновляем HTML панели
+    panel.innerHTML = `
+        <div class="finance-section-title"><span>Категории</span></div>
+        
+        <!-- Секция Доходов -->
+        <div class="finance-category-section">
+            <h3 style="color: #22c55e; margin: 10px 0 5px;">Категории Доходов</h3>
+            <button type="button" id="financeCategoryToggleIncome" class="finance-category-toggle" aria-expanded="false">
+                <span>Доходы</span>
+                <span class="finance-category-toggle-icon">▸</span>
+            </button>
+            <div id="financeCategoryContentIncome" class="finance-category-content hidden">
+                ${incomeHtml}
+            </div>
+        </div>
+
+        <!-- Секция Расходов -->
+        <div class="finance-category-section">
+            <h3 style="color: #dc2626; margin: 10px 0 5px;">Категории Расходов</h3>
+            <button type="button" id="financeCategoryToggleExpense" class="finance-category-toggle" aria-expanded="false">
+                <span>Расходы</span>
+                <span class="finance-category-toggle-icon">▸</span>
+            </button>
+            <div id="financeCategoryContentExpense" class="finance-category-content hidden">
+                ${expenseHtml}
+            </div>
+        </div>
+
+        <div class="finance-buttons-row" style="margin-top: 20px;">
+            <button class="finance-category-income-add" onclick="addFinanceCategory('income')" style="background: #22c55e; color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer;">Добавить категорию дохода</button>
+            <button class="finance-category-expense-add" onclick="addFinanceCategory('expense')" style="background: #dc2626; color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer;">Добавить категорию расхода</button>
+        </div>
+    `;
+
+    // Логика сворачивания/разворачивания для Доходов
+    const toggleIncome = document.getElementById('financeCategoryToggleIncome');
+    const contentIncome = document.getElementById('financeCategoryContentIncome');
+    if (toggleIncome && contentIncome) {
+        toggleIncome.addEventListener('click', () => {
+            const isHidden = contentIncome.classList.toggle('hidden');
+            toggleIncome.setAttribute('aria-expanded', String(!isHidden));
+            toggleIncome.classList.toggle('expanded', !isHidden);
+            const icon = toggleIncome.querySelector('.finance-category-toggle-icon');
+            if (icon) icon.textContent = isHidden ? '▸' : '▼';
+        });
+    }
+
+    // Логика сворачивания/разворачивания для Расходов
+    const toggleExpense = document.getElementById('financeCategoryToggleExpense');
+    const contentExpense = document.getElementById('financeCategoryContentExpense');
+    if (toggleExpense && contentExpense) {
+        toggleExpense.addEventListener('click', () => {
+            const isHidden = contentExpense.classList.toggle('hidden');
+            toggleExpense.setAttribute('aria-expanded', String(!isHidden));
+            toggleExpense.classList.toggle('expanded', !isHidden);
+            const icon = toggleExpense.querySelector('.finance-category-toggle-icon');
+            if (icon) icon.textContent = isHidden ? '▸' : '▼';
+        });
+    }
 }
+
 
 //Функция для рендеринга финансовых доходов
 function renderFinanceIncome() {
@@ -520,7 +572,7 @@ function buildFinanceTransactionsPayload(transactions) {
   }, {});
 }
 
-//Функция для рендеринга истории финансовых транзакций
+
 // Функция для рендеринга истории финансовых транзакций
 function renderFinanceHistoryList() {
   const list = document.getElementById('financeHistoryList');
