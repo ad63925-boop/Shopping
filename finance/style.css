@@ -39,6 +39,32 @@
     display: none;
 }
 
+#financeHistoryList {
+    height: 500px;
+    overflow: scroll;
+}
+
+/* Опционально: стили для заголовка-переключателя */
+.finance-history-header {
+  cursor: pointer;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 8px 8px 0 0;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+
+.toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+.finance-history-header.expanded .toggle-icon {
+  transform: rotate(180deg);
+}
+
 /* Шапка и навигация */
 .finance-header {
     display: flex;

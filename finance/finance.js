@@ -1,4 +1,77 @@
-﻿// Финансовый модуль: экран, операции, кошельки и категории
+﻿//-----------КНОПКИ--------------
+document.addEventListener('DOMContentLoaded', () => {
+  // Закрытие экрана финансов
+  const closeBtn = document.getElementById('financeCloseBtn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      document.getElementById('financeScreen').classList.add('hidden');
+      // тут можно сбросить состояние financeState.view и т.д.
+    });
+  }
+
+  // Переключение вкладок (пример для одной, остальные по аналогии)
+  const tabs = [
+    { btnId: 'financeNavDashboard', panelId: 'financePanel-dashboard' },
+    { btnId: 'financeNavWallets', panelId: 'financePanel-wallets' },
+    { btnId: 'financeNavIncome', panelId: 'financePanel-income' },
+    { btnId: 'financeNavExpenses', panelId: 'financePanel-expenses' },
+    { btnId: 'financeNavTransfers', panelId: 'financePanel-transfers' },
+    { btnId: 'financeNavCategories', panelId: 'financePanel-categories' },
+    { btnId: 'financeNavHistory', panelId: 'financePanel-history' }
+  ];
+
+  tabs.forEach(({ btnId, panelId }) => {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+      // убираем active у всех кнопок вкладок
+      document.querySelectorAll('.finance-panel-tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // скрываем все панели
+      document.querySelectorAll('.finance-panel').forEach(p => p.classList.add('hidden'));
+      // показываем нужную
+      const panel = document.getElementById(panelId);
+      if (panel) panel.classList.remove('hidden');
+
+      // можно обновить financeState.view здесь
+    });
+  });
+
+  // Кнопки действий: Добавить кошелек / категорию
+  const addWalletBtn = document.getElementById('btnAddWallet');
+  const addCategoryBtn = document.getElementById('btnAddCategory');
+
+  if (addWalletBtn) {
+    addWalletBtn.addEventListener('click', addFinanceWallet);
+  }
+  if (addCategoryBtn) {
+    addCategoryBtn.addEventListener('click', addFinanceCategory);
+  }
+
+  // Сохранение: Доход
+  const saveIncomeBtn = document.getElementById('btnSaveIncome');
+  if (saveIncomeBtn) {
+    saveIncomeBtn.addEventListener('click', () => saveFinanceTransaction('income'));
+  }
+
+  // Сохранение: Расход
+  const saveExpenseBtn = document.getElementById('btnSaveExpense');
+  if (saveExpenseBtn) {
+    saveExpenseBtn.addEventListener('click', () => saveFinanceTransaction('expense'));
+  }
+
+  // Сохранение: Перевод
+  const saveTransferBtn = document.getElementById('btnSaveTransfer');
+  if (saveTransferBtn) {
+    saveTransferBtn.addEventListener('click', () => saveFinanceTransaction('transfer'));
+  }
+});
+
+//-----------------------------------------------------------
+
+// Финансовый модуль: экран, операции, кошельки и категории
 const financeDb = firebase.database().ref('finance');
 
 const financeState = {
@@ -18,6 +91,7 @@ const financeState = {
   }
 };
 
+// Функция для инициализации финансового модуля
 function initFinanceModule() {
   if (financeState.initialized) return;
   renderFinanceScreen();
@@ -26,6 +100,7 @@ function initFinanceModule() {
   financeState.initialized = true;
 }
 
+//Функция для рендеринга экрана финансового модуля
 function renderFinanceScreen() {
   const container = document.getElementById('financeScreen');
   if (!container) return;
@@ -40,6 +115,7 @@ function renderFinanceScreen() {
       <button id="financeNavIncome">Доходы</button>
       <button id="financeNavExpenses">Расходы</button>
       <button id="financeNavTransfers">Переводы</button>
+      <button id="financeNavCategories">Категории</button>
       <button id="financeNavHistory">История</button>
     </div>
     <div id="financePanel-dashboard" class="finance-panel"></div>
@@ -47,6 +123,7 @@ function renderFinanceScreen() {
     <div id="financePanel-income" class="finance-panel hidden"></div>
     <div id="financePanel-expenses" class="finance-panel hidden"></div>
     <div id="financePanel-transfers" class="finance-panel hidden"></div>
+    <div id="financePanel-categories" class="finance-panel hidden"></div>
     <div id="financePanel-history" class="finance-panel hidden"></div>
   `;
 }
@@ -67,6 +144,7 @@ function closeFinanceScreen() {
   document.getElementById('mainAppScreen')?.classList.remove('hidden');
 }
 
+//Функция для установки событий на кнопки финансового модуля
 function setupFinanceEvents() {
   document.getElementById('financeCloseBtn')?.addEventListener('click', closeFinanceScreen);
   document.getElementById('financeNavDashboard')?.addEventListener('click', () => showFinancePanel('dashboard'));
@@ -74,15 +152,18 @@ function setupFinanceEvents() {
   document.getElementById('financeNavIncome')?.addEventListener('click', () => showFinancePanel('income'));
   document.getElementById('financeNavExpenses')?.addEventListener('click', () => showFinancePanel('expenses'));
   document.getElementById('financeNavTransfers')?.addEventListener('click', () => showFinancePanel('transfers'));
+  document.getElementById('financeNavCategories')?.addEventListener('click', () => showFinancePanel('categories'));
   document.getElementById('financeNavHistory')?.addEventListener('click', () => showFinancePanel('history'));
 }
 
+//Функция для открытия финансового модуля
 function openFinanceModule() {
   initFinanceModule();
   loadFinanceScreen();
   showFinancePanel('dashboard');
 }
 
+// Функция для переключения состояния финансового модуля
 function toggleFinanceModule() {
   const screen = document.getElementById('financeScreen');
   if (!screen) return openFinanceModule();
@@ -95,6 +176,7 @@ function toggleFinanceModule() {
 
 document.getElementById('financeBtn')?.addEventListener('click', toggleFinanceModule);
 
+//загрузка данных финансового модуля из Firebase
 function loadFinanceData() {
   financeDb.on('value', snapshot => {
     const data = snapshot.val() || {};
@@ -107,6 +189,7 @@ function loadFinanceData() {
   });
 }
 
+//Функция для обеспечения наличия данных по умолчанию в финансовом модуле
 function ensureFinanceDefaults() {
   if (!financeState.exchangeRates || Object.keys(financeState.exchangeRates).length === 0) {
     const defaultRates = { RUP: 1, RUR: 0.95, USD: 90, EUR: 100, MDL: 4.5 };
@@ -131,10 +214,12 @@ function ensureFinanceDefaults() {
   }
 }
 
+//Функция для сохранения данных в Firebase
 function saveFinanceNode(node, payload) {
   return financeDb.child(node).set(payload);
 }
 
+//Функция для отображения выбранной панели финансового модуля
 function showFinancePanel(panel) {
   financeState.view = panel;
   document.querySelectorAll('.finance-panel').forEach(el => el.classList.add('hidden'));
@@ -144,12 +229,14 @@ function showFinancePanel(panel) {
   renderFinancePanel();
 }
 
+//Функция для рендеринга финансового дашборда, кошельков, доходов, расходов, переводов и истории
 function renderFinancePanel() {
   renderFinanceDashboard();
   renderFinanceWallets();
   renderFinanceIncome();
   renderFinanceExpenses();
   renderFinanceTransfers();
+  renderFinanceCategories();
   renderFinanceHistory();
 }
 
@@ -180,7 +267,6 @@ function renderFinanceWallets() {
       <button onclick="addFinanceWallet()">Добавить кошелек</button>
     </div>
     <div id="financeWalletList"></div>
-    <div id="financeCategoryList"></div>
   `;
 
   // Рендеринг списка кошельков
@@ -196,6 +282,20 @@ function renderFinanceWallets() {
       </div>
     </div>
   `).join('');
+  }
+
+  //Функция для рендеринга финансовых кошельков и категорий
+function renderFinanceCategories() {
+  const panel = document.getElementById('financePanel-categories');
+  if (!panel) return;
+  panel.innerHTML = `
+    <div class="finance-section-title"><span>Категории</span></div>
+    <div class="finance-buttons-row">
+      <button onclick="addFinanceCategory()">Добавить категорию</button>
+    </div>
+    <div id="financeCategoryList"></div>
+  `;
+
 
   // Рендеринг списка категорий
   const categoryList = document.getElementById('financeCategoryList');
@@ -254,12 +354,14 @@ function renderFinanceIncome() {
       <textarea id="incomeComment" placeholder="Комментарий"></textarea>
       <button onclick="saveFinanceTransaction('income')">Создать доход</button>
     </div>
-    <div id="financeTransactionListIncome"></div>
+    
   `;
   fillFinanceTransactionSelects('income');
   renderFinanceTransactionList('income', 'financeTransactionListIncome');
 }
 
+
+//Функция для рендеринга финансовых расходов
 function renderFinanceExpenses() {
   const panel = document.getElementById('financePanel-expenses');
   if (!panel) return;
@@ -281,12 +383,12 @@ function renderFinanceExpenses() {
       <textarea id="expenseComment" placeholder="Комментарий"></textarea>
       <button onclick="saveFinanceTransaction('expense')">Создать расход</button>
     </div>
-    <div id="financeTransactionListExpense"></div>
   `;
   fillFinanceTransactionSelects('expense');
   renderFinanceTransactionList('expense', 'financeTransactionListExpense');
 }
 
+//Функция для рендеринга финансовых переводов
 function renderFinanceTransfers() {
   const panel = document.getElementById('financePanel-transfers');
   if (!panel) return;
@@ -312,6 +414,7 @@ function renderFinanceTransfers() {
   fillFinanceTransactionSelects('transfer');
 }
 
+//Функция для фильтрации финансовых транзакций по поисковому запросу, кошельку и дате
 function getFilteredFinanceTransactions() {
   const query = financeState.searchQuery.trim().toLowerCase();
   const walletId = financeState.historyFilters.walletId;
@@ -350,6 +453,7 @@ function getFilteredFinanceTransactions() {
     });
 }
 
+//Функция для применения финансовой транзакции к кошелькам
 function revertFinanceTransactionFromWallets(wallets, tx) {
   return wallets.map(wallet => {
     if (tx.type === 'transfer') {
@@ -372,6 +476,7 @@ function revertFinanceTransactionFromWallets(wallets, tx) {
   });
 }
 
+//Функция для применения финансовой транзакции к кошелькам
 function applyFinanceTransactionToWallets(wallets, tx) {
   return wallets.map(wallet => {
     if (tx.type === 'transfer') {
@@ -394,6 +499,7 @@ function applyFinanceTransactionToWallets(wallets, tx) {
   });
 }
 
+//Функция для построения полезной нагрузки для финансовых кошельков
 function buildFinanceWalletPayload(wallets) {
   return wallets.reduce((acc, wallet) => {
     acc[wallet.id] = {
@@ -406,6 +512,7 @@ function buildFinanceWalletPayload(wallets) {
   }, {});
 }
 
+//Функция для построения полезной нагрузки для финансовых транзакций
 function buildFinanceTransactionsPayload(transactions) {
   return transactions.reduce((acc, tx) => {
     acc[tx.id] = tx;
@@ -413,16 +520,35 @@ function buildFinanceTransactionsPayload(transactions) {
   }, {});
 }
 
+//Функция для рендеринга истории финансовых транзакций
+// Функция для рендеринга истории финансовых транзакций
 function renderFinanceHistoryList() {
   const list = document.getElementById('financeHistoryList');
   if (!list) return;
+
   const filtered = getFilteredFinanceTransactions();
-  const rows = filtered.map(tx => {
+
+  // --- ГЛАВНОЕ ИЗМЕНЕНИЕ: сортировка (новые сверху) ---
+  const sorted = filtered.slice().sort((a, b) => {
+    // Если есть timestamp (число) — лучше сортировать по нему
+    const timeA = a.timestamp ?? new Date(a.date).getTime();
+    const timeB = b.timestamp ?? new Date(b.date).getTime();
+    return timeB - timeA; // B - A → новые раньше
+  });
+  // -----------------------------------------------------
+
+  const rows = sorted.map(tx => {
     const walletText = tx.type === 'transfer'
       ? `${tx.fromWalletName || ''}${tx.fromWalletName && tx.toWalletName ? ' → ' : ''}${tx.toWalletName || ''}`
       : tx.walletName || '';
+
     const sign = tx.type === 'income' ? '+' : tx.type === 'expense' ? '-' : '';
-    const amountClass = tx.type === 'income' ? 'finance-amount-positive' : tx.type === 'expense' ? 'finance-amount-negative' : 'finance-amount-neutral';
+    const amountClass = tx.type === 'income'
+      ? 'finance-amount-positive'
+      : tx.type === 'expense'
+      ? 'finance-amount-negative'
+      : 'finance-amount-neutral';
+
     return `
       <div class="finance-item-card">
         <div><strong>${tx.type === 'transfer' ? 'Перевод' : tx.type === 'income' ? 'Доход' : 'Расход'}</strong></div>
@@ -438,9 +564,14 @@ function renderFinanceHistoryList() {
       </div>
     `;
   }).join('');
+
   list.innerHTML = rows || '<div class="finance-item-card">Операции не найдены</div>';
 }
 
+
+
+
+//Функция для рендеринга истории финансовых транзакций
 function renderFinanceHistory() {
   const panel = document.getElementById('financePanel-history');
   if (!panel) return;
@@ -516,6 +647,7 @@ function renderFinanceHistory() {
   renderFinanceHistoryList();
 }
 
+//Функция для конвертации валюты
 function convertCurrency(amount, fromCurrency, toCurrency) {
   if (!amount) return 0;
   if (fromCurrency === toCurrency) return Number(amount);
@@ -525,6 +657,8 @@ function convertCurrency(amount, fromCurrency, toCurrency) {
   return Number(amount) * (toRate / fromRate);
 }
 
+
+//Функция для заполнения селектов валют, кошельков и категорий в формах транзакций
 function fillFinanceTransactionSelects(type) {
   const currencySelect = document.getElementById(`${type}Currency`) || document.getElementById('transferCurrency');
   const walletSelect = document.getElementById(`${type}Wallet`);
@@ -582,6 +716,7 @@ function renderFinanceTransactionList(type, containerId) {
   }).join('');
 }
 
+//Функция для редактирования финансовой транзакции
 function editFinanceTransaction(id) {
   const tx = financeState.transactions.find(item => item.id === id);
   if (!tx) return;

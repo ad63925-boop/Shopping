@@ -23,7 +23,7 @@
       <button id="btnAddCategory">Добавить категорию</button>
     </div>
     <div id="financeWalletList"></div>
-    <div id="financeCategoryList"></div>
+    
   </div>
 
   <div id="financePanel-income" class="finance-panel hidden">
@@ -74,10 +74,25 @@
     <div id="financeTransferPreview"></div>
   </div>
 
-  <div id="financePanel-history" class="finance-panel hidden">
+  <div id="financePanel-categories" class="finance-panel" hidden>
+    <div id="financeCategoryList"></div>
+  </div>
+
+  <!-- История транзакций -->
+<div id="financePanel-history" class="finance-panel">
+  <!-- Заголовок-кнопка (всегда виден) -->
+  <div class="finance-history-header" id="financeHistoryToggle">
+    <span>📜 История операций</span>
+    <span class="toggle-icon">▼</span> <!-- Стрелочка для наглядности -->
+  </div>
+
+  <!-- Контент (по умолчанию скрыт) -->
+  <div id="financeHistoryContent" class="hidden">
     <div class="finance-search-row">
       <input id="financeSearchInput" placeholder="Поиск по операциям...">
     </div>
     <div id="financeHistoryList"></div>
   </div>
+</div>
+
 </div>
