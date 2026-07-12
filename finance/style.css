@@ -41,6 +41,8 @@
 
 #financeHistoryList {
     height: 500px;
+    padding: 3px;
+    border-radius: 7px;
     overflow: scroll;
     background: lightgray;
 }
@@ -465,7 +467,7 @@
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 10px;
-  margin: 0px 8px 5px;
+  margin: 6px 0px;
   cursor: pointer;
   transition: box-shadow 0.2s;
 }
@@ -476,18 +478,15 @@
 
 .finance-tx-summary {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;  
 }
 
 .finance-tx-category {
+  font-family: cursive;  
   font-size: 0.85rem;
   color: #666;
   margin-left: 6px;
 }
-
-.text-green { color: #22c55e; }
-.text-red { color: #ef4444; }
 
 .finance-tx-comment-preview {
   margin-top: 6px;
@@ -522,8 +521,16 @@
   font-size: 1.1rem;
   margin: 8px 0 12px;
 }
-.text-green { color: #22c55e; }
-.text-red { color: #ef4444; }
+
+.text-green { 
+    color: #22c55e;
+    text-align: right; 
+}
+
+.text-red { 
+    color: #ef4444;
+    text-align: right; 
+}
 
 .finance-wallet-edit-form input,
 .finance-wallet-edit-form select {

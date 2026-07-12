@@ -858,7 +858,7 @@ function renderTransactionListItem(tx) {
   return `
     <div class="finance-transaction-item" data-id="${tx.id}" onclick="toggleTransactionDetails(this)">
       <div class="finance-tx-summary">
-        ${icon} ${sourceName} ${categoryName ? '<span class="finance-tx-category">(' + categoryName + ')</span>' : ''}
+        ${icon} ${sourceName} ${categoryName ? '<span class="finance-tx-category">' + categoryName + '</span>' : ''}
         <span class="finance-tx-amount ${tx.type === 'income' ? 'text-green' : 'text-red'}">
           ${sign} ${Number(tx.amount || 0).toFixed(2)} ${tx.currency || ''}
         </span>
