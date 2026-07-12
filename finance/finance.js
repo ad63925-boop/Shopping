@@ -754,6 +754,66 @@ function renderFinanceHistoryList() {
   listContainer.innerHTML = html;
 }
 
+//Функция для рендеринга элемента списка финансовых транзакций
+function renderTransactionListItem(tx) {
+  // Определяем иконку/тип
+  let icon = '💵';
+  let sign = '';
+  if (tx.type === 'income') {
+    icon = '➕'; sign = '+';
+  } else if (tx.type === 'expense') {
+    icon = '➖'; sign = '-';
+  } else if (tx.type === 'transfer') {
+    icon = '🔄'; sign = '=';
+  }
+
+  // Название источника/кошелька (для переводов — от кого/кому)
+  let sourceName = '';
+  if (tx.type === 'transfer') {
+    const fromWallet = financeState.wallets.find(w => w.id === tx.fromWalletId)?.name || 'Неизвестный счёт';
+    const toWallet = financeState.wallets.find(w => w.id === tx.toWalletId)?.name || 'Неизвестный счёт';
+    sourceName = `(${fromWallet} → ${toWallet})`;
+  } else {
+    const wallet = financeState.wallets.find(w => w.id === tx.walletId)?.name || 'Неизвестный счёт';
+    sourceName = `(${wallet})`;
+  }
+
+  // Категория и комментарий (сокращённо)
+  const categoryName = tx.category || '';
+  const commentPreview = (tx.comment || '').length > 40
+    ? (tx.comment.substring(0, 40) + '…')
+    : (tx.comment || '');
+
+  return `
+    <div class="finance-transaction-item" data-id="${tx.id}" onclick="toggleTransactionDetails(this)">
+      <div class="finance-tx-summary">
+        ${icon} ${sourceName} ${categoryName ? '<span class="finance-tx-category">(' + categoryName + ')</span>' : ''}
+        <span class="finance-tx-amount ${tx.type === 'income' ? 'text-green' : 'text-red'}">
+          ${sign} ${Number(tx.amount || 0).toFixed(2)} ${tx.currency || ''}
+        </span>
+      </div>
+      ${commentPreview ? `<div class="finance-tx-comment-preview">💬 ${commentPreview}</div>` : ''}
+      
+      <!-- Скрытая карточка (полная информация) -->
+      <div class="finance-tx-details hidden">
+        <div><strong>Тип:</strong> ${tx.type}</div>
+        ${tx.type === 'transfer'
+          ? `
+            <div><strong>От:</strong> ${financeState.wallets.find(w => w.id === tx.fromWalletId)?.name || '—'} (${tx.fromWalletCurrency || ''})</div>
+            <div><strong>Кому:</strong> ${financeState.wallets.find(w => w.id === tx.toWalletId)?.name || '—'} (${tx.toWalletCurrency || ''})</div>
+          `
+          : `
+            <div><strong>Счёт:</strong> ${financeState.wallets.find(w => w.id === tx.walletId)?.name || '—'}</div>
+          `}
+        <div><strong>Категория:</strong> ${tx.category || 'Без категории'}</div>
+        <div><strong>Дата:</strong> ${new Date(tx.date).toLocaleString('ru-RU')}</div>
+        <div><strong>Комментарий:</strong> <em>${tx.comment || 'Нет комментария'}</em></div>
+        <div style="margin-top:8px; font-size:0.875rem; color:#666;">ID: ${tx.id}</div>
+      </div>
+    </div>
+  `;
+}
+
 
 //Функция для конвертации валюты
 function convertCurrency(amount, fromCurrency, toCurrency) {
