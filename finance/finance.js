@@ -472,7 +472,7 @@ function renderFinanceIncome() {
       </div>
       <div class="form-row">
         <input id="incomeAmount" type="number" placeholder="Сумма">
-        <input id="incomeDate" type="date" value="${new Date().toISOString().slice(0, 10)}">
+        <input id="incomeDate" type="date" value="">
       </div>
       <textarea id="incomeComment" placeholder="Комментарий"></textarea>
       <button onclick="saveFinanceTransaction('income')">Создать доход</button>
@@ -500,7 +500,7 @@ function renderFinanceExpenses() {
       </div>
       <div class="form-row">
         <input id="expenseAmount" type="number" placeholder="Сумма">
-        <input id="expenseDate" type="date" value="${new Date().toISOString().slice(0, 10)}">
+        <input id="expenseDate" type="date" value="" required>
       </div>
       <textarea id="expenseComment" placeholder="Комментарий"></textarea>
       <button onclick="saveFinanceTransaction('expense')">Создать расход</button>
@@ -526,7 +526,7 @@ function renderFinanceTransfers() {
         <input id="transferAmount" type="number" placeholder="Сумма">
       </div>
       <div class="form-row-full">
-        <input id="transferDate" type="date" value="${new Date().toISOString().slice(0, 10)}">
+        <input id="transferDate" type="date" value="" required>
       </div>
       <textarea id="transferComment" placeholder="Комментарий"></textarea>
       <button onclick="saveFinanceTransaction('transfer')">Создать перевод</button>
@@ -1139,6 +1139,7 @@ function renderFinanceTransactionList(type, containerId) {
   }).join('');
 }
 
+/*
 //Функция для редактирования финансовой транзакции
 function editFinanceTransaction(id) {
   const tx = financeState.transactions.find(item => item.id === id);
@@ -1274,7 +1275,7 @@ Swal.fire({
   financeDb.child('wallets').set(buildFinanceWalletPayload(updatedWallets));
   financeDb.child('transactions').set(buildFinanceTransactionsPayload(financeState.transactions));
   renderFinancePanel();
-}
+}*/
 
 async function removeFinanceTransaction(id) {
   const tx = financeState.transactions.find(item => item.id === id);
@@ -1650,7 +1651,21 @@ function saveFinanceTransaction(type) {
   const amountInput = document.getElementById(`${type === 'income' ? 'incomeAmount' : type === 'expense' ? 'expenseAmount' : 'transferAmount'}`);
   const amount = Number(amountInput?.value || 0);
   const comment = document.getElementById(`${type === 'income' ? 'incomeComment' : type === 'expense' ? 'expenseComment' : 'transferComment'}`)?.value || '';
-  const date = document.getElementById(`${type === 'income' ? 'incomeDate' : type === 'expense' ? 'expenseDate' : 'transferDate'}`)?.value || new Date().toISOString();
+  const date = document.getElementById(`${type === 'income' ? 'incomeDate' : type === 'expense' ? 'expenseDate' : 'transferDate'}`)?.value || '';
+
+  // ПРОВЕРКА: если даты нет — показываем ошибку и прерываем
+  if (!date) {
+
+    Swal.fire({ 
+      icon: 'warning', 
+      title: 'Дата не указана', 
+      text: 'Пожалуйста, выберите дату операции', 
+      confirmButtonColor: '#2563eb' 
+    });  
+
+    document.getElementById(`${type === 'income' ? 'incomeDate' : type === 'expense' ? 'expenseDate' : 'transferDate'}`)?.focus();
+    return; // прерываем функцию сохранения
+  }
 
   if (amount <= 0) {
     Swal.fire({ icon: 'warning', title: 'Некорректная сумма', text: 'Сумма должна быть больше 0', confirmButtonColor: '#2563eb' });
