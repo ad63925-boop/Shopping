@@ -814,6 +814,18 @@ function renderTransactionListItem(tx) {
   `;
 }
 
+//Функция для переключения видимости деталей транзакции
+function toggleTransactionDetails(element) {
+  const details = element.querySelector('.finance-tx-details');
+  if (!details) return;
+  const isHidden = details.classList.toggle('hidden');
+  
+  // Опционально: меняем стрелочку/иконку в заголовке, если есть
+  const summary = element.querySelector('.finance-tx-summary');
+  if (summary) {
+    summary.style.cursor = 'default'; // чтобы было понятно, что клик уже обработан
+  }
+}
 
 //Функция для конвертации валюты
 function convertCurrency(amount, fromCurrency, toCurrency) {
