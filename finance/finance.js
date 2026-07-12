@@ -465,7 +465,6 @@ function renderFinanceIncome() {
     <div class="finance-form">
       <div class="form-row">
         <input id="incomeName" type="text" placeholder="Название дохода">
-        <select id="incomeCurrency"></select>
       </div>
       <div class="form-row">
         <select id="incomeWallet"></select>
@@ -494,7 +493,6 @@ function renderFinanceExpenses() {
     <div class="finance-form">
       <div class="form-row">
         <input id="expenseName" type="text" placeholder="Название расхода">
-        <select id="expenseCurrency"></select>
       </div>
       <div class="form-row">
         <select id="expenseWallet"></select>
@@ -1094,9 +1092,6 @@ function fillFinanceTransactionSelects(type) {
   const fromSelect = document.getElementById('transferFrom');
   const toSelect = document.getElementById('transferTo');
 
-  if (currencySelect) {
-    currencySelect.innerHTML = financeState.currencies.map(cur => `<option value="${cur}">${cur}</option>`).join('');
-  }
   if (walletSelect) {
     walletSelect.innerHTML = financeState.wallets.map(wallet => `<option value="${wallet.id}">${wallet.name} (${wallet.currency})</option>`).join('');
   }
@@ -1654,25 +1649,21 @@ function removeFinanceCategory(id) {
 function saveFinanceTransaction(type) {
   const amountInput = document.getElementById(`${type === 'income' ? 'incomeAmount' : type === 'expense' ? 'expenseAmount' : 'transferAmount'}`);
   const amount = Number(amountInput?.value || 0);
-  const currency = document.getElementById(`${type === 'income' ? 'incomeCurrency' : type === 'expense' ? 'expenseCurrency' : 'transferCurrency'}`)?.value || 'RUP';
   const comment = document.getElementById(`${type === 'income' ? 'incomeComment' : type === 'expense' ? 'expenseComment' : 'transferComment'}`)?.value || '';
   const date = document.getElementById(`${type === 'income' ? 'incomeDate' : type === 'expense' ? 'expenseDate' : 'transferDate'}`)?.value || new Date().toISOString();
 
   if (amount <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Валидация', text: 'Сумма должна быть больше 0' });
+    Swal.fire({ icon: 'warning', title: 'Некорректная сумма', text: 'Сумма должна быть больше 0', confirmButtonColor: '#2563eb' });
     return;
   }
 
+  // Логика для ПЕРЕВОДА (остается прежней, валюта берется из селекта)
   if (type === 'transfer') {
+    const currency = document.getElementById('transferCurrency')?.value || 'RUP';
     const fromId = document.getElementById('transferFrom')?.value;
     const toId = document.getElementById('transferTo')?.value;
     if (!fromId || !toId || fromId === toId) {
-      Swal.fire({
-  icon: 'warning',
-  title: 'Проверьте счета',
-  text: 'Выберите разные счета для перевода',
-  confirmButtonColor: '#2563eb'
-});
+      Swal.fire({ icon: 'warning', title: 'Проверьте счета', text: 'Выберите разные счета для перевода', confirmButtonColor: '#2563eb' });
       return;
     }
     const fromWallet = financeState.wallets.find(item => item.id === fromId);
@@ -1707,47 +1698,30 @@ function saveFinanceTransaction(type) {
     };
     const payload = financeState.transactions.reduce((acc, tx) => ({ ...acc, [tx.id]: tx }), {});
     payload[txId] = transaction;
-  financeDb.child('transactions').set(payload);
-  Swal.fire({
-  icon: 'success',
-  title: type === 'income' ? 'Доход сохранен' : 'Расход сохранен',
-  toast: true,               // Делает окно маленьким всплывающим "нотисом"
-  position: 'top-end',       // В правом верхнем углу
-  showConfirmButton: false,
-  timer: 3000,
-  timerProgressBar: true
-});
-  
-  // --- ДОБАВИТЬ: Сброс полей формы ---
-  const fieldsToReset = ['Name', 'Amount', 'Comment'];
-  fieldsToReset.forEach(field => {
-    const input = document.getElementById(`${type}${field}`);
-    if (input) input.value = field === 'Amount' ? '' : '';
-  });
-  // Возвращаем дату на текущую
-  const dateInput = document.getElementById(`${type}Date`);
-  if (dateInput) dateInput.value = new Date().toISOString().slice(0, 10);
-  // ------------------------------------
-
-  renderFinanceTransactionList(type, type === 'income' ? 'financeTransactionListIncome' : 'financeTransactionListExpense');
-  renderFinanceHistory();
+    financeDb.child('transactions').set(payload);
+    
+    Swal.fire({ icon: 'success', title: 'Перевод сохранен', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
+    renderFinanceTransfers();
+    renderFinanceHistory();
     return;
   }
 
+  // Логика для ДОХОДА и РАСХОДА (ИСПРАВЛЕНО)
   const name = document.getElementById(`${type === 'income' ? 'incomeName' : 'expenseName'}`)?.value || (type === 'income' ? 'Доход' : 'Расход');
   const walletId = document.getElementById(`${type === 'income' ? 'incomeWallet' : 'expenseWallet'}`)?.value;
   const categoryId = document.getElementById(`${type === 'income' ? 'incomeCategory' : 'expenseCategory'}`)?.value;
+  
   const wallet = financeState.wallets.find(item => item.id === walletId);
   const category = financeState.categories.find(item => item.id === categoryId);
+  
   if (!wallet) {
-    Swal.fire({
-  icon: 'warning',
-  title: 'Выбор счета',
-  text: 'Пожалуйста, выберите кошелек для проведения операции',
-  confirmButtonColor: '#2563eb'
-});
+    Swal.fire({ icon: 'warning', title: 'Ошибка выбора', text: 'Выберите корректный кошелек', confirmButtonColor: '#2563eb' });
     return;
   }
+
+  // 👇 ВАЛЮТА ПРИНУДИТЕЛЬНО БЕРЕТСЯ ИЗ ВЫБРАННОГО КОШЕЛЬКА 👇
+  const currency = wallet.currency || 'RUP';
+
   const payloadWallets = financeState.wallets.reduce((acc, item) => {
     if (item.id === wallet.id) {
       const delta = type === 'income' ? amount : -amount;
@@ -1757,14 +1731,16 @@ function saveFinanceTransaction(type) {
     }
     return acc;
   }, {});
+  
   financeDb.child('wallets').set(payloadWallets);
+  
   const txId = `tx-${Date.now()}`;
   const transaction = {
     id: txId,
     name,
     type,
     amount,
-    currency,
+    currency, // запишется валюта кошелька
     comment,
     date,
     walletId: wallet.id,
@@ -1772,18 +1748,13 @@ function saveFinanceTransaction(type) {
     category: category ? category.name : '',
     categoryId: category?.id || ''
   };
+  
   const payload = financeState.transactions.reduce((acc, tx) => ({ ...acc, [tx.id]: tx }), {});
   payload[txId] = transaction;
   financeDb.child('transactions').set(payload);
-  Swal.fire({
-  icon: 'success',
-  title: type === 'income' ? 'Доход сохранен' : 'Расход сохранен',
-  toast: true,
-  position: 'top-end',
-  showConfirmButton: false,
-  timer: 2500,
-  timerProgressBar: true
-});
+  
+  Swal.fire({ icon: 'success', title: type === 'income' ? 'Доход сохранен' : 'Расход сохранен', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
+  
   renderFinanceTransactionList(type, type === 'income' ? 'financeTransactionListIncome' : 'financeTransactionListExpense');
   renderFinanceHistory();
 }
@@ -1793,55 +1764,51 @@ function saveFinanceTransaction(type) {
 function initFinanceTabs() {
   console.log("[Finance] Инициализация вкладок панели...");
 
+  // Добавляем классы иконок Font Awesome для каждой вкладки
   const tabs = [
-    { btnId: 'financeNavDashboard', panelId: 'financePanel-dashboard', view: 'dashboard' },
-    { btnId: 'financeNavWallets', panelId: 'financePanel-wallets', view: 'wallets' },
-    { btnId: 'financeNavIncome', panelId: 'financePanel-income', view: 'income' },
-    { btnId: 'financeNavExpenses', panelId: 'financePanel-expenses', view: 'expenses' },
-    { btnId: 'financeNavTransfers', panelId: 'financePanel-transfers', view: 'transfers' },
-    { btnId: 'financeNavCategories', panelId: 'financePanel-categories', view: 'categories' },
-    { btnId: 'financeNavHistory', panelId: 'financePanel-history', view: 'history' }
+    { btnId: 'financeNavDashboard', panelId: 'financePanel-dashboard', view: 'dashboard', icon: 'fa-chart-pie', title: 'Главная' },
+    { btnId: 'financeNavWallets', panelId: 'financePanel-wallets', view: 'wallets', icon: 'fa-wallet', title: 'Кошельки' },
+    { btnId: 'financeNavIncome', panelId: 'financePanel-income', view: 'income', icon: 'fa-arrow-down-long', title: 'Доходы' },
+    { btnId: 'financeNavExpenses', panelId: 'financePanel-expenses', view: 'expenses', icon: 'fa-arrow-up-long', title: 'Расходы' },
+    { btnId: 'financeNavTransfers', panelId: 'financePanel-transfers', view: 'transfers', icon: 'fa-right-left', title: 'Переводы' },
+    { btnId: 'financeNavCategories', panelId: 'financePanel-categories', view: 'categories', icon: 'fa-tags', title: 'Категории' },
+    { btnId: 'financeNavHistory', panelId: 'financePanel-history', view: 'history', icon: 'fa-history', title: 'История' }
   ];
 
-  tabs.forEach(({ btnId, panelId, view }) => {
+  tabs.forEach(({ btnId, panelId, view, icon, title }) => {
     const btn = document.getElementById(btnId);
     if (!btn) {
-      console.warn(`[Finance Error] Кнопка ${btnId} всё еще не найдена в DOM! Проверьте ID в HTML-шаблоне.`);
+      console.warn(`[Finance Error] Кнопка ${btnId} не найдена в DOM!`);
       return;
     }
 
-    // Удаляем старый слушатель, если функция вызывается повторно, и вешаем новый
+    // ЧИСТИМ ТЕКСТ И ВСТАВЛЯЕМ ИКОНКУ Font Awesome
+    // Атрибут title добавит всплывающую подсказку при наведении на десктопе
+    btn.innerHTML = `<i class="fa-solid ${icon}"></i>`;
+    btn.setAttribute('title', title); 
+    btn.setAttribute('aria-label', title); // Для доступности
+
+    // Пересоздаем слушатель клика (защита от дублирования)
     btn.replaceWith(btn.cloneNode(true)); 
     const freshBtn = document.getElementById(btnId);
 
     freshBtn.addEventListener('click', () => {
       console.log(`--- [Клик] Нажата вкладка: ${view} ---`);
-      
       financeState.view = view;
 
-      // Переключаем класс active
       document.querySelectorAll('.finance-panel-tabs button').forEach(b => b.classList.remove('active'));
       freshBtn.classList.add('active');
 
-      // Скрываем все панели
       document.querySelectorAll('.finance-panel').forEach(p => p.classList.add('hidden'));
       
-      // Показываем нужную
       const panel = document.getElementById(panelId);
-      if (panel) {
-        panel.classList.remove('hidden');
-      }
+      if (panel) panel.classList.remove('hidden');
 
-      // Сначала рендерим данные внутри вкладки
       triggerPanelSpecificRender(view);
 
-      // Теперь плавно скроллим к уже построенному контенту
       if (panel) {
         setTimeout(() => {
-          panel.scrollIntoView({
-            behavior: 'smooth', 
-            block: 'start'      
-          });
+          panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
       }
     });

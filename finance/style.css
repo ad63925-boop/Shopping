@@ -90,24 +90,11 @@
 
 .finance-panel-tabs {
     display: flex;
+    justify-content: space-between; /* Растянет иконки равномерно по экрану */
     position: fixed;
     bottom: 0;
+    width: 100%;
     background-color: var(--finance-bg-income);
-    gap: var(--finance-gap-sm);
-    flex-wrap: wrap;
-    justify-content: space-around;
-    padding: var(--finance-pad-md);
-    margin-bottom: var(--finance-gap-lg);
-}
-
-.finance-panel-tabs button {
-    padding: 5px 10px;
-    border: none;
-    background: var(--finance-accent);
-    color: var(--finance-surface);
-    border-radius: var(--finance-radius-sm);
-    cursor: pointer;
-    transition: background 0.2s ease;
 }
 
 .finance-panel-tabs button:hover,
@@ -576,4 +563,36 @@
 
 #financePanel-history {
     margin-bottom: 95px;/* Чтобы панель истории занимала оставшееся пространство */
+}
+
+/* Стилизуем кнопки под круглые аккуратные табы */
+.finance-panel-tabs button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;  /* Фиксированная ширина */
+  height: 44px; /* Фиксированная высота */
+  min-width: 44px;
+  border-radius: 50%; /* Делает кнопки круглыми. Если хотите скругленные квадраты — ставьте 10px */
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 1rem; /* Размер самой иконки */
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+/* Эффект ховера */
+.finance-panel-tabs button:hover {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+/* Активная иконка */
+.finance-panel-tabs button.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4);
+  transform: scale(1.05); /* Легкое увеличение активной кнопки */
 }
