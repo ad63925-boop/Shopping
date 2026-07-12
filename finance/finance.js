@@ -1125,24 +1125,108 @@ function addFinanceCategory() {
   financeDb.child('categories').set(payload);
 }
 
-function editFinanceWallet(id) {
-  const wallet = financeState.wallets.find(item => item.id === id);
+//Функция для редактирования финансового кошелька
+function editFinanceWallet(walletId) {
+  const wallet = financeState.wallets.find(w => w.id === walletId);
   if (!wallet) return;
-  const name = prompt('Название кошелька/карты/счета', wallet.name) || wallet.name;
-  const type = prompt('Тип (Кошелек/Карта/Счет)', wallet.type || 'Кошелек') || wallet.type;
-  const currency = promptFinanceCurrency(wallet.currency || 'RUP');
-  const balance = Number(prompt('Баланс', wallet.balance) || wallet.balance);
-  const payload = financeState.wallets.reduce((acc, item) => ({ ...acc, [item.id]: item.id === id ? { name, type, currency, balance } : { name: item.name, type: item.type, currency: item.currency, balance: item.balance } }), {});
-  financeDb.child('wallets').set(payload);
+
+  const card = document.querySelector(`.finance-item-card button[onclick*="'${walletId}'"]`).closest('.finance-item-card');
+  if (!card) return;
+
+  card.innerHTML = `
+    <form class="finance-wallet-edit-form" onsubmit="handleWalletEdit(event, '${walletId}')">
+      <div>
+        <label>Название</label>
+        <input type="text" id="walletName_${walletId}" value="${escapeHtml(wallet.name)}" required>
+      </div>
+      <div>
+        <label>Тип</label>
+        <select id="walletType_${walletId}">
+          <option value="cash" ${wallet.type === 'cash' ? 'selected' : ''}>Наличные</option>
+          <option value="card" ${wallet.type === 'card' ? 'selected' : ''}>Карта</option>
+          <option value="account" ${wallet.type === 'account' ? 'selected' : ''}>Счёт</option>
+        </select>
+      </div>
+      <div>
+        <label>Валюта</label>
+        <input type="text" id="walletCurrency_${walletId}" value="${wallet.currency || 'RUB'}" required>
+      </div>
+      <div>
+        <label>Баланс (текущий)</label>
+        <input type="number" id="walletBalance_${walletId}" step="0.01" value="${wallet.balance || 0}" readonly style="background:#f3f4f6;">
+        <small style="color:#666;">Баланс лучше менять через транзакции, а не вручную.</small>
+      </div>
+      <div class="finance-wallet-form-actions">
+        <button type="submit" class="btn-save">Сохранить</button>
+        <button type="button" onclick="renderFinanceWallets()" class="btn-cancel">Отмена</button>
+      </div>
+    </form>
+  `;
 }
 
-function removeFinanceWallet(id) {
-  const payload = financeState.wallets.reduce((acc, wallet) => {
-    if (wallet.id !== id) acc[wallet.id] = { name: wallet.name, type: wallet.type, currency: wallet.currency, balance: wallet.balance };
-    return acc;
-  }, {});
-  financeDb.child('wallets').set(payload);
+//Функция для обработки редактирования кошелька
+async function handleWalletEdit(e, walletId) {
+  e.preventDefault();
+
+  const name = document.getElementById(`walletName_${walletId}`).value.trim();
+  const type = document.getElementById(`walletType_${walletId}`).value;
+  const currency = document.getElementById(`walletCurrency_${walletId}`).value.trim();
+
+  if (!name) {
+    alert('Название кошелька обязательно.');
+    return;
+  }
+
+  try {
+    const updatedWallet = {
+      id: walletId,
+      name,
+      type,
+      currency,
+      // баланс не меняем здесь: он считается по транзакциям
+    };
+
+    const db = firebase.firestore();
+    await db.collection('wallets').doc(walletId).set(updatedWallet, { merge: true });
+
+    // Обновить локально
+    const idx = financeState.wallets.findIndex(w => w.id === walletId);
+    if (idx >= 0) financeState.wallets[idx] = updatedWallet;
+
+    renderFinanceWallets();
+    alert('Кошелёк обновлён.');
+  } catch (err) {
+    console.error(err);
+    alert('Ошибка при сохранении кошелька.');
+  }
 }
+
+//Функция для удаления финансового кошелька
+async function removeFinanceWallet(walletId, hasTransactions) {
+  if (hasTransactions) {
+    alert('Нельзя удалить кошелёк, по которому есть транзакции. Сначала удалите или перенесите операции.');
+    return;
+  }
+
+  if (!confirm('Вы уверены, что хотите удалить этот кошелёк? Это действие нельзя отменить.')) return;
+
+  try {
+    // 1. Удалить из Firebase
+    const db = firebase.firestore();
+    await db.collection('wallets').doc(walletId).delete();
+
+    // 2. Удалить локально
+    financeState.wallets = financeState.wallets.filter(w => w.id !== walletId);
+
+    renderFinanceWallets();
+    renderFinanceHistoryList(); // если где-то отображаются кошельки
+    alert('Кошелёк удалён.');
+  } catch (err) {
+    console.error(err);
+    alert('Ошибка при удалении кошелька.');
+  }
+}
+
 
 function editFinanceCategory(id) {
   const category = financeState.categories.find(item => item.id === id);

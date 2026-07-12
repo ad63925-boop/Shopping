@@ -506,3 +506,47 @@
   text-align: center;
   color: #6b7280;
 }
+
+/*Кошельки*/
+.finance-wallet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.finance-wallet-type {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+.finance-wallet-balance {
+  font-size: 1.1rem;
+  margin: 8px 0 12px;
+}
+.text-green { color: #22c55e; }
+.text-red { color: #ef4444; }
+
+.finance-wallet-edit-form input,
+.finance-wallet-edit-form select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+.finance-wallet-form-actions {
+  display: flex;
+  gap: 8px;
+}
+.btn-cancel {
+  background: #e5e7eb;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-delete-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #ccc;
+}
