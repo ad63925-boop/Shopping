@@ -133,6 +133,7 @@
     border-radius: var(--finance-radius-lg);
     padding: 5px;
     margin: 5px 0;
+    scroll-margin-top: 60px; /* Высота вашей фиксированной шапки, если она есть */
 }
 
 #financePanel-income {

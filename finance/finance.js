@@ -169,6 +169,17 @@ function closeFinanceScreen() {
 //Функция для установки событий на кнопки финансового модуля
 function setupFinanceEvents() {
   document.getElementById('financeCloseBtn')?.addEventListener('click', closeFinanceScreen);
+  
+  const setupTabScroll = (btnId, panelId, view) => {
+    const btn = document.getElementById(btnId);
+    btn?.addEventListener('click', () => {
+      showFinancePanel(view);
+      setTimeout(() => {
+        document.getElementById(panelId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+    });
+  };
+  document.getElementById('financeCloseBtn')?.addEventListener('click', closeFinanceScreen);
   document.getElementById('financeNavDashboard')?.addEventListener('click', () => showFinancePanel('dashboard'));
   document.getElementById('financeNavWallets')?.addEventListener('click', () => showFinancePanel('wallets'));
   document.getElementById('financeNavIncome')?.addEventListener('click', () => showFinancePanel('income'));
@@ -1518,3 +1529,57 @@ function saveFinanceTransaction(type) {
   renderFinanceTransactionList(type, type === 'income' ? 'financeTransactionListIncome' : 'financeTransactionListExpense');
   renderFinanceHistory();
 }
+
+//-----------КНОПКИ (Внутри DOMContentLoaded)--------------
+document.addEventListener('DOMContentLoaded', () => {
+  // Закрытие экрана финансов
+  const closeBtn = document.getElementById('financeCloseBtn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeFinanceScreen);
+  }
+
+  // Переключение вкладок
+  const tabs = [
+    { btnId: 'financeNavDashboard', panelId: 'financePanel-dashboard', view: 'dashboard' },
+    { btnId: 'financeNavWallets', panelId: 'financePanel-wallets', view: 'wallets' },
+    { btnId: 'financeNavIncome', panelId: 'financePanel-income', view: 'income' },
+    { btnId: 'financeNavExpenses', panelId: 'financePanel-expenses', view: 'expenses' },
+    { btnId: 'financeNavTransfers', panelId: 'financePanel-transfers', view: 'transfers' },
+    { btnId: 'financeNavCategories', panelId: 'financePanel-categories', view: 'categories' },
+    { btnId: 'financeNavHistory', panelId: 'financePanel-history', view: 'history' }
+  ];
+
+  tabs.forEach(({ btnId, panelId, view }) => {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+      // 1. Синхронизируем внутреннее состояние модуля
+      financeState.view = view;
+
+      // 2. Убираем active у всех кнопок вкладок
+      document.querySelectorAll('.finance-panel-tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // 3. Скрываем все панели
+      document.querySelectorAll('.finance-panel').forEach(p => p.classList.add('hidden'));
+      
+      // 4. Показываем нужную панель
+      const panel = document.getElementById(panelId);
+      if (panel) {
+        panel.classList.remove('hidden');
+        
+        // --- ДОБАВЛЕНО: Скролл к открывшемуся блоку ---
+        setTimeout(() => {
+          panel.scrollIntoView({
+            behavior: 'smooth', // Плавная анимация прокрутки
+            block: 'start'      // Выравнивание по верхней границе экрана
+          });
+        }, 50); // Небольшой таймаут, чтобы браузер успел убрать класс hidden и посчитать высоту
+      }
+
+      // 5. Вызываем точечный рендеринг контента для открываемой вкладки
+      triggerPanelSpecificRender(view);
+    });
+  });
+});
