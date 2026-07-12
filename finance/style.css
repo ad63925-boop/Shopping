@@ -223,7 +223,7 @@
 }
 
 .finance-item-card {
-    background: var(--finance-surface);
+    background: #dadce0;
     border-radius: var(--finance-radius-lg);
     border: 1px solid var(--finance-border);
     padding: 8px;
@@ -401,6 +401,7 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    flex-direction: column;
 }
 
 .finance-buttons-row button {

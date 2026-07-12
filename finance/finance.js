@@ -313,10 +313,12 @@ function renderFinanceWallets() {
 
   panel.innerHTML = `
     <div class="finance-section-title"><span>Кошельки</span></div>
-    <div class="finance-buttons-row">
+
+    <div id="financeWalletList"></div>
+
+        <div class="finance-buttons-row">
       <button onclick="showAddWalletForm()">➕ Добавить кошелёк</button>
     </div>
-    <div id="financeWalletList"></div>
   `;
 
   const list = document.getElementById('financeWalletList');
@@ -341,13 +343,13 @@ function renderFinanceWallets() {
         </div>
 
         <div class="finance-item-actions">
-          <button class="btn-edit-wallet" onclick="editFinanceWallet('${wallet.id}')">✎</button>
+          <button class="btn-edit-wallet" onclick="editFinanceWallet('${wallet.id}')">✎ Редактировать</button>
           <button 
             class="btn-delete-wallet ${hasTransactions ? 'btn-delete-disabled' : ''}" 
             onclick="removeFinanceWallet('${wallet.id}', ${hasTransactions})"
             ${hasTransactions ? 'disabled title="Есть транзакции — сначала перенесите или удалите их"' : ''}
           >
-            🗑
+            🗑 Удалить
           </button>
         </div>
       </div>
