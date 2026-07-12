@@ -826,19 +826,13 @@ function renderFinanceHistoryList() {
 }
 
 //Функция для рендеринга элемента списка финансовых транзакций
-function renderTransactionListItem(tx) {
-  // Определяем иконку/тип
+function renderTransactionListItem(tx, isEditing = false) {
   let icon = '💵';
   let sign = '';
-  if (tx.type === 'income') {
-    icon = '➕'; sign = '+';
-  } else if (tx.type === 'expense') {
-    icon = '➖'; sign = '-';
-  } else if (tx.type === 'transfer') {
-    icon = '🔄'; sign = '=';
-  }
+  if (tx.type === 'income') { icon = '➕'; sign = '+'; }
+  else if (tx.type === 'expense') { icon = '➖'; sign = '-'; }
+  else if (tx.type === 'transfer') { icon = '🔄'; sign = '='; }
 
-  // Название источника/кошелька (для переводов — от кого/кому)
   let sourceName = '';
   if (tx.type === 'transfer') {
     const fromWallet = financeState.wallets.find(w => w.id === tx.fromWalletId)?.name || 'Неизвестный счёт';
@@ -849,14 +843,80 @@ function renderTransactionListItem(tx) {
     sourceName = `(${wallet})`;
   }
 
-  // Категория и комментарий (сокращённо)
   const categoryName = tx.category || '';
   const commentPreview = (tx.comment || '').length > 40
     ? (tx.comment.substring(0, 40) + '…')
     : (tx.comment || '');
 
+  // Если этот элемент сейчас РЕДАКТИРУЕТСЯ прямо в списке
+  if (isEditing) {
+    return `
+      <div class="finance-transaction-item editing-mode" data-id="${tx.id}">
+        <div class="finance-tx-edit-container" style="padding: 10px; background: #f9fafb; border-radius: 6px;">
+          <h4 style="margin: 0 0 8px 0; font-size: 0.9rem; color: #374151;">Редактирование операции</h4>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+            <div>
+              <label style="font-size: 0.75rem; color: #6b7280;">Сумма</label>
+              <input type="number" id="inline-amount-${tx.id}" value="${tx.amount}" step="0.01" style="width:100%; padding:4px;">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; color: #6b7280;">Валюта</label>
+              <select id="inline-currency-${tx.id}" style="width:100%; padding:4px;">
+                ${financeState.currencies.map(c => `<option value="${c}" ${c === tx.currency ? 'selected' : ''}>${c}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+
+          ${tx.type !== 'transfer' ? `
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+            <div>
+              <label style="font-size: 0.75rem; color: #6b7280;">Счёт</label>
+              <select id="inline-wallet-${tx.id}" style="width:100%; padding:4px;">
+                ${financeState.wallets.map(w => `<option value="${w.id}" ${w.id === tx.walletId ? 'selected' : ''}>${w.name}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; color: #6b7280;">Категория</label>
+              <select id="inline-category-${tx.id}" style="width:100%; padding:4px;">
+                ${financeState.categories.filter(c => c.type === tx.type).map(c => `<option value="${c.id}" ${c.name === tx.category ? 'selected' : ''}>${c.name}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          ` : `
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+            <div>
+              <label style="font-size: 0.75rem; color: #6b7280;">Откуда</label>
+              <select id="inline-from-${tx.id}" style="width:100%; padding:4px;">
+                ${financeState.wallets.map(w => `<option value="${w.id}" ${w.id === tx.fromWalletId ? 'selected' : ''}>${w.name}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; color: #6b7280;">Куда</label>
+              <select id="inline-to-${tx.id}" style="width:100%; padding:4px;">
+                ${financeState.wallets.map(w => `<option value="${w.id}" ${w.id === tx.toWalletId ? 'selected' : ''}>${w.name}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          `}
+
+          <div style="margin-bottom: 8px;">
+            <label style="font-size: 0.75rem; color: #6b7280;">Комментарий</label>
+            <input type="text" id="inline-comment-${tx.id}" value="${escapeHtml(tx.comment || '')}" style="width:100%; padding:4px;">
+          </div>
+
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button onclick="saveInlineEdit('${tx.id}')" style="background:#22c55e; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Сохранить</button>
+            <button onclick="renderFinanceHistoryList()" style="background:#9ca3af; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Отмена</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Обычный режим просмотра (добавлена кнопка "Редактировать" и "Удалить" вниз)
   return `
-    <div class="finance-transaction-item" data-id="${tx.id}" onclick="toggleTransactionDetails(this)">
+    <div class="finance-transaction-item" data-id="${tx.id}" onclick="toggleTransactionDetails(this, event)">
       <div class="finance-tx-summary">
         ${icon} ${sourceName} ${categoryName ? '<span class="finance-tx-category">' + categoryName + '</span>' : ''}
         <span class="finance-tx-amount ${tx.type === 'income' ? 'text-green' : 'text-red'}">
@@ -865,13 +925,13 @@ function renderTransactionListItem(tx) {
       </div>
       ${commentPreview ? `<div class="finance-tx-comment-preview">💬 ${commentPreview}</div>` : ''}
       
-      <!-- Скрытая карточка (полная информация) -->
       <div class="finance-tx-details hidden">
-        <div><strong>Тип:</strong> ${tx.type}</div>
+        <hr style="margin: 8px 0; border: 0; border-top: 1px solid #e5e7eb;">
+        <div><strong>Тип:</strong> ${tx.type === 'income' ? 'Доход' : tx.type === 'expense' ? 'Расход' : 'Перевод'}</div>
         ${tx.type === 'transfer'
           ? `
-            <div><strong>От:</strong> ${financeState.wallets.find(w => w.id === tx.fromWalletId)?.name || '—'} (${tx.fromWalletCurrency || ''})</div>
-            <div><strong>Кому:</strong> ${financeState.wallets.find(w => w.id === tx.toWalletId)?.name || '—'} (${tx.toWalletCurrency || ''})</div>
+            <div><strong>От:</strong> ${financeState.wallets.find(w => w.id === tx.fromWalletId)?.name || '—'}</div>
+            <div><strong>Кому:</strong> ${financeState.wallets.find(w => w.id === tx.toWalletId)?.name || '—'}</div>
           `
           : `
             <div><strong>Счёт:</strong> ${financeState.wallets.find(w => w.id === tx.walletId)?.name || '—'}</div>
@@ -879,22 +939,104 @@ function renderTransactionListItem(tx) {
         <div><strong>Категория:</strong> ${tx.category || 'Без категории'}</div>
         <div><strong>Дата:</strong> ${new Date(tx.date).toLocaleString('ru-RU')}</div>
         <div><strong>Комментарий:</strong> <em>${tx.comment || 'Нет комментария'}</em></div>
-        <div style="margin-top:8px; font-size:0.875rem; color:#666;">ID: ${tx.id}</div>
+        
+        <div class="finance-tx-actions" style="margin-top: 10px; display: flex; gap: 8px;">
+          <button onclick="startInlineEdit('${tx.id}', event)" style="background:#2563eb; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:0.8rem;">✎ Редактировать</button>
+          <button onclick="removeFinanceTransaction('${tx.id}')" style="background:#dc2626; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:0.8rem;">🗑 Удалить</button>
+        </div>
       </div>
     </div>
   `;
 }
 
 //Функция для переключения видимости деталей транзакции
-function toggleTransactionDetails(element) {
+function toggleTransactionDetails(element, event) {
+  // Если кликнули на кнопку или инпут внутри карточки — не сворачиваем её
+  if (event.target.closest('button') || event.target.closest('.finance-tx-edit-container')) return;
+
   const details = element.querySelector('.finance-tx-details');
   if (!details) return;
-  const isHidden = details.classList.toggle('hidden');
+  details.classList.toggle('hidden');
+}
+
+//Функция для сохранения изменений транзакции после редактирования
+function saveInlineEdit(id) {
+  const tx = financeState.transactions.find(item => item.id === id);
+  if (!tx) return;
+
+  const amount = Number(document.getElementById(`inline-amount-${id}`).value || 0);
+  const currency = document.getElementById(`inline-currency-${id}`).value;
+  const comment = document.getElementById(`inline-comment-${id}`).value.trim();
+
+  if (amount <= 0) {
+    alert('Сумма должна быть больше 0');
+    return;
+  }
+
+  let updatedTx = { ...tx, amount, currency, comment };
+
+  if (tx.type === 'transfer') {
+    const fromId = document.getElementById(`inline-from-${id}`).value;
+    const toId = document.getElementById(`inline-to-${id}`).value;
+    
+    if (fromId === toId) {
+      alert('Выберите разные счета для перевода');
+      return;
+    }
+    
+    const fromWallet = financeState.wallets.find(w => w.id === fromId);
+    const toWallet = financeState.wallets.find(w => w.id === toId);
+    
+    updatedTx.fromWalletId = fromId;
+    updatedTx.fromWalletName = fromWallet ? fromWallet.name : '';
+    updatedTx.toWalletId = toId;
+    updatedTx.toWalletName = toWallet ? toWallet.name : '';
+  } else {
+    const walletId = document.getElementById(`inline-wallet-${id}`).value;
+    const categoryId = document.getElementById(`inline-category-${id}`).value;
+    const wallet = financeState.wallets.find(w => w.id === walletId);
+    const category = financeState.categories.find(c => c.id === categoryId);
+
+    updatedTx.walletId = walletId;
+    updatedTx.walletName = wallet ? wallet.name : '';
+    updatedTx.categoryId = categoryId;
+    updatedTx.category = category ? category.name : '';
+  }
+
+  // 1. Возвращаем старый баланс кошелькам и применяем новый
+  const cleanWallets = revertFinanceTransactionFromWallets(financeState.wallets.map(w => ({ ...w })), tx);
+  const updatedWallets = applyFinanceTransactionToWallets(cleanWallets, updatedTx);
+
+  // 2. Обновляем транзакции в локальном массиве для мгновенного апдейта
+  financeState.wallets = updatedWallets;
+  financeState.transactions = financeState.transactions.map(item => item.id === id ? updatedTx : item);
+
+  // 3. Сохраняем пачкой в Firebase Realtime Database
+  financeDb.child('wallets').set(buildFinanceWalletPayload(updatedWallets));
+  financeDb.child('transactions').set(buildFinanceTransactionsPayload(financeState.transactions))
+    .then(() => {
+      alert('Операция обновлена');
+      renderFinancePanel(); // Полный перерендер интерфейса
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Ошибка сохранения изменений');
+    });
+}
+
+// Переключение конкретного элемента в режим редактирования
+function startInlineEdit(id, event) {
+  if (event) event.stopPropagation(); // Стоп клик по родителю
   
-  // Опционально: меняем стрелочку/иконку в заголовке, если есть
-  const summary = element.querySelector('.finance-tx-summary');
-  if (summary) {
-    summary.style.cursor = 'default'; // чтобы было понятно, что клик уже обработан
+  const tx = financeState.transactions.find(item => item.id === id);
+  if (!tx) return;
+
+  // Находим контейнер этой транзакции в DOM и заменяем его HTML на форму
+  const container = document.querySelector(`.finance-transaction-item[data-id="${id}"]`);
+  if (container) {
+    const parent = container.parentElement;
+    // Отрендерим элемент заново с флагом редактирования
+    container.outerHTML = renderTransactionListItem(tx, true);
   }
 }
 
@@ -1317,10 +1459,22 @@ function saveFinanceTransaction(type) {
     };
     const payload = financeState.transactions.reduce((acc, tx) => ({ ...acc, [tx.id]: tx }), {});
     payload[txId] = transaction;
-    financeDb.child('transactions').set(payload);
-    alert('Перевод сохранен');
-    renderFinanceTransfers();
-    renderFinanceHistory();
+  financeDb.child('transactions').set(payload);
+  alert(type === 'income' ? 'Доход сохранен' : 'Расход сохранен');
+  
+  // --- ДОБАВИТЬ: Сброс полей формы ---
+  const fieldsToReset = ['Name', 'Amount', 'Comment'];
+  fieldsToReset.forEach(field => {
+    const input = document.getElementById(`${type}${field}`);
+    if (input) input.value = field === 'Amount' ? '' : '';
+  });
+  // Возвращаем дату на текущую
+  const dateInput = document.getElementById(`${type}Date`);
+  if (dateInput) dateInput.value = new Date().toISOString().slice(0, 10);
+  // ------------------------------------
+
+  renderFinanceTransactionList(type, type === 'income' ? 'financeTransactionListIncome' : 'financeTransactionListExpense');
+  renderFinanceHistory();
     return;
   }
 
