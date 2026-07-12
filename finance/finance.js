@@ -314,7 +314,7 @@ function renderFinanceWallets() {
   panel.innerHTML = `
     <div class="finance-section-title"><span>Кошельки</span></div>
     <div class="finance-buttons-row">
-      <button onclick="addFinanceWallet()">➕ Добавить кошелёк</button>
+      <button onclick="showAddWalletForm()">➕ Добавить кошелёк</button>
     </div>
     <div id="financeWalletList"></div>
   `;
@@ -981,7 +981,12 @@ function saveInlineEdit(id) {
   const comment = document.getElementById(`inline-comment-${id}`).value.trim();
 
   if (amount <= 0) {
-    alert('Сумма должна быть больше 0');
+    Swal.fire({
+  icon: 'warning',
+  title: 'Некорректная сумма',
+  text: 'Сумма должна быть больше 0',
+  confirmButtonColor: '#2563eb'
+});
     return;
   }
 
@@ -992,7 +997,12 @@ function saveInlineEdit(id) {
     const toId = document.getElementById(`inline-to-${id}`).value;
     
     if (fromId === toId) {
-      alert('Выберите разные счета для перевода');
+      Swal.fire({
+  icon: 'warning',
+  title: 'Проверьте счета',
+  text: 'Выберите разные счета для перевода',
+  confirmButtonColor: '#2563eb'
+});
       return;
     }
     
@@ -1026,13 +1036,26 @@ function saveInlineEdit(id) {
   // 3. Сохраняем пачкой в Firebase Realtime Database
   financeDb.child('wallets').set(buildFinanceWalletPayload(updatedWallets));
   financeDb.child('transactions').set(buildFinanceTransactionsPayload(financeState.transactions))
-    .then(() => {
-      alert('Операция обновлена');
+.then(() => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Операция обновлена',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+      });
       renderFinancePanel(); // Полный перерендер интерфейса
     })
     .catch(err => {
       console.error(err);
-      alert('Ошибка сохранения изменений');
+      Swal.fire({
+        icon: 'error',
+        title: 'Ошибка',
+        text: 'Ошибка сохранения изменений',
+        confirmButtonColor: '#dc2626'
+      });
     });
 }
 
@@ -1132,7 +1155,12 @@ function editFinanceTransaction(id) {
     const fromWallet = financeState.wallets.find(item => item.name === fromName) || financeState.wallets.find(item => item.id === tx.fromWalletId);
     const toWallet = financeState.wallets.find(item => item.name === toName) || financeState.wallets.find(item => item.id === tx.toWalletId);
     if (!fromWallet || !toWallet) {
-      alert('Выберите корректные счета для перевода');
+      Swal.fire({
+  icon: 'warning',
+  title: 'Проверьте счета',
+  text: 'Выберите разные счета для перевода',
+  confirmButtonColor: '#2563eb'
+});
       return;
     }
 
@@ -1142,7 +1170,12 @@ function editFinanceTransaction(id) {
     const comment = prompt('Комментарий', tx.comment || '') || tx.comment || '';
 
     if (amount <= 0) {
-      alert('Сумма должна быть больше 0');
+      Swal.fire({
+  icon: 'warning',
+  title: 'Некорректная сумма',
+  text: 'Сумма должна быть больше 0',
+  confirmButtonColor: '#2563eb'
+});
       return;
     }
 
@@ -1181,7 +1214,12 @@ function editFinanceTransaction(id) {
   const walletName = prompt('Кошелек', tx.walletName || '') || tx.walletName || '';
   const wallet = financeState.wallets.find(item => item.name === walletName) || financeState.wallets.find(item => item.id === tx.walletId);
   if (!wallet) {
-    alert('Выберите корректный кошелек');
+    Swal.fire({
+  icon: 'warning',
+  title: 'Ошибка выбора',
+  text: 'Выберите корректный кошелек',
+  confirmButtonColor: '#2563eb'
+});
     return;
   }
 
@@ -1194,7 +1232,19 @@ function editFinanceTransaction(id) {
   const comment = prompt('Комментарий', tx.comment || '') || tx.comment || '';
 
   if (amount <= 0) {
-    alert('Сумма должна быть больше 0');
+    Swal.fire({
+  icon: 'warning',
+  title: 'Некорректная сумма',
+  text: 'Сумма должна быть больше 0',
+  confirmButtonColor: '#2563eb'
+});
+
+Swal.fire({
+  icon: 'warning',
+  title: 'Проверьте счета',
+  text: 'Выберите разные счета для перевода',
+  confirmButtonColor: '#2563eb'
+});
     return;
   }
 
@@ -1231,18 +1281,38 @@ function editFinanceTransaction(id) {
   renderFinancePanel();
 }
 
-function removeFinanceTransaction(id) {
+async function removeFinanceTransaction(id) {
   const tx = financeState.transactions.find(item => item.id === id);
   if (!tx) return;
-  if (!confirm('Удалить эту операцию?')) return;
 
-  const updatedWallets = revertFinanceTransactionFromWallets(financeState.wallets.map(wallet => ({ ...wallet })), tx);
-  const nextTransactions = financeState.transactions.filter(item => item.id !== id);
-  financeState.wallets = updatedWallets;
-  financeState.transactions = nextTransactions;
-  financeDb.child('wallets').set(buildFinanceWalletPayload(updatedWallets));
-  financeDb.child('transactions').set(buildFinanceTransactionsPayload(nextTransactions));
-  renderFinancePanel();
+  const result = await Swal.fire({
+    title: 'Удалить операцию?',
+    text: `Будет удалена транзакция на сумму ${tx.amount} ${tx.currency}`,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#64748b',
+    confirmButtonText: 'Удалить',
+    cancelButtonText: 'Оставить'
+  });
+
+  if (result.isConfirmed) {
+    const updatedWallets = revertFinanceTransactionFromWallets(financeState.wallets.map(wallet => ({ ...wallet })), tx);
+    const nextTransactions = financeState.transactions.filter(item => item.id !== id);
+    financeState.wallets = updatedWallets;
+    financeState.transactions = nextTransactions;
+    
+    financeDb.child('wallets').set(buildFinanceWalletPayload(updatedWallets));
+    financeDb.child('transactions').set(buildFinanceTransactionsPayload(nextTransactions));
+    
+    Swal.fire({
+      icon: 'success',
+      title: 'Удалено',
+      timer: 1000,
+      showConfirmButton: false
+    });
+    renderFinancePanel();
+  }
 }
 
 function promptFinanceCurrency(defaultCurrency = 'RUP') {
@@ -1254,18 +1324,116 @@ function promptFinanceCurrency(defaultCurrency = 'RUP') {
   return currencies.includes(normalized) ? normalized : (defaultCurrency || 'RUP');
 }
 
-//Функции для добавления, редактирования и удаления кошельков и категорий
-function addFinanceWallet() {
-  const name = prompt('Название кошелька/карты/счета');
-  if (!name) return;
-  const type = prompt('Тип (Кошелек/Карта/Счет)', 'Кошелек') || 'Кошелек';
-  const currency = promptFinanceCurrency('RUP');
-  const balance = Number(prompt('Баланс', '0') || 0);
+// Функция для отрисовки inline-формы добавления кошелька вместо prompt
+function showAddWalletForm() {
+  const container = document.getElementById('financeWalletList'); // Ваш ID контейнера кошельков
+  if (!container) return;
+
+  // Создаем блок формы
+  const formHtml = `
+    <div class="finance-item-card finance-wallet-add-box" style="background: #f9fafb; border: 2px dashed #cbd5e1; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+      <h4 style="margin: 0 0 10px 0; font-size: 1rem; color: #1e293b;">Новый кошелек / счет</h4>
+      
+      <div style="margin-bottom: 8px;">
+        <label style="display:block; font-size: 0.8rem; color: #475569; margin-bottom: 2px;">Название</label>
+        <input type="text" id="newWalletName" placeholder="Например, Карта **4455" style="width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px;">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+        <div>
+          <label style="display:block; font-size: 0.8rem; color: #475569; margin-bottom: 2px;">Тип</label>
+          <select id="newWalletType" style="width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px;">
+            <option value="Кошелек">Кошелек</option>
+            <option value="Карта">Карта</option>
+            <option value="Счет">Счет</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block; font-size: 0.8rem; color: #475569; margin-bottom: 2px;">Валюта</label>
+          <select id="newWalletCurrency" style="width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px;">
+            ${(financeState.currencies || ['RUP', 'USD', 'EUR']).map(cur => `<option value="${cur}">${cur}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <label style="display:block; font-size: 0.8rem; color: #475569; margin-bottom: 2px;">Начальный баланс</label>
+        <input type="number" id="newWalletBalance" value="0" step="0.01" style="width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px;">
+      </div>
+
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button onclick="saveFinanceWalletFromInput()" style="background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Создать</button>
+        <button onclick="renderFinanceWallets()" style="background: #64748b; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">Отмена</button>
+      </div>
+    </div>
+  `;
+
+  // Вставляем форму в начало списка кошельков
+  container.insertAdjacentHTML('afterbegin', formHtml);
+  
+  // Плавно скроллим к форме добавления
+  document.querySelector('.finance-wallet-add-box')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Функция сбора данных из инпутов и сохранения кошелька
+function saveFinanceWalletFromInput() {
+  const nameInput = document.getElementById('newWalletName');
+  const typeSelect = document.getElementById('newWalletType');
+  const currencySelect = document.getElementById('newWalletCurrency');
+  const balanceInput = document.getElementById('newWalletBalance');
+
+  const name = nameInput?.value.trim();
+  const type = typeSelect?.value || 'Кошелек';
+  const currency = currencySelect?.value || 'RUP';
+  const balance = Number(balanceInput?.value || 0);
+
+  if (!name) {
+    Swal.fire({ icon: 'info', title: 'Заполните поле', text: 'Пожалуйста, введите название кошелька/счета' });
+    if (nameInput) nameInput.focus();
+    return;
+  }
+
   const id = `wallet-${Date.now()}`;
   const wallet = { name, type, currency, balance };
-  const payload = financeState.wallets.reduce((acc, item) => ({ ...acc, [item.id]: { name: item.name, type: item.type, currency: item.currency, balance: item.balance } }), {});
+
+  // Формируем payload на основе текущих кошельков в financeState
+  const payload = financeState.wallets.reduce((acc, item) => {
+    acc[item.id] = { 
+      name: item.name, 
+      type: item.type, 
+      currency: item.currency, 
+      balance: item.balance 
+    };
+    return acc;
+  }, {});
+
+  // Добавляем новый кошелек в объект отправки
   payload[id] = wallet;
-  financeDb.child('wallets').set(payload);
+
+  // Отправляем всю структуру в Firebase Realtime Database
+// Отправляем всю структуру в Firebase Realtime Database
+financeDb.child('wallets').set(payload)
+  .then(() => {
+    Swal.fire({
+      icon: 'success',
+      title: 'Кошелек успешно добавлен!',
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true
+    });
+    // renderFinanceWallets();
+  })
+  .catch(err => {
+    console.error("Ошибка при создании кошелька:", err);
+    Swal.fire({
+      icon: 'error',
+      title: 'Ошибка базы данных',
+      text: 'Не удалось сохранить кошелек в базу данных.',
+      confirmButtonColor: '#2563eb'
+    });
+  });
 }
 
 function addFinanceCategory() {
@@ -1327,7 +1495,12 @@ async function handleWalletEdit(e, walletId) {
   const currency = document.getElementById(`walletCurrency_${walletId}`).value.trim().toUpperCase();
 
   if (!name) {
-    alert('Название кошелька обязательно.');
+    Swal.fire({
+  icon: 'error',
+  title: 'Упс...',
+  text: 'Название кошелька обязательно.',
+  confirmButtonColor: '#2563eb'
+});
     return;
   }
 
@@ -1345,44 +1518,89 @@ async function handleWalletEdit(e, walletId) {
   try {
     // Сохраняем в Realtime Database в ту же ветку 'finance/wallets/id'
     await financeDb.child('wallets').child(walletId).set(updatedWallet);
-    alert('Кошелёк обновлён.');
+    Swal.fire({
+  icon: 'success',
+  title: 'Успешно!',
+  text: 'Кошелёк обновлён.',
+  timer: 1500,
+  showConfirmButton: false
+});
     
     // Рендеринг вызовется автоматически через подписку .on('value') в loadFinanceData
   } catch (err) {
     console.error(err);
-    alert('Ошибка при сохранении кошелька.');
+    Swal.fire({
+  icon: 'error',
+  title: 'Упс...',
+  text: 'Ошибка при сохранении кошелька.',
+  confirmButtonColor: '#2563eb'
+});
   }
 }
 
 //Функция для удаления финансового кошелька
 async function removeFinanceWallet(walletId, hasTransactions) {
   if (hasTransactions) {
-    alert('Нельзя удалить кошелёк, по которому есть транзакции. Сначала удалите или перенесите операции.');
+    Swal.fire({
+      icon: 'warning',
+      title: 'Внимание',
+      text: 'Нельзя удалить кошелёк, по которому есть транзакции. Сначала удалите или перенесите операции.'
+    });
     return;
   }
 
-  if (!confirm('Вы уверены, что хотите удалить этот кошелёк? Это действие нельзя отменить.')) return;
+  // Красивое окно подтверждения
+  const result = await Swal.fire({
+    title: 'Вы уверены?',
+    text: "Это действие нельзя будет отменить!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#64748b',
+    confirmButtonText: 'Да, удалить!',
+    cancelButtonText: 'Отмена'
+  });
 
-  try {
-    // Удаляем из Realtime Database
-    await financeDb.child('wallets').child(walletId).remove();
-    alert('Кошелёк удалён.');
-    
-    // Интерфейс обновится автоматически благодаря реактивному слушателю базы данных
-  } catch (err) {
-    console.error(err);
-    alert('Ошибка при удалении кошелька.');
+  // Если пользователь подтвердил
+  if (result.isConfirmed) {
+    try {
+      await financeDb.child('wallets').child(walletId).remove();
+      Swal.fire({
+        icon: 'success',
+        title: 'Удалено!',
+        text: 'Кошелёк успешно удалён.',
+        timer: 1500,
+        showConfirmButton: false
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire({ icon: 'error', title: 'Ошибка', text: 'Ошибка при удалении кошелька.' });
+    }
   }
 }
 
 //Функция для удаления финансового кошелька
 async function removeFinanceWallet(walletId, hasTransactions) {
   if (hasTransactions) {
-    alert('Нельзя удалить кошелёк, по которому есть транзакции. Сначала удалите или перенесите операции.');
+    Swal.fire({
+      icon: 'warning',
+      title: 'Внимание',
+      text: 'Нельзя удалить кошелёк, по которому есть транзакции. Сначала удалите или перенесите операции.'
+    });
     return;
   }
 
-  if (!confirm('Вы уверены, что хотите удалить этот кошелёк? Это действие нельзя отменить.')) return;
+  const confirmResult = await Swal.fire({
+    title: 'Вы уверены?',
+    text: "Это действие нельзя будет отменить!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#64748b',
+    confirmButtonText: 'Да, удалить!',
+    cancelButtonText: 'Отмена'
+  });
+  if (!confirmResult.isConfirmed) return;
 
   try {
     // 1. Удалить из Firebase
@@ -1394,10 +1612,23 @@ async function removeFinanceWallet(walletId, hasTransactions) {
 
     renderFinanceWallets();
     renderFinanceHistoryList(); // если где-то отображаются кошельки
-    alert('Кошелёк удалён.');
+    Swal.fire({
+      icon: 'success',
+      title: 'Кошелёк удалён.',
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true
+    });
   } catch (err) {
-    console.error(err);
-    alert('Ошибка при удалении кошелька.');
+console.error(err);
+    Swal.fire({
+      icon: 'error',
+      title: 'Ошибка удаления',
+      text: 'Ошибка при удалении кошелька.',
+      confirmButtonColor: '#dc2626'
+    });
   }
 }
 
@@ -1428,7 +1659,7 @@ function saveFinanceTransaction(type) {
   const date = document.getElementById(`${type === 'income' ? 'incomeDate' : type === 'expense' ? 'expenseDate' : 'transferDate'}`)?.value || new Date().toISOString();
 
   if (amount <= 0) {
-    alert('Сумма должна быть больше 0');
+    Swal.fire({ icon: 'warning', title: 'Валидация', text: 'Сумма должна быть больше 0' });
     return;
   }
 
@@ -1436,7 +1667,12 @@ function saveFinanceTransaction(type) {
     const fromId = document.getElementById('transferFrom')?.value;
     const toId = document.getElementById('transferTo')?.value;
     if (!fromId || !toId || fromId === toId) {
-      alert('Выберите разные счета для перевода');
+      Swal.fire({
+  icon: 'warning',
+  title: 'Проверьте счета',
+  text: 'Выберите разные счета для перевода',
+  confirmButtonColor: '#2563eb'
+});
       return;
     }
     const fromWallet = financeState.wallets.find(item => item.id === fromId);
@@ -1472,7 +1708,15 @@ function saveFinanceTransaction(type) {
     const payload = financeState.transactions.reduce((acc, tx) => ({ ...acc, [tx.id]: tx }), {});
     payload[txId] = transaction;
   financeDb.child('transactions').set(payload);
-  alert(type === 'income' ? 'Доход сохранен' : 'Расход сохранен');
+  Swal.fire({
+  icon: 'success',
+  title: type === 'income' ? 'Доход сохранен' : 'Расход сохранен',
+  toast: true,               // Делает окно маленьким всплывающим "нотисом"
+  position: 'top-end',       // В правом верхнем углу
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true
+});
   
   // --- ДОБАВИТЬ: Сброс полей формы ---
   const fieldsToReset = ['Name', 'Amount', 'Comment'];
@@ -1496,7 +1740,12 @@ function saveFinanceTransaction(type) {
   const wallet = financeState.wallets.find(item => item.id === walletId);
   const category = financeState.categories.find(item => item.id === categoryId);
   if (!wallet) {
-    alert('Выберите кошелек');
+    Swal.fire({
+  icon: 'warning',
+  title: 'Выбор счета',
+  text: 'Пожалуйста, выберите кошелек для проведения операции',
+  confirmButtonColor: '#2563eb'
+});
     return;
   }
   const payloadWallets = financeState.wallets.reduce((acc, item) => {
@@ -1526,7 +1775,15 @@ function saveFinanceTransaction(type) {
   const payload = financeState.transactions.reduce((acc, tx) => ({ ...acc, [tx.id]: tx }), {});
   payload[txId] = transaction;
   financeDb.child('transactions').set(payload);
-  alert(type === 'income' ? 'Доход сохранен' : 'Расход сохранен');
+  Swal.fire({
+  icon: 'success',
+  title: type === 'income' ? 'Доход сохранен' : 'Расход сохранен',
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 2500,
+  timerProgressBar: true
+});
   renderFinanceTransactionList(type, type === 'income' ? 'financeTransactionListIncome' : 'financeTransactionListExpense');
   renderFinanceHistory();
 }
