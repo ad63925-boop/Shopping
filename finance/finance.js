@@ -20,6 +20,28 @@ document.addEventListener('DOMContentLoaded', () => {
     { btnId: 'financeNavHistory', panelId: 'financePanel-history' }
   ];
 
+  // Функция для парсинга даты транзакции
+  function parseTxDate(dateValue) {
+  // Если уже Date — возвращаем как есть
+  if (dateValue instanceof Date) return dateValue;
+
+  // Если timestamp (число) — конвертируем
+  if (typeof dateValue === 'number') return new Date(dateValue);
+
+  // Если ISO строка "2026-07-12T14:30:00" — new Date() справится
+  if (typeof dateValue === 'string') {
+    // Формат "ДД.ММ.ГГГГ"
+    const parts = dateValue.split('.');
+    if (parts.length === 3) {
+      return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+    }
+    // Любой другой строковый формат — доверяем конструктору Date
+    return new Date(dateValue);
+  }
+
+  return new Date(); // fallback
+}
+
   tabs.forEach(({ btnId, panelId }) => {
     const btn = document.getElementById(btnId);
     if (!btn) return;
@@ -742,7 +764,7 @@ function renderFinanceHistoryList() {
 
       html += `
         <div class="finance-history-date-header">
-          ----- ${formattedDate} -----
+          ${formattedDate}
         </div>
         <div class="finance-history-group">
           ${grouped[date].map(tx => renderTransactionListItem(tx)).join('')}
