@@ -262,6 +262,21 @@ function renderFinancePanel() {
   renderFinanceHistory();
 }
 
+//Функция для экранирования HTML-символов в строке
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, tag => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[tag]));
+}
+
+//Функция для удаления финансового кошелька
+
+
 //Функция для рендеринга финансового дашборда, кошельков, доходов, расходов, переводов и истории
 function renderFinanceDashboard() {
   const panel = document.getElementById('financePanel-dashboard');
@@ -279,34 +294,57 @@ function renderFinanceDashboard() {
   `;
 }
 
-//Функция для рендеринга финансовых кошельков и категорий
+//Функция для рендеринга финансовых кошельков
 function renderFinanceWallets() {
   const panel = document.getElementById('financePanel-wallets');
   if (!panel) return;
+
   panel.innerHTML = `
     <div class="finance-section-title"><span>Кошельки</span></div>
     <div class="finance-buttons-row">
-      <button onclick="addFinanceWallet()">Добавить кошелек</button>
+      <button onclick="addFinanceWallet()">➕ Добавить кошелёк</button>
     </div>
     <div id="financeWalletList"></div>
   `;
 
-  // Рендеринг списка кошельков
   const list = document.getElementById('financeWalletList');
-  list.innerHTML = financeState.wallets.map(wallet => `
-    <div class="finance-item-card">
-    
-      <div><strong>${wallet.name}</strong></div>
-      <div>${wallet.type || 'Кошелек'} — ${wallet.currency} ${Number(wallet.balance || 0).toFixed(2)}</div>
-      <div class="finance-item-actions">
-        <button class="btn-edit-wallet" onclick="editFinanceWallet('${wallet.id}')">✎ Редактировать</button>
-        <button class="btn-delete-wallet" onclick="removeFinanceWallet('${wallet.id}')">🗑 Удалить</button>
-      </div>
-    </div>
-  `).join('');
-  }
+  if (!list) return;
 
-  //Функция для рендеринга финансовых  и категорий
+  list.innerHTML = financeState.wallets.map(wallet => {
+    const balance = Number(wallet.balance || 0);
+    const colorClass = balance >= 0 ? 'text-green' : 'text-red';
+    const hasTransactions = financeState.transactions.some(t =>
+      t.walletId === wallet.id || t.fromWalletId === wallet.id || t.toWalletId === wallet.id
+    );
+
+    return `
+      <div class="finance-item-card">
+        <div class="finance-wallet-header">
+          <strong class="finance-wallet-name">${escapeHtml(wallet.name)}</strong>
+          <span class="finance-wallet-type">(${wallet.type || 'Кошелёк'})</span>
+        </div>
+        <div class="finance-wallet-balance">
+          ${wallet.currency || 'RUB'}
+          <span class="${colorClass}" style="font-weight:700;">${balance.toFixed(2)}</span>
+        </div>
+
+        <div class="finance-item-actions">
+          <button class="btn-edit-wallet" onclick="editFinanceWallet('${wallet.id}')">✎</button>
+          <button 
+            class="btn-delete-wallet ${hasTransactions ? 'btn-delete-disabled' : ''}" 
+            onclick="removeFinanceWallet('${wallet.id}', ${hasTransactions})"
+            ${hasTransactions ? 'disabled title="Есть транзакции — сначала перенесите или удалите их"' : ''}
+          >
+            🗑
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('') || '<div class="finance-empty-state">Кошельков пока нет</div>';
+}
+
+
+//Функция для рендеринга финансовых  и категорий
 //Функция для рендеринга финансовых кошельков и категорий
 function renderFinanceCategories() {
     const panel = document.getElementById('financePanel-categories');
