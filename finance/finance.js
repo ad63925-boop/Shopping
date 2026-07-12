@@ -117,6 +117,7 @@ const financeState = {
 function initFinanceModule() {
   if (financeState.initialized) return;
   renderFinanceScreen();
+  initFinanceTabs();
   setupFinanceEvents();
   loadFinanceData();
   financeState.initialized = true;
@@ -1531,14 +1532,10 @@ function saveFinanceTransaction(type) {
 }
 
 //-----------КНОПКИ (Внутри DOMContentLoaded)--------------
-document.addEventListener('DOMContentLoaded', () => {
-  // Закрытие экрана финансов
-  const closeBtn = document.getElementById('financeCloseBtn');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', closeFinanceScreen);
-  }
+// Вызывайте эту функцию СРАЗУ после того, как вставили HTML финансовой панели на страницу
+function initFinanceTabs() {
+  console.log("[Finance] Инициализация вкладок панели...");
 
-  // Переключение вкладок
   const tabs = [
     { btnId: 'financeNavDashboard', panelId: 'financePanel-dashboard', view: 'dashboard' },
     { btnId: 'financeNavWallets', panelId: 'financePanel-wallets', view: 'wallets' },
@@ -1551,35 +1548,83 @@ document.addEventListener('DOMContentLoaded', () => {
 
   tabs.forEach(({ btnId, panelId, view }) => {
     const btn = document.getElementById(btnId);
-    if (!btn) return;
+    if (!btn) {
+      console.warn(`[Finance Error] Кнопка ${btnId} всё еще не найдена в DOM! Проверьте ID в HTML-шаблоне.`);
+      return;
+    }
 
-    btn.addEventListener('click', () => {
-      // 1. Синхронизируем внутреннее состояние модуля
+    // Удаляем старый слушатель, если функция вызывается повторно, и вешаем новый
+    btn.replaceWith(btn.cloneNode(true)); 
+    const freshBtn = document.getElementById(btnId);
+
+    freshBtn.addEventListener('click', () => {
+      console.log(`--- [Клик] Нажата вкладка: ${view} ---`);
+      
       financeState.view = view;
 
-      // 2. Убираем active у всех кнопок вкладок
+      // Переключаем класс active
       document.querySelectorAll('.finance-panel-tabs button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      freshBtn.classList.add('active');
 
-      // 3. Скрываем все панели
+      // Скрываем все панели
       document.querySelectorAll('.finance-panel').forEach(p => p.classList.add('hidden'));
       
-      // 4. Показываем нужную панель
+      // Показываем нужную
       const panel = document.getElementById(panelId);
       if (panel) {
         panel.classList.remove('hidden');
-        
-        // --- ДОБАВЛЕНО: Скролл к открывшемуся блоку ---
-        setTimeout(() => {
-          panel.scrollIntoView({
-            behavior: 'smooth', // Плавная анимация прокрутки
-            block: 'start'      // Выравнивание по верхней границе экрана
-          });
-        }, 50); // Небольшой таймаут, чтобы браузер успел убрать класс hidden и посчитать высоту
       }
 
-      // 5. Вызываем точечный рендеринг контента для открываемой вкладки
+      // Сначала рендерим данные внутри вкладки
       triggerPanelSpecificRender(view);
+
+      // Теперь плавно скроллим к уже построенному контенту
+      if (panel) {
+        setTimeout(() => {
+          panel.scrollIntoView({
+            behavior: 'smooth', 
+            block: 'start'      
+          });
+        }, 100);
+      }
     });
   });
-});
+}
+
+//Функция для точечного рендеринга контента конкретной вкладки
+function triggerPanelSpecificRender(view) {
+  console.log(`[Вызов рендера] Отрисовка контента для панели: ${view}`);
+  
+  switch (view) {
+    case 'dashboard':
+      if (typeof renderFinanceDashboard === 'function') renderFinanceDashboard();
+      break;
+    case 'wallets':
+      if (typeof renderFinanceWallets === 'function') renderFinanceWallets();
+      break;
+    case 'income':
+      // Подставляем ID контейнера доходов из вашей разметки
+      renderFinanceTransactionList('income', 'financeTransactionListIncome');
+      break;
+    case 'expenses':
+      // Подставляем ID контейнера расходов из вашей разметки
+      renderFinanceTransactionList('expense', 'financeTransactionListExpense');
+      break;
+    case 'transfers':
+      if (typeof renderFinanceTransfers === 'function') renderFinanceTransfers();
+      break;
+    case 'categories':
+      if (typeof renderFinanceCategories === 'function') renderFinanceCategories();
+      break;
+    case 'history':
+      // Вызываем построение истории операций
+      if (typeof renderFinanceHistory === 'function') {
+        renderFinanceHistory(); 
+      } else if (typeof renderFinanceHistoryList === 'function') {
+        renderFinanceHistoryList();
+      }
+      break;
+    default:
+      console.warn(`[Finance] Неизвестный тип панели для рендера: ${view}`);
+  }
+}
