@@ -597,53 +597,56 @@ function buildFinanceTransactionsPayload(transactions) {
 
 // Функция для рендеринга карточки финансовых транзакций
 function renderFinanceHistoryList() {
-  const list = document.getElementById('financeHistoryList');
-  if (!list) return;
+  const listContainer = document.getElementById('financeHistoryList');
+  if (!listContainer) return;
 
-  const filtered = getFilteredFinanceTransactions();
+  const transactions = getFilteredFinanceTransactions();
 
-  // --- ГЛАВНОЕ ИЗМЕНЕНИЕ: сортировка (новые сверху) ---
-  const sorted = filtered.slice().sort((a, b) => {
-    // Если есть timestamp (число) — лучше сортировать по нему
-    const timeA = a.timestamp ?? new Date(a.date).getTime();
-    const timeB = b.timestamp ?? new Date(b.date).getTime();
-    return timeB - timeA; // B - A → новые раньше
+  // Группируем по дате (YYYY-MM-DD)
+  const grouped = {};
+  transactions.forEach(tx => {
+    const d = parseTxDate(tx.date);
+    const dateKey = d.toISOString().slice(0, 10); // YYYY-MM-DD
+    if (!grouped[dateKey]) grouped[dateKey] = [];
+    grouped[dateKey].push(tx);
   });
-  // -----------------------------------------------------
 
-  const rows = sorted.map(tx => {
-    const walletText = tx.type === 'transfer'
-      ? `${tx.fromWalletName || ''}${tx.fromWalletName && tx.toWalletName ? ' → ' : ''}${tx.toWalletName || ''}`
-      : tx.walletName || '';
+  // Сортируем даты по убыванию: сначала новые дни
+  const sortedDates = Object.keys(grouped).sort().reverse();
 
-    const sign = tx.type === 'income' ? '+' : tx.type === 'expense' ? '-' : '';
-    const amountClass = tx.type === 'income'
-      ? 'finance-amount-positive'
-      : tx.type === 'expense'
-      ? 'finance-amount-negative'
-      : 'finance-amount-neutral';
+  let html = '';
 
-    return `
-      <div class="finance-item-card">
-        <div><strong>${tx.type === 'transfer' ? 'Перевод' : tx.type === 'income' ? 'Доход' : 'Расход'}</strong></div>
-        <div>${walletText}</div>
-        <div class="${amountClass}">${sign}${tx.currency} ${Number(tx.amount || 0).toFixed(2)}</div>
-        <div>${tx.category || '-'}</div>
-        <div>${tx.comment || ''}</div>
-        <div>${new Date(tx.date).toLocaleString()}</div>
-        <div class="finance-item-actions">
-          <button class="btn-edit-wallet" onclick="editFinanceTransaction('${tx.id}')">✎ Редактировать</button>
-          <button class="btn-delete-wallet" onclick="removeFinanceTransaction('${tx.id}')">🗑 Удалить</button>
+  if (sortedDates.length === 0) {
+    html = '<div class="finance-empty-state">Нет транзакций по выбранным фильтрам</div>';
+  } else {
+    sortedDates.forEach(dateKey => {
+      const dateObj = new Date(dateKey);
+      const formattedDate = dateObj.toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+
+      // Сортируем транзакции внутри дня по убыванию (новые первыми)
+      const sortedTxs = grouped[dateKey].sort((a, b) => {
+        const da = parseTxDate(a.date).getTime();
+        const db = parseTxDate(b.date).getTime();
+        return db - da; // обратный порядок: новые раньше
+      });
+
+      html += `
+        <div class="finance-history-date-header">
+          ----- ${formattedDate} -----
         </div>
-      </div>
-    `;
-  }).join('');
+        <div class="finance-history-group">
+          ${sortedTxs.map(tx => renderTransactionListItem(tx)).join('')}
+        </div>
+      `;
+    });
+  }
 
-  list.innerHTML = rows || '<div class="finance-item-card">Операции не найдены</div>';
+  listContainer.innerHTML = html;
 }
-
-
-
 
 //Функция для рендеринга панели со всеми карточками истории финансовых транзакций
 function renderFinanceHistory() {
