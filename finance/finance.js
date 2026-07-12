@@ -594,6 +594,14 @@ function buildFinanceTransactionsPayload(transactions) {
   }, {});
 }
 
+// Функция для получения ключа даты в формате YYYY-MM-DD для группировки транзакций
+function getLocalDateKey(dateValue) {
+  const d = parseTxDate(dateValue);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 
 // Функция для рендеринга карточки финансовых транзакций
 function renderFinanceHistoryList() {
