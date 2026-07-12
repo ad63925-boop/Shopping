@@ -573,7 +573,7 @@ function buildFinanceTransactionsPayload(transactions) {
 }
 
 
-// Функция для рендеринга истории финансовых транзакций
+// Функция для рендеринга карточки финансовых транзакций
 function renderFinanceHistoryList() {
   const list = document.getElementById('financeHistoryList');
   if (!list) return;
@@ -623,18 +623,24 @@ function renderFinanceHistoryList() {
 
 
 
-//Функция для рендеринга истории финансовых транзакций
+//Функция для рендеринга панели со всеми карточками истории финансовых транзакций
 function renderFinanceHistory() {
   const panel = document.getElementById('financePanel-history');
   if (!panel) return;
+
   panel.innerHTML = `
     <div class="finance-section-title"><span>История транзакций</span></div>
+
     <div class="finance-history-filters">
       <div class="finance-filter-group">
         <label for="financeHistoryAccount">По счетам</label>
         <select id="financeHistoryAccount">
           <option value="all">Все счета</option>
-          ${financeState.wallets.map(wallet => `<option value="${wallet.id}" ${financeState.historyFilters.walletId === wallet.id ? 'selected' : ''}>${wallet.name} (${wallet.currency})</option>`).join('')}
+          ${financeState.wallets.map(wallet => `
+            <option value="${wallet.id}" ${financeState.historyFilters.walletId === wallet.id ? 'selected' : ''}>
+              ${wallet.name} (${wallet.currency})
+            </option>
+          `).join('')}
         </select>
       </div>
       <div class="finance-filter-group">
@@ -650,12 +656,15 @@ function renderFinanceHistory() {
         <input id="financeHistoryEndDate" type="date" value="${financeState.historyFilters.endDate || ''}">
       </div>
     </div>
+
     <div class="finance-search-row">
       <input id="financeSearchInput" placeholder="Поиск по операциям..." value="${financeState.searchQuery}">
     </div>
+
     <div id="financeHistoryList"></div>
   `;
 
+  // Поиск
   const input = document.getElementById('financeSearchInput');
   if (input) {
     input.oninput = event => {
@@ -664,6 +673,7 @@ function renderFinanceHistory() {
     };
   }
 
+  // Фильтры
   const accountSelect = document.getElementById('financeHistoryAccount');
   if (accountSelect) {
     accountSelect.onchange = event => {
@@ -698,6 +708,8 @@ function renderFinanceHistory() {
 
   renderFinanceHistoryList();
 }
+
+
 
 //Функция для конвертации валюты
 function convertCurrency(amount, fromCurrency, toCurrency) {
