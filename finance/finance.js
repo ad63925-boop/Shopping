@@ -1170,34 +1170,54 @@ async function handleWalletEdit(e, walletId) {
 
   const name = document.getElementById(`walletName_${walletId}`).value.trim();
   const type = document.getElementById(`walletType_${walletId}`).value;
-  const currency = document.getElementById(`walletCurrency_${walletId}`).value.trim();
+  const currency = document.getElementById(`walletCurrency_${walletId}`).value.trim().toUpperCase();
 
   if (!name) {
     alert('Название кошелька обязательно.');
     return;
   }
 
+  // Находим текущий кошелек, чтобы сохранить его баланс
+  const wallet = financeState.wallets.find(w => w.id === walletId);
+  if (!wallet) return;
+
+  const updatedWallet = {
+    name,
+    type,
+    currency,
+    balance: Number(wallet.balance || 0) // сохраняем баланс неизменным
+  };
+
   try {
-    const updatedWallet = {
-      id: walletId,
-      name,
-      type,
-      currency,
-      // баланс не меняем здесь: он считается по транзакциям
-    };
-
-    const db = firebase.firestore();
-    await db.collection('wallets').doc(walletId).set(updatedWallet, { merge: true });
-
-    // Обновить локально
-    const idx = financeState.wallets.findIndex(w => w.id === walletId);
-    if (idx >= 0) financeState.wallets[idx] = updatedWallet;
-
-    renderFinanceWallets();
+    // Сохраняем в Realtime Database в ту же ветку 'finance/wallets/id'
+    await financeDb.child('wallets').child(walletId).set(updatedWallet);
     alert('Кошелёк обновлён.');
+    
+    // Рендеринг вызовется автоматически через подписку .on('value') в loadFinanceData
   } catch (err) {
     console.error(err);
     alert('Ошибка при сохранении кошелька.');
+  }
+}
+
+//Функция для удаления финансового кошелька
+async function removeFinanceWallet(walletId, hasTransactions) {
+  if (hasTransactions) {
+    alert('Нельзя удалить кошелёк, по которому есть транзакции. Сначала удалите или перенесите операции.');
+    return;
+  }
+
+  if (!confirm('Вы уверены, что хотите удалить этот кошелёк? Это действие нельзя отменить.')) return;
+
+  try {
+    // Удаляем из Realtime Database
+    await financeDb.child('wallets').child(walletId).remove();
+    alert('Кошелёк удалён.');
+    
+    // Интерфейс обновится автоматически благодаря реактивному слушателю базы данных
+  } catch (err) {
+    console.error(err);
+    alert('Ошибка при удалении кошелька.');
   }
 }
 
