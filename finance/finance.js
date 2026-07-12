@@ -709,6 +709,50 @@ function renderFinanceHistory() {
   renderFinanceHistoryList();
 }
 
+//Функция для рендеринга списка финансовых транзакций с группировкой по дате
+function renderFinanceHistoryList() {
+  const listContainer = document.getElementById('financeHistoryList');
+  if (!listContainer) return;
+
+  const transactions = getFilteredFinanceTransactions();
+
+  // Группируем по дате (YYYY-MM-DD)
+  const grouped = {};
+  transactions.forEach(tx => {
+    const date = new Date(tx.date).toISOString().slice(0, 10);
+    if (!grouped[date]) grouped[date] = [];
+    grouped[date].push(tx);
+  });
+
+  // Сортируем даты по убыванию
+  const sortedDates = Object.keys(grouped).sort().reverse();
+
+  let html = '';
+
+  if (sortedDates.length === 0) {
+    html = '<div class="finance-empty-state">Нет транзакций по выбранным фильтрам</div>';
+  } else {
+    sortedDates.forEach(date => {
+      const dateObj = new Date(date);
+      const formattedDate = dateObj.toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+
+      html += `
+        <div class="finance-history-date-header">
+          ----- ${formattedDate} -----
+        </div>
+        <div class="finance-history-group">
+          ${grouped[date].map(tx => renderTransactionListItem(tx)).join('')}
+        </div>
+      `;
+    });
+  }
+
+  listContainer.innerHTML = html;
+}
 
 
 //Функция для конвертации валюты
