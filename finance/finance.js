@@ -637,12 +637,45 @@ function buildFinanceWalletPayload(wallets) {
 }
 
 //Функция для построения полезной нагрузки для финансовых транзакций
-function buildFinanceTransactionsPayload(transactions) {
-  return transactions.reduce((acc, tx) => {
-    acc[tx.id] = tx;
+// ГАРАНТИРОВАННО РАБОЧИЙ ВАРИАНТ ФУНКЦИИ
+function buildFinanceTransactionsPayload(transactionsArray) {
+  console.log("[Payload Builder] Сборка транзакций для Firebase из массива:", transactionsArray);
+  
+  // Защита: если передан пустой или некорректный аргумент, берем текущий стейт
+  const list = transactionsArray || financeState.transactions;
+  
+  return list.reduce((acc, tx) => {
+    if (!tx.id) return acc;
+    
+    // Формируем чистый объект для каждой транзакции, исключая мусорные свойства DOM
+    acc[tx.id] = {
+      id: tx.id,
+      name: tx.name || '',
+      type: tx.type,
+      amount: Number(tx.amount), // Принудительно приводим к числу перед отправкой
+      currency: tx.currency,
+      comment: tx.comment || '',
+      date: tx.date
+    };
+
+    // Добавляем специфичные поля в зависимости от типа операции
+    if (tx.type === 'transfer') {
+      acc[tx.id].fromWalletId = tx.fromWalletId;
+      acc[tx.id].fromWalletName = tx.fromWalletName;
+      acc[tx.id].toWalletId = tx.toWalletId;
+      acc[tx.id].toWalletName = tx.toWalletName;
+    } else {
+      acc[tx.id].walletId = tx.walletId;
+      acc[tx.id].walletName = tx.walletName;
+      acc[tx.id].categoryId = tx.categoryId || '';
+      acc[tx.id].category = tx.category || '';
+    }
+
     return acc;
   }, {});
 }
+
+
 
 // Функция для получения ключа даты в формате YYYY-MM-DD для группировки транзакций
 function getLocalDateKey(dateValue) {
@@ -973,36 +1006,69 @@ function toggleTransactionDetails(element, event) {
 
 //Функция для сохранения изменений транзакции после редактирования
 function saveInlineEdit(id) {
-  const tx = financeState.transactions.find(item => item.id === id);
-  if (!tx) return;
+  console.log(`%c[Inline Save] Начало сохранения изменений для транзакции ID: ${id}`, 'color: #0284c7; font-weight: bold;');
 
-  const amount = Number(document.getElementById(`inline-amount-${id}`).value || 0);
-  const currency = document.getElementById(`inline-currency-${id}`).value;
-  const comment = document.getElementById(`inline-comment-${id}`).value.trim();
+  // 1. Поиск исходной транзакции
+  const tx = financeState.transactions.find(item => item.id === id);
+  if (!tx) {
+    console.error(`[Inline Save Error] Исходная трансакция с ID "${id}" не найдена в financeState.transactions!`);
+    return;
+  }
+  console.log("[Inline Save] Исходный объект транзакции до изменений:", { ...tx });
+
+  // 2. Сбор базовых данных из инпутов инлайн-формы
+  const amountEl = document.getElementById(`inline-amount-${id}`);
+  const currencyEl = document.getElementById(`inline-currency-${id}`);
+  const commentEl = document.getElementById(`inline-comment-${id}`);
+
+  if (!amountEl || !currencyEl || !commentEl) {
+    console.error("[Inline Save Error] Не удалось найти базовые инпуты редактирования в DOM!", {
+      amountEl, currencyEl, commentEl
+    });
+    return;
+  }
+
+  const amount = Number(amountEl.value || 0);
+  const currency = currencyEl.value;
+  const comment = commentEl.value.trim();
+
+  console.log("[Inline Save] Считанные базовые данные:", { amount, currency, comment });
 
   if (amount <= 0) {
+    console.warn(`[Inline Save Validation] Некорректная сумма: ${amount}. Остановка сохранения.`);
     Swal.fire({
-  icon: 'warning',
-  title: 'Некорректная сумма',
-  text: 'Сумма должна быть больше 0',
-  confirmButtonColor: '#2563eb'
-});
+      icon: 'warning',
+      title: 'Некорректная сумма',
+      text: 'Сумма должна быть больше 0',
+      confirmButtonColor: '#2563eb'
+    });
     return;
   }
 
   let updatedTx = { ...tx, amount, currency, comment };
 
+  // 3. Сбор специфичных данных в зависимости от типа транзакции
   if (tx.type === 'transfer') {
-    const fromId = document.getElementById(`inline-from-${id}`).value;
-    const toId = document.getElementById(`inline-to-${id}`).value;
-    
+    const fromEl = document.getElementById(`inline-from-${id}`);
+    const toEl = document.getElementById(`inline-to-${id}`);
+
+    if (!fromEl || !toEl) {
+      console.error("[Inline Save Error] Не найдены инпуты счетов (from/to) для перевода в DOM!");
+      return;
+    }
+
+    const fromId = fromEl.value;
+    const toId = toEl.value;
+    console.log("[Inline Save] Считанные счета для перевода:", { fromId, toId });
+
     if (fromId === toId) {
+      console.warn("[Inline Save Validation] Совпадают счета отправления и получения. Остановка.");
       Swal.fire({
-  icon: 'warning',
-  title: 'Проверьте счета',
-  text: 'Выберите разные счета для перевода',
-  confirmButtonColor: '#2563eb'
-});
+        icon: 'warning',
+        title: 'Проверьте счета',
+        text: 'Выберите разные счета для перевода',
+        confirmButtonColor: '#2563eb'
+      });
       return;
     }
     
@@ -1013,9 +1079,20 @@ function saveInlineEdit(id) {
     updatedTx.fromWalletName = fromWallet ? fromWallet.name : '';
     updatedTx.toWalletId = toId;
     updatedTx.toWalletName = toWallet ? toWallet.name : '';
+
   } else {
-    const walletId = document.getElementById(`inline-wallet-${id}`).value;
-    const categoryId = document.getElementById(`inline-category-${id}`).value;
+    const walletEl = document.getElementById(`inline-wallet-${id}`);
+    const categoryEl = document.getElementById(`inline-category-${id}`);
+
+    if (!walletEl || !categoryEl) {
+      console.error("[Inline Save Error] Не найдены инпуты кошелька или категории в DOM!");
+      return;
+    }
+
+    const walletId = walletEl.value;
+    const categoryId = categoryEl.value;
+    console.log("[Inline Save] Считанные кошелек и категория:", { walletId, categoryId });
+
     const wallet = financeState.wallets.find(w => w.id === walletId);
     const category = financeState.categories.find(c => c.id === categoryId);
 
@@ -1025,53 +1102,114 @@ function saveInlineEdit(id) {
     updatedTx.category = category ? category.name : '';
   }
 
-  // 1. Возвращаем старый баланс кошелькам и применяем новый
-  const cleanWallets = revertFinanceTransactionFromWallets(financeState.wallets.map(w => ({ ...w })), tx);
-  const updatedWallets = applyFinanceTransactionToWallets(cleanWallets, updatedTx);
+  console.log("[Inline Save] Сформирован измененный объект транзакции:", updatedTx);
 
-  // 2. Обновляем транзакции в локальном массиве для мгновенного апдейта
+  // 4. Пересчет балансов кошельков
+  console.log("[Inline Save] Запуск пересчета балансов...");
+  let cleanWallets, updatedWallets;
+  
+  try {
+    cleanWallets = revertFinanceTransactionFromWallets(financeState.wallets.map(w => ({ ...w })), tx);
+    console.log("[Inline Save] Балансы после отката старой транзакции:", cleanWallets);
+    
+    updatedWallets = applyFinanceTransactionToWallets(cleanWallets, updatedTx);
+    console.log("[Inline Save] Итоговые балансы после наката новой транзакции:", updatedWallets);
+  } catch (calcErr) {
+    console.error("[Inline Save Critical Error] Ошибка в функциях пересчета баланса (revert/apply):", calcErr);
+    return;
+  }
+
+  // 5. Обновление локального стейта
   financeState.wallets = updatedWallets;
   financeState.transactions = financeState.transactions.map(item => item.id === id ? updatedTx : item);
+  console.log("[Inline Save] Локальное состояние financeState успешно обновлено.");
 
-  // 3. Сохраняем пачкой в Firebase Realtime Database
-  financeDb.child('wallets').set(buildFinanceWalletPayload(updatedWallets));
-  financeDb.child('transactions').set(buildFinanceTransactionsPayload(financeState.transactions))
-.then(() => {
-      Swal.fire({
-        icon: 'success',
-        title: 'Операция обновлена',
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 2000,
-        timerProgressBar: true
-      });
-      renderFinancePanel(); // Полный перерендер интерфейса
-    })
-    .catch(err => {
-      console.error(err);
-      Swal.fire({
-        icon: 'error',
-        title: 'Ошибка',
-        text: 'Ошибка сохранения изменений',
-        confirmButtonColor: '#dc2626'
-      });
+  // 6. Синхронизация пачкой с Firebase Realtime Database
+  console.log("[Inline Save] Отправка данных в Firebase...");
+  
+  const walletsPayload = buildFinanceWalletPayload(updatedWallets);
+  const transactionsPayload = buildFinanceTransactionsPayload(financeState.transactions);
+
+  Promise.all([
+    financeDb.child('wallets').set(walletsPayload),
+    financeDb.child('transactions').set(transactionsPayload)
+  ])
+  .then(() => {
+    console.log(`%c[Inline Save Success] Данные успешно сохранены в Firebase для ID: ${id}`, 'color: #10b981; font-weight: bold;');
+    
+    Swal.fire({
+      icon: 'success',
+      title: 'Операция обновлена',
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true
     });
+    
+    console.log("[Inline Save] Запуск полного перерендера интерфейса панели...");
+    renderFinancePanel(); 
+  })
+  .catch(err => {
+    console.error("[Inline Save Firebase Error] Сбой при записи пачки в Firebase:", err);
+    Swal.fire({
+      icon: 'error',
+      title: 'Ошибка',
+      text: 'Ошибка сохранения изменений в базу данных',
+      confirmButtonColor: '#dc2626'
+    });
+  });
 }
 
-// Переключение конкретного элемента в режим редактирования
-function startInlineEdit(id, event) {
-  if (event) event.stopPropagation(); // Стоп клик по родителю
-  
-  const tx = financeState.transactions.find(item => item.id === id);
-  if (!tx) return;
 
-  // Находим контейнер этой транзакции в DOM и заменяем его HTML на форму
-  const container = document.querySelector(`.finance-transaction-item[data-id="${id}"]`);
-  if (container) {
-    const parent = container.parentElement;
-    // Отрендерим элемент заново с флагом редактирования
-    container.outerHTML = renderTransactionListItem(tx, true);
+// Переключение конкретного элемента в режим редактирования с проверками
+function startInlineEdit(id, event) {
+  console.log(`%c[Inline Edit] Попытка входа в режим редактирования транзакции ID: ${id}`, 'color: #2563eb; font-weight: bold;');
+
+  if (event) {
+    console.log("[Inline Edit] Обнаружено событие клика. Вызываем stopPropagation().");
+    event.stopPropagation(); // Стоп клик по родителю
+  } else {
+    console.warn("[Inline Edit Warning] Объект события (event) не был передан в функцию.");
+  }
+  
+  // 1. Проверяем наличие транзакции в локальном состоянии
+  const tx = financeState.transactions.find(item => item.id === id);
+  if (!tx) {
+    console.error(`[Inline Edit Error] Транзакция с ID "${id}" не найдена в массиве financeState.transactions!`, financeState.transactions);
+    return;
+  }
+  console.log("[Inline Edit] Объект транзакции успешно найден в state:", tx);
+
+  // 2. Ищем элемент в DOM-дереве
+  const selector = `.finance-transaction-item[data-id="${id}"]`;
+  const container = document.querySelector(selector);
+  
+  if (!container) {
+    console.error(`[Inline Edit Error] Элемент не найден в DOM по селектору: "${selector}". Проверьте, добавлен ли атрибут data-id="${id}" к контейнеру карточки.`);
+    return;
+  }
+  
+  console.log("[Inline Edit] Текущий DOM-контейнер элемента успешно найден:", container);
+
+  // 3. Проверяем существование функции рендеринга
+  if (typeof renderTransactionListItem !== 'function') {
+    console.error("[Inline Edit Error] Функция renderTransactionListItem не объявлена или не видна в данном контексте!");
+    return;
+  }
+
+  // 4. Пробуем перерисовать элемент
+  try {
+    const editHtml = renderTransactionListItem(tx, true);
+    
+    if (!editHtml || typeof editHtml !== 'string') {
+      console.warn("[Inline Edit Warning] Функция renderTransactionListItem вернула пустую строку или некорректный тип данных:", editHtml);
+    }
+
+    container.outerHTML = editHtml;
+    console.log(`%c[Inline Edit Success] Элемент ${id} успешно перерисован в режим инпут-формы!`, 'color: #10b981; font-weight: bold;');
+  } catch (error) {
+    console.error("[Inline Edit Critical Error] Произошел сбой при выполнении renderTransactionListItem или замене outerHTML:", error);
   }
 }
 
@@ -1779,7 +1917,7 @@ function saveFinanceTransaction(type) {
 //-----------КНОПКИ (Внутри DOMContentLoaded)--------------
 // Вызывайте эту функцию СРАЗУ после того, как вставили HTML финансовой панели на страницу
 function initFinanceTabs() {
-  console.log("[Finance] Инициализация вкладок панели...");
+  //console.log("[Finance] Инициализация вкладок панели...");
 
   // Добавляем классы иконок Font Awesome для каждой вкладки
   const tabs = [
