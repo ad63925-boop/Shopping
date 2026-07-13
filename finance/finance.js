@@ -1451,6 +1451,7 @@ async function removeFinanceTransaction(id) {
   }
 }
 
+//Функция для запроса валюты с проверкой на допустимые значения
 function promptFinanceCurrency(defaultCurrency = 'RUP') {
   const currencies = financeState.currencies || ['RUP', 'RUR', 'USD', 'EUR', 'MDL'];
   const value = prompt(`Валюта (${currencies.join(', ')})`, defaultCurrency || 'RUP');
@@ -1572,15 +1573,105 @@ financeDb.child('wallets').set(payload)
   });
 }
 
+//Функция для добавления категории
 function addFinanceCategory() {
-  const name = prompt('Название категории');
-  if (!name) return;
-  const type = prompt('Тип категории (income/expense)', 'expense') || 'expense';
-  const color = prompt('Цвет категории в HEX', '#4f46e5') || '#4f46e5';
-  const id = `category-${Date.now()}`;
-  const payload = financeState.categories.reduce((acc, item) => ({ ...acc, [item.id]: { name: item.name, type: item.type, color: item.color } }), {});
-  payload[id] = { name, type, color };
-  financeDb.child('categories').set(payload);
+  console.log("[Category] Запуск создания новой категории через SweetAlert2");
+
+  // Рендерим красивое окно SweetAlert2 с формой внутри
+  Swal.fire({
+    title: 'Новая категория',
+    html: `
+      <div style="text-align: left; font-family: inherit;">
+        <div style="margin-bottom: 12px;">
+          <label style="display:block; font-size: 0.85rem; color: #475569; margin-bottom: 4px; font-weight: 600;">Название</label>
+          <input id="swal-cat-name" class="swal2-input" placeholder="Например: Продукты" style="margin: 0; width: 100%; box-sizing: border-box;">
+        </div>
+        
+        <div style="margin-bottom: 12px;">
+          <label style="display:block; font-size: 0.85rem; color: #475569; margin-bottom: 4px; font-weight: 600;">Тип категории</label>
+          <select id="swal-cat-type" class="swal2-select" style="margin: 0; width: 100%; box-sizing: border-box; display: flex;">
+            <option value="expense">Расход (expense)</option>
+            <option value="income">Доход (income)</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 4px;">
+          <label style="display:block; font-size: 0.85rem; color: #475569; margin-bottom: 4px; font-weight: 600;">Цвет категории</label>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="color" id="swal-cat-color" value="#4f46e5" style="width: 50px; height: 40px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0; cursor: pointer;">
+            <span style="font-size: 0.85rem; color: #64748b;">Нажмите на квадрат для выбора</span>
+          </div>
+        </div>
+      </div>
+    `,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: 'Создать',
+    cancelButtonText: 'Отмена',
+    confirmButtonColor: '#2563eb',
+    cancelButtonColor: '#64748b',
+    // Собираем данные из инпутов модального окна перед закрытием
+    preConfirm: () => {
+      const name = document.getElementById('swal-cat-name').value.trim();
+      const type = document.getElementById('swal-cat-type').value;
+      const color = document.getElementById('swal-cat-color').value;
+
+      if (!name) {
+        Swal.showValidationMessage('Название категории обязательно!');
+        return false;
+      }
+
+      return { name, type, color };
+    }
+  }).then((result) => {
+    // Если пользователь нажал "Создать" и валидация прошла успешно
+    if (result.isConfirmed && result.value) {
+      const { name, type, color } = result.value;
+      console.log("[Category] Данные валидны, отправка в Firebase:", { name, type, color });
+
+      const id = `category-${Date.now()}`;
+      
+      // Сборка текущих категорий в payload объект
+      const payload = financeState.categories.reduce((acc, item) => {
+        acc[item.id] = { 
+          name: item.name, 
+          type: item.type, 
+          color: item.color 
+        };
+        return acc;
+      }, {});
+
+      // Добавление новой категории
+      payload[id] = { name, type, color };
+
+      // Отправка пачки в базу Realtime Database
+      financeDb.child('categories').set(payload)
+        .then(() => {
+          console.log("[Category Success] Категория сохранена в Firebase.");
+          Swal.fire({
+            icon: 'success',
+            title: 'Категория добавлена',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true
+          });
+          
+          // Если у вас есть функция рендера списка категорий — вызовите её здесь:
+          // if (typeof renderFinanceCategories === 'function') renderFinanceCategories();
+        })
+        .catch(err => {
+          console.error("[Category Firebase Error]", err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Ошибка',
+            text: 'Не удалось сохранить категорию в базу данных',
+            confirmButtonColor: '#dc2626'
+          });
+        });
+    }
+  });
 }
 
 //Функция для редактирования финансового кошелька
@@ -1768,15 +1859,108 @@ console.error(err);
   }
 }
 
-
+//Функция для редактирования финансовой категории
 function editFinanceCategory(id) {
+  console.log(`[Category Edit] Попытка редактирования категории ID: ${id}`);
+
+  // 1. Находим текущую категорию в стейте
   const category = financeState.categories.find(item => item.id === id);
-  if (!category) return;
-  const name = prompt('Название категории', category.name) || category.name;
-  const type = prompt('Тип категории (income/expense)', category.type) || category.type;
-  const color = prompt('Цвет категории в HEX', category.color || '#4f46e5') || category.color;
-  const payload = financeState.categories.reduce((acc, item) => ({ ...acc, [item.id]: item.id === id ? { name, type, color } : { name: item.name, type: item.type, color: item.color } }), {});
-  financeDb.child('categories').set(payload);
+  if (!category) {
+    console.error(`[Category Edit Error] Категория с ID "${id}" не найдена в стейте.`);
+    return;
+  }
+
+  // Дефолтный цвет, если в базе пусто
+  const defaultColor = category.color || '#4f46e5';
+
+  // 2. Вызываем модальное окно SweetAlert2 с предзаполненными данными
+  Swal.fire({
+    title: 'Редактировать категорию',
+    html: `
+      <div style="text-align: left; font-family: inherit;">
+        <div style="margin-bottom: 12px;">
+          <label style="display:block; font-size: 0.85rem; color: #475569; margin-bottom: 4px; font-weight: 600;">Название</label>
+          <input id="swal-edit-cat-name" class="swal2-input" value="${category.name}" placeholder="Название категории" style="margin: 0; width: 100%; box-sizing: border-box;">
+        </div>
+        
+        <div style="margin-bottom: 12px;">
+          <label style="display:block; font-size: 0.85rem; color: #475569; margin-bottom: 4px; font-weight: 600;">Тип категории</label>
+          <select id="swal-edit-cat-type" class="swal2-select" style="margin: 0; width: 100%; box-sizing: border-box; display: flex;">
+            <option value="expense" ${category.type === 'expense' ? 'selected' : ''}>Расход (expense)</option>
+            <option value="income" ${category.type === 'income' ? 'selected' : ''}>Доход (income)</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 4px;">
+          <label style="display:block; font-size: 0.85rem; color: #475569; margin-bottom: 4px; font-weight: 600;">Цвет категории</label>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="color" id="swal-edit-cat-color" value="${defaultColor}" style="width: 50px; height: 40px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0; cursor: pointer;">
+            <span style="font-size: 0.85rem; color: #64748b;">Выберите новый цвет на палитре</span>
+          </div>
+        </div>
+      </div>
+    `,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: 'Сохранить',
+    cancelButtonText: 'Отмена',
+    confirmButtonColor: '#2563eb',
+    cancelButtonColor: '#64748b',
+    preConfirm: () => {
+      const name = document.getElementById('swal-edit-cat-name').value.trim();
+      const type = document.getElementById('swal-edit-cat-type').value;
+      const color = document.getElementById('swal-edit-cat-color').value;
+
+      if (!name) {
+        Swal.showValidationMessage('Название категории не может быть пустым!');
+        return false;
+      }
+
+      return { name, type, color };
+    }
+  }).then((result) => {
+    // Если пользователь подтвердил изменения
+    if (result.isConfirmed && result.value) {
+      const { name, type, color } = result.value;
+      console.log("[Category Edit] Изменения валидны. Обновляем структуру...");
+
+      // Формируем payload для Firebase Realtime Database
+      const payload = financeState.categories.reduce((acc, item) => {
+        acc[item.id] = item.id === id 
+          ? { name, type, color } // Пишем новые данные для изменяемой категории
+          : { name: item.name, type: item.type, color: item.color }; // Остальные оставляем как были
+        return acc;
+      }, {});
+
+      // Записываем пачку в Firebase
+      financeDb.child('categories').set(payload)
+        .then(() => {
+          console.log(`[Category Edit Success] Категория ${id} успешно обновлена в Firebase.`);
+          
+          Swal.fire({
+            icon: 'success',
+            title: 'Изменения сохранены',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true
+          });
+
+          // Раскомментируйте рендер, если список категорий не обновляется автоматом:
+          // if (typeof renderFinanceCategories === 'function') renderFinanceCategories();
+        })
+        .catch(err => {
+          console.error("[Category Edit Firebase Error]", err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Ошибка',
+            text: 'Не удалось обновить категорию в базе данных',
+            confirmButtonColor: '#dc2626'
+          });
+        });
+    }
+  });
 }
 
 function removeFinanceCategory(id) {
