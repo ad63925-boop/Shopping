@@ -1923,8 +1923,8 @@ function initFinanceTabs() {
   const tabs = [
     { btnId: 'financeNavDashboard', panelId: 'financePanel-dashboard', view: 'dashboard', icon: 'fa-chart-pie', title: 'Главная' },
     { btnId: 'financeNavWallets', panelId: 'financePanel-wallets', view: 'wallets', icon: 'fa-wallet', title: 'Кошельки' },
-    { btnId: 'financeNavIncome', panelId: 'financePanel-income', view: 'income', icon: 'fa-arrow-down-long', title: 'Доходы' },
-    { btnId: 'financeNavExpenses', panelId: 'financePanel-expenses', view: 'expenses', icon: 'fa-arrow-up-long', title: 'Расходы' },
+    { btnId: 'financeNavIncome', panelId: 'financePanel-income', view: 'income', icon: 'fa-circle-plus', title: 'Доходы' },
+    { btnId: 'financeNavExpenses', panelId: 'financePanel-expenses', view: 'expenses', icon: 'fa-circle-minus', title: 'Расходы' },
     { btnId: 'financeNavTransfers', panelId: 'financePanel-transfers', view: 'transfers', icon: 'fa-right-left', title: 'Переводы' },
     { btnId: 'financeNavCategories', panelId: 'financePanel-categories', view: 'categories', icon: 'fa-tags', title: 'Категории' },
     { btnId: 'financeNavHistory', panelId: 'financePanel-history', view: 'history', icon: 'fa-history', title: 'История' }

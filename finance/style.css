@@ -597,3 +597,19 @@
   box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4);
   transform: scale(1.05); /* Легкое увеличение активной кнопки */
 }
+
+#financeNavIncome {
+    color: green;
+    font-size: 1.7rem;
+}
+
+#financeNavExpenses {
+    color: red;
+    font-size: 1.7rem;
+}
+
+#financeNavTransfers {
+    color: blue;
+    font-size: 1.7rem;
+}
+
