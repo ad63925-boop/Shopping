@@ -116,10 +116,11 @@ const financeState = {
 // Функция для инициализации финансового модуля
 function initFinanceModule() {
   if (financeState.initialized) return;
-  renderFinanceScreen();
-  initFinanceTabs();
-  setupFinanceEvents();
-  loadFinanceData();
+  
+  renderFinanceScreen();        // Отрисовываем HTML
+  initFinanceTabs();            // 🔥 ВАЖНО: инициализируем вкладки
+  setupFinanceEvents();        // Вешаем обработчики (если есть)
+  loadFinanceData();           // Загружаем данные из Firebase
   financeState.initialized = true;
 }
 
@@ -637,7 +638,6 @@ function buildFinanceWalletPayload(wallets) {
 }
 
 //Функция для построения полезной нагрузки для финансовых транзакций
-// ГАРАНТИРОВАННО РАБОЧИЙ ВАРИАНТ ФУНКЦИИ
 function buildFinanceTransactionsPayload(transactionsArray) {
   console.log("[Payload Builder] Сборка транзакций для Firebase из массива:", transactionsArray);
   
@@ -686,7 +686,8 @@ function getLocalDateKey(dateValue) {
   return `${y}-${m}-${day}`;
 }
 
-// Функция для рендеринга карточки финансовых транзакций
+/*
+// Функция для рендеринга карточки финансовых транзакций 1
 function renderFinanceHistoryList() {
   const listContainer = document.getElementById('financeHistoryList');
   if (!listContainer) return;
@@ -738,6 +739,7 @@ function renderFinanceHistoryList() {
 
   listContainer.innerHTML = html;
 }
+*/
 
 //Функция для рендеринга панели со всеми карточками истории финансовых транзакций
 function renderFinanceHistory() {
@@ -825,7 +827,7 @@ function renderFinanceHistory() {
   renderFinanceHistoryList();
 }
 
-//Функция для рендеринга списка финансовых транзакций с группировкой по дате
+//Функция для рендеринга списка финансовых транзакций с группировкой по дате 2
 function renderFinanceHistoryList() {
   const listContainer = document.getElementById('financeHistoryList');
   if (!listContainer) return;
@@ -1765,6 +1767,59 @@ async function handleWalletEdit(e, walletId) {
   }
 }
 
+//Функция для удаления финансового кошелька с проверкой на наличие транзакций
+async function removeFinanceWallet(walletId, hasTransactions) {
+  if (hasTransactions) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Внимание',
+      text: 'Нельзя удалить кошелёк, по которому есть транзакции. Сначала удалите или перенесите операции.'
+    });
+    return;
+  }
+
+  const result = await Swal.fire({
+    title: 'Вы уверены?',
+    text: "Это действие нельзя будет отменить!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#64748b',
+    confirmButtonText: 'Да, удалить!',
+    cancelButtonText: 'Отмена'
+  });
+
+  if (result.isConfirmed) {
+    try {
+      // 🔥 Используем Realtime Database (не Firestore!)
+      await financeDb.child('wallets').child(walletId).remove();
+      
+      // Обновляем локальное состояние
+      financeState.wallets = financeState.wallets.filter(w => w.id !== walletId);
+      
+      renderFinanceWallets();
+      renderFinanceHistoryList();
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Кошелёк удалён.',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Ошибка удаления',
+        text: 'Ошибка при удалении кошелька.',
+        confirmButtonColor: '#dc2626'
+      });
+    }
+  }
+}
+/*
 //Функция для удаления финансового кошелька
 async function removeFinanceWallet(walletId, hasTransactions) {
   if (hasTransactions) {
@@ -1805,7 +1860,9 @@ async function removeFinanceWallet(walletId, hasTransactions) {
     }
   }
 }
+*/
 
+/*
 //Функция для удаления финансового кошелька
 async function removeFinanceWallet(walletId, hasTransactions) {
   if (hasTransactions) {
@@ -1858,6 +1915,7 @@ console.error(err);
     });
   }
 }
+*/
 
 //Функция для редактирования финансовой категории
 function editFinanceCategory(id) {
@@ -1970,7 +2028,8 @@ function removeFinanceCategory(id) {
   }, {});
   financeDb.child('categories').set(payload);
 }
-
+/*
+//функция для сохранения финансовой транзакции (доход, расход, перевод)
 function saveFinanceTransaction(type) {
   const amountInput = document.getElementById(`${type === 'income' ? 'incomeAmount' : type === 'expense' ? 'expenseAmount' : 'transferAmount'}`);
   const amount = Number(amountInput?.value || 0);
@@ -2080,6 +2139,161 @@ function saveFinanceTransaction(type) {
     type,
     amount,
     currency, // запишется валюта кошелька
+    comment,
+    date,
+    walletId: wallet.id,
+    walletName: wallet.name,
+    category: category ? category.name : '',
+    categoryId: category?.id || ''
+  };
+  
+  const payload = financeState.transactions.reduce((acc, tx) => ({ ...acc, [tx.id]: tx }), {});
+  payload[txId] = transaction;
+  financeDb.child('transactions').set(payload);
+  
+  Swal.fire({ icon: 'success', title: type === 'income' ? 'Доход сохранен' : 'Расход сохранен', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
+  
+  renderFinanceTransactionList(type, type === 'income' ? 'financeTransactionListIncome' : 'financeTransactionListExpense');
+  renderFinanceHistory();
+}
+*/
+
+// функция для сохранения финансовой транзакции (доход, расход, перевод)
+function saveFinanceTransaction(type) {
+  const comment = document.getElementById(`${type === 'income' ? 'incomeComment' : type === 'expense' ? 'expenseComment' : 'transferComment'}`)?.value || '';
+  const date = document.getElementById(`${type === 'income' ? 'incomeDate' : type === 'expense' ? 'expenseDate' : 'transferDate'}`)?.value || '';
+
+  // ПРОВЕРКА: если даты нет — показываем ошибку и прерываем
+  if (!date) {
+    Swal.fire({ 
+      icon: 'warning', 
+      title: 'Дата не указана', 
+      text: 'Пожалуйста, выберите дату операции на календаре', 
+      confirmButtonColor: '#2563eb' 
+    });  
+    return; // прерываем функцию сохранения
+  }
+
+  // Логика для ПЕРЕВОДА (ОБНОВЛЕНА: Мультивалютность без ручного выбора валюты)
+  if (type === 'transfer') {
+    const fromId = document.getElementById('transferFrom')?.value;
+    const toId = document.getElementById('transferTo')?.value;
+    
+    // Считываем две разные суммы (сколько ушло и сколько пришло)
+    const amountFromInput = document.getElementById('transferAmountFrom'); // Инпут суммы списания
+    const amountToInput = document.getElementById('transferAmountTo');     // Инпут суммы зачисления
+    
+    const amountFrom = Number(amountFromInput?.value || 0);
+    const amountTo = Number(amountToInput?.value || 0);
+
+    if (!fromId || !toId || fromId === toId) {
+      Swal.fire({ icon: 'warning', title: 'Проверьте счета', text: 'Выберите разные счета для перевода', confirmButtonColor: '#2563eb' });
+      return;
+    }
+
+    if (amountFrom <= 0 || amountTo <= 0) {
+      Swal.fire({ icon: 'warning', title: 'Некорректная сумма', text: 'Сумма списания и зачисления должна быть больше 0', confirmButtonColor: '#2563eb' });
+      return;
+    }
+
+    const fromWallet = financeState.wallets.find(item => item.id === fromId);
+    const toWallet = financeState.wallets.find(item => item.id === toId);
+    if (!fromWallet || !toWallet) return;
+
+    // Валюты определяются автоматически из настроек кошельков!
+    const currencyFrom = fromWallet.currency || 'RUP';
+    const currencyTo = toWallet.currency || 'RUP';
+
+    // Автоматический расчет кросс-курса операции
+    const effectiveRate = amountFrom > 0 ? (amountTo / amountFrom) : 0;
+    console.log(`[Transfer] Перевод из ${currencyFrom} в ${currencyTo}. Эффективный курс: ${effectiveRate.toFixed(4)}`);
+
+    // Списываем точную сумму списания со счета-отправителя, зачисляем точную сумму на счет-получатель
+    const updatedWallets = financeState.wallets.reduce((acc, wallet) => {
+      if (wallet.id === fromWallet.id) {
+        acc[wallet.id] = { ...wallet, balance: Number(wallet.balance || 0) - amountFrom };
+      } else if (wallet.id === toWallet.id) {
+        acc[wallet.id] = { ...wallet, balance: Number(wallet.balance || 0) + amountTo };
+      } else {
+        acc[wallet.id] = { ...wallet };
+      }
+      return acc;
+    }, {});
+
+    financeDb.child('wallets').set(updatedWallets);
+
+    const txId = `tx-${Date.now()}`;
+    const transaction = {
+      id: txId,
+      name: 'Перевод',
+      type: 'transfer',
+      amountFrom,                 // Сохраняем сколько ушло
+      amountTo,                   // Сохраняем сколько пришло
+      currencyFrom,               // Валюта источника
+      currencyTo,                 // Валюта назначения
+      exchangeRate: effectiveRate,// Рассчитанный курс операции
+      comment: comment || `Курс: 1 ${currencyFrom} = ${effectiveRate.toFixed(2)} ${currencyTo}`,
+      date,
+      fromWalletId: fromWallet.id,
+      fromWalletName: fromWallet.name,
+      toWalletId: toWallet.id,
+      toWalletName: toWallet.name
+    };
+
+    const payload = financeState.transactions.reduce((acc, tx) => ({ ...acc, [tx.id]: tx }), {});
+    payload[txId] = transaction;
+    financeDb.child('transactions').set(payload);
+    
+    Swal.fire({ icon: 'success', title: 'Перевод сохранен', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
+    
+    if (typeof renderFinanceTransfers === 'function') renderFinanceTransfers();
+    renderFinanceHistory();
+    return;
+  }
+
+  // Логика для ДОХОДА и РАСХОДА
+  const amountInput = document.getElementById(`${type === 'income' ? 'incomeAmount' : 'expenseAmount'}`);
+  const amount = Number(amountInput?.value || 0);
+
+  if (amount <= 0) {
+    Swal.fire({ icon: 'warning', title: 'Некорректная сумма', text: 'Сумма должна быть больше 0', confirmButtonColor: '#2563eb' });
+    return;
+  }
+
+  const name = document.getElementById(`${type === 'income' ? 'incomeName' : 'expenseName'}`)?.value || (type === 'income' ? 'Доход' : 'Расход');
+  const walletId = document.getElementById(`${type === 'income' ? 'incomeWallet' : 'expenseWallet'}`)?.value;
+  const categoryId = document.getElementById(`${type === 'income' ? 'incomeCategory' : 'expenseCategory'}`)?.value;
+  
+  const wallet = financeState.wallets.find(item => item.id === walletId);
+  const category = financeState.categories.find(item => item.id === categoryId);
+  
+  if (!wallet) {
+    Swal.fire({ icon: 'warning', title: 'Ошибка выбора', text: 'Выберите корректный кошелек', confirmButtonColor: '#2563eb' });
+    return;
+  }
+
+  // Валюта принудительно берется из выбранного кошелька
+  const currency = wallet.currency || 'RUP';
+
+  const payloadWallets = financeState.wallets.reduce((acc, item) => {
+    if (item.id === wallet.id) {
+      const delta = type === 'income' ? amount : -amount;
+      acc[item.id] = { ...item, balance: Number(item.balance || 0) + delta };
+    } else {
+      acc[item.id] = { ...item };
+    }
+    return acc;
+  }, {});
+  
+  financeDb.child('wallets').set(payloadWallets);
+  
+  const txId = `tx-${Date.now()}`;
+  const transaction = {
+    id: txId,
+    name,
+    type,
+    amount,
+    currency,
     comment,
     date,
     walletId: wallet.id,

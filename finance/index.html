@@ -29,7 +29,7 @@
   <div id="financePanel-income" class="finance-panel hidden">
     <div class="finance-form">
       <div class="form-row">
-        <input id="incomeName" placeholder="Название дохода">
+        <input id="incomeName" placeholder="Название дохода" hidden>
         <select id="incomeCurrency"></select>
       </div>
       <div class="form-row">
@@ -45,7 +45,7 @@
   <div id="financePanel-expenses" class="finance-panel hidden">
     <div class="finance-form">
       <div class="form-row">
-        <input id="expenseName" placeholder="Название расхода">
+        <input id="expenseName" placeholder="Название расхода" hidden>
         <select id="expenseCurrency"></select>
       </div>
       <div class="form-row">
@@ -65,8 +65,8 @@
         <select id="transferTo"></select>
       </div>
       <div class="form-row">
-        <select id="transferCurrency"></select>
-        <input id="transferAmount" type="number" placeholder="Сумма">
+        <input id="transferAmountFrom" type="number" placeholder="Сумма списания">
+        <input id="transferAmountTo" type="number" placeholder="Сумма зачисления">
       </div>
       <textarea id="transferComment" placeholder="Комментарий"></textarea>
       <button id="btnSaveTransfer">Сохранить перевод</button>
