@@ -900,7 +900,7 @@ function renderFinanceHistoryList() {
           ${formattedDate}
         </div>
         <div class="finance-history-group">
-          ${grouped[date].map(tx => renderTransactionListItem(tx)).join('')}
+          ${grouped[date].map(tx => renderTransactionListItem(tx)).reverse().join('')}
         </div>
       `;
     });
