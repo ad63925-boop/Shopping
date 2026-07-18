@@ -550,30 +550,137 @@ function renderFinanceExpenses() {
   renderFinanceTransactionList('expense', 'financeTransactionListExpense');
 }
 
-//Функция для рендеринга финансовых переводов
+// Функция для рендеринга финансовых переводов
+// Функция для рендеринга финансовых переводов
 function renderFinanceTransfers() {
   const panel = document.getElementById('financePanel-transfers');
   if (!panel) return;
+
+  const today = new Date().toISOString().slice(0, 10);
+
   panel.innerHTML = `
-    <div class="finance-section-title"><span style="color: #2563eb;">Переводы</span></div>
-    <div class="finance-form">
-      <div class="form-row">
-        <select id="transferFrom"></select>
-        <select id="transferTo"></select>
-      </div>
-      <div class="form-row">
-        <select id="transferCurrency"></select>
-        <input id="transferAmount" type="number" placeholder="Сумма">
-      </div>
-      <div class="form-row-full">
-        <input id="transferDate" type="date" value="" required>
-      </div>
-      <textarea id="transferComment" placeholder="Комментарий"></textarea>
-      <button onclick="saveFinanceTransaction('transfer')">Создать перевод</button>
+    <div class="finance-section-title" style="margin-bottom: 12px;">
+      <span style="color: #2563eb; font-weight: 600; font-size: 1.1rem;">Переводы</span>
     </div>
-    <div id="financeTransferPreview"></div>
+    
+    <div class="finance-form" style="display: flex; flex-direction: column; gap: 10px;">
+      
+      <!-- Выбор кошельков -->
+      <div class="form-row" style="display: flex; gap: 8px;">
+        <div style="flex: 1; max-width: 50%;">
+          <select id="transferFrom" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #fff;"></select>
+          <div id="currencyFromLabel" style="font-size: 0.75rem; color: #64748b; margin-top: 4px; padding-left: 4px;">Валюта: --</div>
+        </div>
+        <div style="flex: 1; max-width: 50%;">
+          <select id="transferTo" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #fff;"></select>
+          <div id="currencyToLabel" style="font-size: 0.75rem; color: #64748b; margin-top: 4px; padding-left: 4px;">Валюта: --</div>
+        </div>
+      </div>
+      
+      <!-- Сумма отправления и Сумма приема -->
+      <div class="form-row" style="display: flex; gap: 8px;">
+        <div style="flex: 1; max-width: 50%;">
+          <input id="transferAmountFrom" type="number" step="0.01" placeholder="Сумма списания" 
+                 style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;">
+        </div>
+        <div style="flex: 1; max-width: 50%;">
+          <input id="transferAmountTo" type="number" step="0.01" placeholder="Сумма зачисления" 
+                 style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;">
+        </div>
+      </div>
+
+      <!-- 👇 БЛОК АВТОМАТИЧЕСКОГО РАСЧЕТА КУРСА 👇 -->
+      <div id="transferRateLabel" style="font-size: 0.8rem; color: #0284c7; background: #f0f9ff; padding: 6px 10px; border-radius: 6px; display: none; font-weight: 500;"></div>
+      
+      <!-- Дата перевода -->
+      <div class="form-row-full">
+        <input id="transferDate" type="date" value="Дата" required 
+               style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;">
+      </div>
+      
+      <!-- Комментарий -->
+      <textarea id="transferComment" placeholder="Комментарий" 
+                style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; min-height: 60px; resize: vertical;"></textarea>
+      
+      <!-- Кнопка действия -->
+      <button onclick="saveFinanceTransaction('transfer')" 
+              style="width: 100%; padding: 12px; border: none; background: #2563eb; color: white; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 0.95rem; margin-top: 4px;">
+        Создать перевод
+      </button>
+    </div>
+    
+    <div id="financeTransferPreview" style="margin-top: 12px;"></div>
   `;
+
   fillFinanceTransactionSelects('transfer');
+
+  // Функция для обновления текстовых меток валюты под кошельками
+  const updateCurrencyLabels = () => {
+    const fromId = document.getElementById('transferFrom')?.value;
+    const toId = document.getElementById('transferTo')?.value;
+
+    const fromWallet = financeState.wallets.find(w => w.id === fromId);
+    const toWallet = financeState.wallets.find(w => w.id === toId);
+
+    document.getElementById('currencyFromLabel').innerText = fromWallet ? `Валюта: ${fromWallet.currency || 'RUP'}` : 'Валюта: --';
+    document.getElementById('currencyToLabel').innerText = toWallet ? `Валюта: ${toWallet.currency || 'RUP'}` : 'Валюта: --';
+    
+    // Пересчитываем курс при смене кошельков (если суммы уже были введены)
+    calculateExchangeRate();
+  };
+
+  // Функция автоматического подсчета курса
+  const calculateExchangeRate = () => {
+    const fromId = document.getElementById('transferFrom')?.value;
+    const toId = document.getElementById('transferTo')?.value;
+    const fromWallet = financeState.wallets.find(w => w.id === fromId);
+    const toWallet = financeState.wallets.find(w => w.id === toId);
+
+    const amountFrom = Number(document.getElementById('transferAmountFrom')?.value || 0);
+    const amountTo = Number(document.getElementById('transferAmountTo')?.value || 0);
+    const rateLabel = document.getElementById('transferRateLabel');
+
+    // Если кошельки одинаковые или один не выбран — курс не имеет смысла
+    if (!fromWallet || !toWallet || fromWallet.id === toWallet.id) {
+      rateLabel.style.display = 'none';
+      return;
+    }
+
+    const curFrom = fromWallet.currency || 'RUP';
+    const curTo = toWallet.currency || 'RUP';
+
+    // Если валюты кошельков совпадают, курс всегда 1:1, прячем плашку, чтобы не захламлять экран
+    if (curFrom === curTo) {
+      rateLabel.style.display = 'none';
+      return;
+    }
+
+    // Считаем курс, только если введены обе суммы и они больше нуля
+    if (amountFrom > 0 && amountTo > 0) {
+      const rateDirect = (amountTo / amountFrom).toFixed(4); // Сколько получаем за 1 ед. отправления
+      const rateReverse = (amountFrom / amountTo).toFixed(4); // Обратный курс
+
+      rateLabel.innerHTML = `
+        <div style="display: flex; justify-content: space-between;">
+          <span>Курс: 1 ${curFrom} = ${rateDirect} ${curTo}</span>
+          <span style="color: #0369a1;">Обратный: 1 ${curTo} = ${rateReverse} ${curFrom}</span>
+        </div>
+      `;
+      rateLabel.style.display = 'block';
+    } else {
+      rateLabel.style.display = 'none';
+    }
+  };
+
+  // Слушатели событий
+  document.getElementById('transferFrom').addEventListener('change', updateCurrencyLabels);
+  document.getElementById('transferTo').addEventListener('change', updateCurrencyLabels);
+  
+  // Пересчитываем курс в реальном времени при вводе цифр пользователем
+  document.getElementById('transferAmountFrom').addEventListener('input', calculateExchangeRate);
+  document.getElementById('transferAmountTo').addEventListener('input', calculateExchangeRate);
+
+  setTimeout(updateCurrencyLabels, 50); 
 }
 
 //Функция для фильтрации финансовых транзакций по поисковому запросу, кошельку и дате
@@ -1264,12 +1371,14 @@ function convertCurrency(amount, fromCurrency, toCurrency) {
 
 
 //Функция для заполнения селектов валют, кошельков и категорий в формах транзакций
+//Функция для заполнения селектов валют, кошельков и категорий в формах транзакций
 function fillFinanceTransactionSelects(type) {
-  const currencySelect = document.getElementById(`${type}Currency`) || document.getElementById('transferCurrency');
   const walletSelect = document.getElementById(`${type}Wallet`);
   const categorySelect = document.getElementById(`${type}Category`);
   const fromSelect = document.getElementById('transferFrom');
   const toSelect = document.getElementById('transferTo');
+
+  // УБРАНО: Генерация currencySelect для income и expense
 
   if (walletSelect) {
     walletSelect.innerHTML = financeState.wallets.map(wallet => `<option value="${wallet.id}">${wallet.name} (${wallet.currency})</option>`).join('');
@@ -1284,6 +1393,8 @@ function fillFinanceTransactionSelects(type) {
     const html = financeState.wallets.map(wallet => `<option value="${wallet.id}">${wallet.name} (${wallet.currency})</option>`).join('');
     fromSelect.innerHTML = html;
     toSelect.innerHTML = html;
+    
+    // Для переводов валюту оставляем!
     const transferCurrency = document.getElementById('transferCurrency');
     if (transferCurrency) {
       transferCurrency.innerHTML = financeState.currencies.map(cur => `<option value="${cur}">${cur}</option>`).join('');
@@ -2225,17 +2336,14 @@ function saveFinanceTransaction(type) {
     return; // прерываем функцию сохранения
   }
 
-  // Логика для ПЕРЕВОДА (ОБНОВЛЕНА: Мультивалютность без ручного выбора валюты)
+ // Логика для ПЕРЕВОДА (ОБНОВЛЕННАЯ С ДВУМЯ СУММАМИ)
   if (type === 'transfer') {
     const fromId = document.getElementById('transferFrom')?.value;
     const toId = document.getElementById('transferTo')?.value;
     
-    // Считываем две разные суммы (сколько ушло и сколько пришло)
-    const amountFromInput = document.getElementById('transferAmountFrom'); // Инпут суммы списания
-    const amountToInput = document.getElementById('transferAmountTo');     // Инпут суммы зачисления
-    
-    const amountFrom = Number(amountFromInput?.value || 0);
-    const amountTo = Number(amountToInput?.value || 0);
+    // Считываем две разные суммы
+    const amountFrom = Number(document.getElementById('transferAmountFrom')?.value || 0);
+    const amountTo = Number(document.getElementById('transferAmountTo')?.value || 0);
 
     if (!fromId || !toId || fromId === toId) {
       Swal.fire({ icon: 'warning', title: 'Проверьте счета', text: 'Выберите разные счета для перевода', confirmButtonColor: '#2563eb' });
@@ -2243,7 +2351,7 @@ function saveFinanceTransaction(type) {
     }
 
     if (amountFrom <= 0 || amountTo <= 0) {
-      Swal.fire({ icon: 'warning', title: 'Некорректная сумма', text: 'Сумма списания и зачисления должна быть больше 0', confirmButtonColor: '#2563eb' });
+      Swal.fire({ icon: 'warning', title: 'Некорректная сумма', text: 'Обе суммы должны быть больше 0', confirmButtonColor: '#2563eb' });
       return;
     }
 
@@ -2251,15 +2359,7 @@ function saveFinanceTransaction(type) {
     const toWallet = financeState.wallets.find(item => item.id === toId);
     if (!fromWallet || !toWallet) return;
 
-    // Валюты определяются автоматически из настроек кошельков!
-    const currencyFrom = fromWallet.currency || 'RUP';
-    const currencyTo = toWallet.currency || 'RUP';
-
-    // Автоматический расчет кросс-курса операции
-    const effectiveRate = amountFrom > 0 ? (amountTo / amountFrom) : 0;
-    console.log(`[Transfer] Перевод из ${currencyFrom} в ${currencyTo}. Эффективный курс: ${effectiveRate.toFixed(4)}`);
-
-    // Списываем точную сумму списания со счета-отправителя, зачисляем точную сумму на счет-получатель
+    // Обновляем балансы кошельков: с одного списываем amountFrom, на второй зачисляем amountTo
     const updatedWallets = financeState.wallets.reduce((acc, wallet) => {
       if (wallet.id === fromWallet.id) {
         acc[wallet.id] = { ...wallet, balance: Number(wallet.balance || 0) - amountFrom };
@@ -2270,7 +2370,7 @@ function saveFinanceTransaction(type) {
       }
       return acc;
     }, {});
-
+    
     financeDb.child('wallets').set(updatedWallets);
 
     const txId = `tx-${Date.now()}`;
@@ -2278,12 +2378,12 @@ function saveFinanceTransaction(type) {
       id: txId,
       name: 'Перевод',
       type: 'transfer',
-      amountFrom,                 // Сохраняем сколько ушло
-      amountTo,                   // Сохраняем сколько пришло
-      currencyFrom,               // Валюта источника
-      currencyTo,                 // Валюта назначения
-      exchangeRate: effectiveRate,// Рассчитанный курс операции
-      comment: comment || `Курс: 1 ${currencyFrom} = ${effectiveRate.toFixed(2)} ${currencyTo}`,
+      amountFrom,                                 // Сохраняем сколько ушло
+      currencyFrom: fromWallet.currency || 'RUP', // Валюта отправления
+      amountTo,                                   // Сохраняем сколько пришло
+      currencyTo: toWallet.currency || 'RUP',     // Валюта приема
+      exchangeRate: amountFrom > 0 ? (amountTo / amountFrom).toFixed(4) : 1, // Рассчитываем курс обмена
+      comment,
       date,
       fromWalletId: fromWallet.id,
       fromWalletName: fromWallet.name,
@@ -2297,7 +2397,7 @@ function saveFinanceTransaction(type) {
     
     Swal.fire({ icon: 'success', title: 'Перевод сохранен', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
     
-    if (typeof renderFinanceTransfers === 'function') renderFinanceTransfers();
+    renderFinanceTransfers();
     renderFinanceHistory();
     return;
   }
