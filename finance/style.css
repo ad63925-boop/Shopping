@@ -306,6 +306,10 @@
 }
 
 .finance-item-actions {
+    display: none;
+}
+
+.finance-item-actions-vision {
     display: flex;
     gap: 6px;
     justify-content: space-around;

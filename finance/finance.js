@@ -336,7 +336,7 @@ function renderFinanceWallets() {
       <div class="finance-item-card">
         <div class="finance-wallet-header">
           <strong class="finance-wallet-name">${escapeHtml(wallet.name)}</strong>
-          <span class="finance-wallet-type">(${wallet.type || 'Кошелёк'})</span>
+          
         </div>
         <div class="finance-wallet-balance">
           ${wallet.currency || 'RUB'}
@@ -359,8 +359,7 @@ function renderFinanceWallets() {
 }
 
 
-//Функция для рендеринга финансовых  и категорий
-//Функция для рендеринга финансовых кошельков и категорий
+//Функция для рендеринга финансовых категорий
 function renderFinanceCategories() {
     const panel = document.getElementById('financePanel-categories');
     if (!panel) return;
@@ -375,7 +374,7 @@ function renderFinanceCategories() {
             <div>
                 <span class="finance-category-swatch" style="background:${cat.color || '#22c55e'}"></span> ${cat.name}
             </div>
-            <div>${cat.type}</div>
+            
             <div class="finance-item-actions">
                 <button style="background: #2563eb;" onclick="editFinanceCategory('${cat.id}')">✎ Редактировать</button>
                 <button style="background: #dc2626;" onclick="removeFinanceCategory('${cat.id}')">🗑 Удалить</button>
@@ -389,7 +388,7 @@ function renderFinanceCategories() {
             <div>
                 <span class="finance-category-swatch" style="background:${cat.color || '#ef4444'}"></span> ${cat.name}
             </div>
-            <div>${cat.type}</div>
+            
             <div class="finance-item-actions">
                 <button style="background: #2563eb;" onclick="editFinanceCategory('${cat.id}')">✎ Редактировать</button>
                 <button style="background: #dc2626;" onclick="removeFinanceCategory('${cat.id}')">🗑 Удалить</button>
@@ -456,6 +455,7 @@ function renderFinanceCategories() {
             if (icon) icon.textContent = isHidden ? '▸' : '▼';
         });
     }
+
 }
 
 
