@@ -309,53 +309,90 @@ function renderFinanceDashboard() {
 
 //Функция для рендеринга финансовых кошельков
 function renderFinanceWallets() {
-  const panel = document.getElementById('financePanel-wallets');
-  if (!panel) return;
+  const container = document.getElementById('financePanel-wallets'); // Ваш ID контейнера кошельков
+  if (!container) return;
 
-  panel.innerHTML = `
-    <div class="finance-section-title"><span>Кошельки</span></div>
+  container.innerHTML = '';
 
-    <div id="financeWalletList"></div>
+  if (!financeState.wallets || financeState.wallets.length === 0) {
+    container.innerHTML = '<div style="color: #64748b; font-size: 0.9rem;">Нет созданных кошельков</div>';
+    return;
+  }
 
-        <div class="finance-buttons-row">
-      <button onclick="showAddWalletForm()">➕ Добавить кошелёк</button>
-    </div>
-  `;
+  financeState.wallets.forEach(wallet => {
+    // Создаем главный элемент карточки кошелька
+    const walletCard = document.createElement('div');
+    walletCard.className = 'finance-item-card';
+    walletCard.style.cssText = `
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    `;
 
-  const list = document.getElementById('financeWalletList');
-  if (!list) return;
+    // Определяем иконку в зависимости от типа кошелька
+    const typeIcons = { cash: '💵', card: '💳', account: '🏦' };
+    const icon = typeIcons[wallet.type] || '💰';
 
-  list.innerHTML = financeState.wallets.map(wallet => {
-    const balance = Number(wallet.balance || 0);
-    const colorClass = balance >= 0 ? 'text-green' : 'text-red';
-    const hasTransactions = financeState.transactions.some(t =>
-      t.walletId === wallet.id || t.fromWalletId === wallet.id || t.toWalletId === wallet.id
-    );
-
-    return `
-      <div class="finance-item-card">
-        <div class="finance-wallet-header">
-          <strong class="finance-wallet-name">${escapeHtml(wallet.name)}</strong>
-          
+    // Внутренняя разметка: верхняя инфо-плашка + выезжающая панель действий
+    walletCard.innerHTML = `
+      <!-- Кликабельная шапка кошелька -->
+      <div class="wallet-main-info" style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.2rem; flex-shrink: 0;">${icon}</span>
+          <div style="display: flex; flex-direction: column;">
+            <span style="font-weight: 500; color: #1e293b;">${escapeHtml(wallet.name)}</span>
+            <span style="font-size: 0.75rem; color: #64748b;">
+              ${wallet.type === 'cash' ? 'Наличные' : wallet.type === 'card' ? 'Карта' : 'Счёт'}
+            </span>
+          </div>
         </div>
-        <div class="finance-wallet-balance">
-          ${wallet.currency || 'RUB'}
-          <span class="${colorClass}" style="font-weight:700;">${balance.toFixed(2)}</span>
-        </div>
-
-        <div class="finance-item-actions">
-          <button class="btn-edit-wallet" onclick="editFinanceWallet('${wallet.id}')">✎ Редактировать</button>
-          <button 
-            class="btn-delete-wallet ${hasTransactions ? 'btn-delete-disabled' : ''}" 
-            onclick="removeFinanceWallet('${wallet.id}', ${hasTransactions})"
-            ${hasTransactions ? 'disabled title="Есть транзакции — сначала перенесите или удалите их"' : ''}
-          >
-            🗑 Удалить
-          </button>
+        <div style="text-align: right;">
+          <span style="font-weight: 600; color: #0f172a;">${Number(wallet.balance || 0).toFixed(2)}</span>
+          <span style="font-size: 0.85rem; color: #64748b; font-weight: 500; margin-left: 2px;">${wallet.currency || 'RUP'}</span>
         </div>
       </div>
+
+      <!-- Выезжающая панель с кнопками (использует тот же CSS-класс, что и категории) -->
+      <div class="category-actions-panel" hidden>
+        <button onclick="event.stopPropagation(); editFinanceWallet('${wallet.id}')" 
+                style="flex: 1; padding: 8px; border: none; background: #eff6ff; color: #2563eb; border-radius: 8px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+          ✏️ Редактировать
+        </button>
+        <button onclick="event.stopPropagation(); deleteFinanceWallet('${wallet.id}')" 
+                style="flex: 1; padding: 8px; border: none; background: #fef2f2; color: #dc2626; border-radius: 8px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+          🗑️ Удалить
+        </button>
+      </div>
     `;
-  }).join('') || '<div class="finance-empty-state">Кошельков пока нет</div>';
+
+    // Логика клика по карточке кошелька
+    walletCard.addEventListener('click', () => {
+      // Ищем панель действий именно внутри этой карточки
+      const currentPanel = walletCard.querySelector('.category-actions-panel');
+      
+      // Если внутри карточки сейчас открыта форма редактирования (тег <form>), клик не должен её закрывать
+      if (walletCard.querySelector('.finance-wallet-edit-form')) return;
+
+      const isOpen = currentPanel.classList.contains('is-open');
+
+      // Закрываем все остальные открытые панели кошельков
+      container.querySelectorAll('.category-actions-panel').forEach(panel => {
+        panel.classList.remove('is-open');
+      });
+
+      // Переключаем состояние текущей панели
+      if (!isOpen) {
+        currentPanel.classList.add('is-open');
+      }
+    });
+
+    container.appendChild(walletCard);
+  });
 }
 
 
@@ -1676,95 +1713,109 @@ function addFinanceCategory() {
   });
 }
 
-//Функция для редактирования финансового кошелька
+// Функция для редактирования финансового кошелька
 function editFinanceWallet(walletId) {
   const wallet = financeState.wallets.find(w => w.id === walletId);
   if (!wallet) return;
 
-  const card = document.querySelector(`.finance-item-card button[onclick*="'${walletId}'"]`).closest('.finance-item-card');
+  // Ищем кнопку управления внутри карточки, чтобы найти саму карточку
+  const card = document.querySelector(`.finance-item-card button[onclick*="'${walletId}'"]`)?.closest('.finance-item-card');
   if (!card) return;
 
+  // Заменяем содержимое карточки на форму редактирования
+  // event.stopPropagation() не дает карточке перехватывать клики внутри инпутов
   card.innerHTML = `
-    <form class="finance-wallet-edit-form" onsubmit="handleWalletEdit(event, '${walletId}')">
-      <div>
-        <label>Название</label>
-        <input type="text" id="walletName_${walletId}" value="${escapeHtml(wallet.name)}" required>
+    <form class="finance-wallet-edit-form" 
+          onsubmit="handleWalletEdit(event, '${walletId}')" 
+          onclick="event.stopPropagation()" 
+          style="display: flex; flex-direction: column; gap: 12px; background: #ffffff; padding: 4px;">
+      
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <label style="font-size: 0.85rem; font-weight: 500; color: #475569;">Название</label>
+        <input type="text" id="walletName_${walletId}" value="${escapeHtml(wallet.name)}" required 
+               style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;">
       </div>
-      <div>
-        <label>Тип</label>
-        <select id="walletType_${walletId}">
+      
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <label style="font-size: 0.85rem; font-weight: 500; color: #475569;">Тип</label>
+        <select id="walletType_${walletId}" 
+                style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #fff;">
           <option value="cash" ${wallet.type === 'cash' ? 'selected' : ''}>Наличные</option>
           <option value="card" ${wallet.type === 'card' ? 'selected' : ''}>Карта</option>
           <option value="account" ${wallet.type === 'account' ? 'selected' : ''}>Счёт</option>
         </select>
       </div>
-      <div>
-        <label>Валюта</label>
-        <input type="text" id="walletCurrency_${walletId}" value="${wallet.currency || 'RUB'}" required>
+      
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <label style="font-size: 0.85rem; font-weight: 500; color: #475569;">Валюта</label>
+        <input type="text" id="walletCurrency_${walletId}" value="${wallet.currency || 'RUP'}" required 
+               style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;">
       </div>
-      <div>
-        <label>Баланс (текущий)</label>
-        <input type="number" id="walletBalance_${walletId}" step="0.01" value="${wallet.balance || 0}" readonly style="background:#f3f4f6;">
-        <small style="color:#666;">Баланс лучше менять через транзакции, а не вручную.</small>
+      
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <label style="font-size: 0.85rem; font-weight: 500; color: #475569;">Баланс (текущий)</label>
+        <input type="number" id="walletBalance_${walletId}" step="0.01" value="${wallet.balance || 0}" readonly 
+               style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background: #f1f5f9; color: #64748b;">
+        <small style="color: #64748b; font-size: 0.75rem; margin-top: 2px;">Баланс лучше менять через транзакции, а не вручную.</small>
       </div>
-      <div class="finance-wallet-form-actions">
-        <button type="submit" class="btn-save">Сохранить</button>
-        <button type="button" onclick="renderFinanceWallets()" class="btn-cancel">Отмена</button>
+      
+      <div class="finance-wallet-form-actions" style="display: flex; gap: 8px; margin-top: 4px;">
+        <button type="submit" class="btn-save" 
+                style="flex: 1; padding: 10px; border: none; background: #2563eb; color: white; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 0.9rem;">
+          Сохранить
+        </button>
+        <button type="button" onclick="event.stopPropagation(); renderFinanceWallets()" class="btn-cancel" 
+                style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 0.9rem;">
+          Отмена
+        </button>
       </div>
     </form>
   `;
 }
 
 //Функция для обработки редактирования кошелька
-async function handleWalletEdit(e, walletId) {
-  e.preventDefault();
+function handleWalletEdit(event, walletId) {
+  event.preventDefault(); // Предотвращаем перезагрузку страницы
 
-  const name = document.getElementById(`walletName_${walletId}`).value.trim();
-  const type = document.getElementById(`walletType_${walletId}`).value;
-  const currency = document.getElementById(`walletCurrency_${walletId}`).value.trim().toUpperCase();
+  const newName = document.getElementById(`walletName_${walletId}`)?.value.trim();
+  const newType = document.getElementById(`walletType_${walletId}`)?.value;
+  const newCurrency = document.getElementById(`walletCurrency_${walletId}`)?.value.trim().toUpperCase() || 'RUP';
 
-  if (!name) {
-    Swal.fire({
-  icon: 'error',
-  title: 'Упс...',
-  text: 'Название кошелька обязательно.',
-  confirmButtonColor: '#2563eb'
-});
+  if (!newName) {
+    Swal.fire({ icon: 'warning', title: 'Ошибка', text: 'Введите название кошелька' });
     return;
   }
 
-  // Находим текущий кошелек, чтобы сохранить его баланс
-  const wallet = financeState.wallets.find(w => w.id === walletId);
-  if (!wallet) return;
-
-  const updatedWallet = {
-    name,
-    type,
-    currency,
-    balance: Number(wallet.balance || 0) // сохраняем баланс неизменным
-  };
-
-  try {
-    // Сохраняем в Realtime Database в ту же ветку 'finance/wallets/id'
-    await financeDb.child('wallets').child(walletId).set(updatedWallet);
-    Swal.fire({
-  icon: 'success',
-  title: 'Успешно!',
-  text: 'Кошелёк обновлён.',
-  timer: 1500,
-  showConfirmButton: false
-});
-    
-    // Рендеринг вызовется автоматически через подписку .on('value') в loadFinanceData
-  } catch (err) {
-    console.error(err);
-    Swal.fire({
-  icon: 'error',
-  title: 'Упс...',
-  text: 'Ошибка при сохранении кошелька.',
-  confirmButtonColor: '#2563eb'
-});
+  // Обновляем локальный стейт (опционально, зависит от вашей архитектуры)
+  const walletIndex = financeState.wallets.findIndex(w => w.id === walletId);
+  if (walletIndex !== -1) {
+    financeState.wallets[walletIndex].name = newName;
+    financeState.wallets[walletIndex].type = newType;
+    financeState.wallets[walletIndex].currency = newCurrency;
   }
+
+  // Записываем обновленные данные в Firebase Realtime Database
+  financeDb.child(`wallets/${walletId}`).update({
+    name: newName,
+    type: newType,
+    currency: newCurrency
+  })
+  .then(() => {
+    Swal.fire({ 
+      icon: 'success', 
+      title: 'Кошелек обновлен', 
+      toast: true, 
+      position: 'top-end', 
+      showConfirmButton: false, 
+      timer: 2000 
+    });
+    // Перерисовываем список кошельков, возвращая карточку в нормальное состояние
+    renderFinanceWallets();
+  })
+  .catch(error => {
+    console.error("Ошибка при обновлении кошелька:", error);
+    Swal.fire({ icon: 'error', title: 'Ошибка Firebase', text: 'Не удалось сохранить изменения' });
+  });
 }
 
 //Функция для удаления финансового кошелька с проверкой на наличие транзакций

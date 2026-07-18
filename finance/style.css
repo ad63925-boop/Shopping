@@ -617,3 +617,20 @@
     font-size: 1.7rem;
 }
 
+/* 1. Состояние панели по умолчанию (когда класса .is-open НЕТ) */
+.category-actions-panel {
+  max-height: 0;            /* Полностью сжимаем панель по высоте */
+  opacity: 0;               /* Делаем её прозрачной */
+  overflow: hidden;         /* Прячем всё, что не помещается в нулевую высоту */
+  display: flex;            /* Выстраиваем кнопки в линию */
+  gap: 8px;                 /* Расстояние между кнопками */
+  margin-top: 0;
+  transition: max-height 0.25s ease-out, opacity 0.2s ease-out, margin-top 0.25s ease-out;
+}
+
+/* 2. Состояние панели, когда JS добавляет класс .is-open */
+.category-actions-panel.is-open {
+  max-height: 50px;         /* Плавно расширяем до высоты кнопок */
+  opacity: 1;               /* Делаем кнопки видимыми */
+  margin-top: 8px;          /* Добавляем отступ сверху от инфо-плашки */
+}
