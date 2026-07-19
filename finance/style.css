@@ -236,13 +236,10 @@
 }
 
 .finance-item-card {
-    background: #dadce0;
-    border-radius: var(--finance-radius-lg);
-    border: 1px solid var(--finance-border);
+    background: white;
+    border: 3px solid var(--finance-border);
     padding: 8px;
-    margin: 4px 0;
-    display: grid;
-    gap: 8px;
+    margin: 2px 0;
 }
 
 .finance-transfer-preview {
@@ -379,8 +376,7 @@
 }
 
 .finance-category-content {
-    display: grid;
-    gap: 8px;
+
 }
 
 .finance-category-content.hidden {

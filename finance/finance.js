@@ -360,16 +360,6 @@ function renderFinanceWallets() {
     // Создаем главный элемент карточки кошелька
     const walletCard = document.createElement('div');
     walletCard.className = 'finance-item-card';
-    walletCard.style.cssText = `
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 8px;
-      cursor: pointer;
-      user-select: none;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    `;
 
     // Определяем иконку в зависимости от типа кошелька
     const typeIcons = { cash: '💵', card: '💳', account: '🏦' };
