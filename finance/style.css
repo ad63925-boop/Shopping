@@ -24,7 +24,10 @@
     --finance-pad-lg: 14px;
     --finance-bg-income: #b7f7c9;
     --finance-bg-expense: #f4bebe;
-    --finance-bg-neutral: #a8ccfc;
+    --finance-bg-transfer: #a8ccfc;
+    --finance-border-income: #16a34a;
+    --finance-border-expense: #dc2626;
+    --finance-border-transfer: #2563eb;
     position: fixed;
     inset: 0;
     background: var(--finance-bg);
@@ -95,7 +98,8 @@
     justify-content: space-between; /* Растянет иконки равномерно по экрану */
     position: fixed;
     bottom: 0;
-    width: 100%;
+    width: 368px; /* Ширина панели */
+    padding: 10px 5px;
     background-color: var(--finance-bg-income);
 }
 
@@ -131,17 +135,17 @@
 
 #financePanel-income {
     background: var(--finance-bg-income);
-    border: 4px solid green;
+    border: 4px solid var(--finance-border-income);
 }
 
 #financePanel-expenses {
     background: var(--finance-bg-expense);
-    border: 4px solid red;
+    border: 4px solid var(--finance-border-expense);
 }
 
 #financePanel-transfers {
-    background: var(--finance-bg-neutral);
-    border: 4px solid blue;
+    background: var(--finance-bg-transfer);
+    border: 4px solid var(--finance-border-transfer);
 }
 
 .finance-dashboard-grid {
@@ -175,7 +179,6 @@
 .finance-section-title span {
     display: inline-block;
     padding: 4px 10px;
-    border-radius: 999px;
     color: var(--finance-accent-dark);
     font-weight: 700;
     font-size: 2rem;
@@ -482,6 +485,22 @@
   margin: 6px 0px;
   cursor: pointer;
   transition: box-shadow 0.2s;
+}
+
+#transferAmountFrom, #transferAmountTo {
+  width: 50%;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+#transferDate {
+    width: 50%;
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    margin-bottom: 10px;
 }
 
 .finance-transaction-item:hover {

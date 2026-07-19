@@ -60,8 +60,9 @@ nameInput.addEventListener('input', () => {
                     <span class="suggestion-cat">${getCategoryIcon(category)} ${category}</span>
                     ${lastPrice ? `<span class="suggestion-price">( ${lastPrice} ₽ )</span>` : ''}
                 </div>
-                <span class="suggestion-delete" data-name="${name}">🗑</span>
-            `;
+                <span class="suggestion-delete" data-name="${name}">
+                    <i class="fa-solid fa-trash"></i>
+                </span>            `;
 
             // Клик по карточке
             div.addEventListener('click', (e) => {

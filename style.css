@@ -776,7 +776,9 @@ footer p {
     display: none;
     margin-bottom: 50px;
     transition: all 0.9s;
-    width: 368px;
+    width: 100%;
+    max-width: 368px;
+    box-sizing: border-box
 }
 
 .visible {

@@ -580,12 +580,10 @@ function renderFinanceTransfers() {
       <!-- Сумма отправления и Сумма приема -->
       <div class="form-row" style="display: flex; gap: 8px;">
         <div style="flex: 1; max-width: 50%;">
-          <input id="transferAmountFrom" type="number" step="0.01" placeholder="Сумма списания" 
-                 style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;">
+          <input id="transferAmountFrom" type="number" step="0.01" placeholder="Сумма списания">
         </div>
         <div style="flex: 1; max-width: 50%;">
-          <input id="transferAmountTo" type="number" step="0.01" placeholder="Сумма зачисления" 
-                 style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;">
+          <input id="transferAmountTo" type="number" step="0.01" placeholder="Сумма зачисления">
         </div>
       </div>
 
