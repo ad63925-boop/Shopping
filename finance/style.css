@@ -184,6 +184,14 @@
     font-size: 2rem;
 }
 
+.finance-income-title span {
+    color: green;
+}
+
+.finance-expense-title span {
+    color: var(--finance-danger);
+}
+
 .finance-collapsible {
     display: grid;
     gap: 0;
@@ -246,6 +254,94 @@
     min-height: 40px;
     display: flex;
     align-items: center;
+}
+
+.finance-transfer-title {
+    margin-bottom: 12px;
+}
+
+.finance-transfer-title span {
+    color: var(--finance-accent-blue);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.finance-transfer-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.finance-form .finance-transfer-row {
+    display: flex;
+    gap: 8px;
+}
+
+.finance-transfer-half {
+    flex: 1;
+    max-width: 50%;
+}
+
+.finance-transfer-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--finance-border-soft);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: var(--finance-surface);
+}
+
+.finance-currency-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 4px;
+    padding-left: 4px;
+}
+
+.finance-transfer-rate-label {
+    display: none;
+    font-size: 0.8rem;
+    color: #0284c7;
+    background: #f0f9ff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.finance-transfer-rate-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.finance-transfer-rate-reverse {
+    color: #0369a1;
+}
+
+.finance-transfer-comment {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--finance-border-soft);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    min-height: 60px;
+    resize: vertical;
+}
+
+.finance-form .finance-transfer-submit {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background: var(--finance-accent-blue);
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 0.95rem;
+    margin-top: 4px;
+}
+
+.finance-transfer-preview-container {
+    margin-top: 12px;
 }
 
 .finance-transfer-balance-preview {
@@ -455,6 +551,29 @@
     grid-column: span 2;
 }
 
+.finance-date-field {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    min-width: 0;
+}
+
+.finance-date-field input {
+    flex: 1;
+    min-width: 0;
+}
+
+.finance-form .finance-date-today-btn {
+    flex: 0 0 42px;
+    padding: 0;
+    border-radius: var(--finance-radius-sm);
+    background: var(--finance-accent-blue);
+    color: var(--finance-surface);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .finance-form button {
     background: #34a853;
     color: var(--finance-surface);
@@ -657,3 +776,4 @@
   opacity: 1;               /* Делаем кнопки видимыми */
   margin-top: 8px;          /* Добавляем отступ сверху от инфо-плашки */
 }
+

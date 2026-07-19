@@ -130,7 +130,7 @@ function renderFinanceScreen() {
   if (!container) return;
   container.innerHTML = `
     <div class="finance-header">
-      <h2 ">Finance_Pro</h2>
+      <h2>Finance_Pro</h2>
       <button id="financeCloseBtn" class="finance-close-btn">✖</button>
     </div>
     <div class="finance-panel-tabs">
@@ -189,6 +189,42 @@ function setupFinanceEvents() {
   document.getElementById('financeNavTransfers')?.addEventListener('click', () => showFinancePanel('transfers'));
   document.getElementById('financeNavCategories')?.addEventListener('click', () => showFinancePanel('categories'));
   document.getElementById('financeNavHistory')?.addEventListener('click', () => showFinancePanel('history'));
+}
+
+function getTodayDateValue() {
+  const today = new Date();
+  const offsetDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
+  return offsetDate.toISOString().slice(0, 10);
+}
+
+function setFinanceDateToday(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  input.value = getTodayDateValue();
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+function focusFinanceAmountField(view) {
+  const amountFieldIds = {
+    income: 'incomeAmount',
+    expenses: 'expenseAmount',
+    expense: 'expenseAmount',
+    transfers: 'transferAmountFrom',
+    transfer: 'transferAmountFrom'
+  };
+
+  const inputId = amountFieldIds[view];
+  if (!inputId) return;
+
+  setTimeout(() => {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+
+    input.focus();
+    input.select();
+  }, 120);
 }
 
 //Функция для открытия финансового модуля
@@ -262,6 +298,7 @@ function showFinancePanel(panel) {
   document.querySelectorAll('.finance-panel-tabs button').forEach(btn => btn.classList.remove('active'));
   document.getElementById(`financeNav${panel.charAt(0).toUpperCase() + panel.slice(1)}`)?.classList.add('active');
   renderFinancePanel();
+  focusFinanceAmountField(panel);
 }
 
 //Функция для рендеринга финансового дашборда, кошельков, доходов, расходов, переводов и истории
@@ -501,18 +538,20 @@ function renderFinanceIncome() {
   const panel = document.getElementById('financePanel-income');
   if (!panel) return;
   panel.innerHTML = `
-    <div class="finance-section-title"><span style="color: green;">Доходы</span></div>
+    <div class="finance-section-title finance-income-title"><span>Доходы</span></div>
     <div class="finance-form">
-      <div class="form-row">
-        <input id="incomeName" type="text" placeholder="Название дохода">
-      </div>
       <div class="form-row">
         <select id="incomeWallet"></select>
         <select id="incomeCategory"></select>
       </div>
       <div class="form-row">
         <input id="incomeAmount" type="number" placeholder="Сумма">
-        <input id="incomeDate" type="date" value="">
+        <div class="finance-date-field">
+          <input id="incomeDate" type="date" value="">
+          <button type="button" class="finance-date-today-btn" onclick="setFinanceDateToday('incomeDate')" title="Сегодня">
+            <i class="fa-solid fa-calendar-day"></i>
+          </button>
+        </div>
       </div>
       <textarea id="incomeComment" placeholder="Комментарий"></textarea>
       <button onclick="saveFinanceTransaction('income')">Создать доход</button>
@@ -523,24 +562,25 @@ function renderFinanceIncome() {
   renderFinanceTransactionList('income', 'financeTransactionListIncome');
 }
 
-
 //Функция для рендеринга финансовых расходов
 function renderFinanceExpenses() {
   const panel = document.getElementById('financePanel-expenses');
   if (!panel) return;
   panel.innerHTML = `
-    <div class="finance-section-title"><span style="color: #dc2626;">Расходы</span></div>
+    <div class="finance-section-title finance-expense-title"><span>Расходы</span></div>
     <div class="finance-form">
-      <div class="form-row">
-        <input id="expenseName" type="text" placeholder="Название расхода">
-      </div>
       <div class="form-row">
         <select id="expenseWallet"></select>
         <select id="expenseCategory"></select>
       </div>
       <div class="form-row">
         <input id="expenseAmount" type="number" placeholder="Сумма">
-        <input id="expenseDate" type="date" value="" required>
+        <div class="finance-date-field">
+          <input id="expenseDate" type="date" value="" required>
+          <button type="button" class="finance-date-today-btn" onclick="setFinanceDateToday('expenseDate')" title="Сегодня">
+            <i class="fa-solid fa-calendar-day"></i>
+          </button>
+        </div>
       </div>
       <textarea id="expenseComment" placeholder="Комментарий"></textarea>
       <button onclick="saveFinanceTransaction('expense')">Создать расход</button>
@@ -556,58 +596,61 @@ function renderFinanceTransfers() {
   const panel = document.getElementById('financePanel-transfers');
   if (!panel) return;
 
-  const today = new Date().toISOString().slice(0, 10);
-
   panel.innerHTML = `
-    <div class="finance-section-title" style="margin-bottom: 12px;">
-      <span style="color: #2563eb; font-weight: 600; font-size: 1.1rem;">Переводы</span>
+    <div class="finance-section-title finance-transfer-title">
+      <span>Переводы</span>
     </div>
     
-    <div class="finance-form" style="display: flex; flex-direction: column; gap: 10px;">
+    <div class="finance-form finance-transfer-form">
       
       <!-- Выбор кошельков -->
-      <div class="form-row" style="display: flex; gap: 8px;">
-        <div style="flex: 1; max-width: 50%;">
-          <select id="transferFrom" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #fff;"></select>
-          <div id="currencyFromLabel" style="font-size: 0.75rem; color: #64748b; margin-top: 4px; padding-left: 4px;">Валюта: --</div>
+      <div class="form-row finance-transfer-row">
+        <div class="finance-transfer-half">
+          <select id="transferFrom" class="finance-transfer-control"></select>
+          <div id="currencyFromLabel" class="finance-currency-label">Валюта: --</div>
         </div>
-        <div style="flex: 1; max-width: 50%;">
-          <select id="transferTo" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #fff;"></select>
-          <div id="currencyToLabel" style="font-size: 0.75rem; color: #64748b; margin-top: 4px; padding-left: 4px;">Валюта: --</div>
+        <div class="finance-transfer-half">
+          <select id="transferTo" class="finance-transfer-control"></select>
+          <div id="currencyToLabel" class="finance-currency-label">Валюта: --</div>
         </div>
       </div>
       
       <!-- Сумма отправления и Сумма приема -->
-      <div class="form-row" style="display: flex; gap: 8px;">
-        <div style="flex: 1; max-width: 50%;">
+      <div class="form-row finance-transfer-row">
+        <div class="finance-transfer-half">
           <input id="transferAmountFrom" type="number" step="0.01" placeholder="Сумма списания">
         </div>
-        <div style="flex: 1; max-width: 50%;">
+        <div class="finance-transfer-half">
           <input id="transferAmountTo" type="number" step="0.01" placeholder="Сумма зачисления">
         </div>
       </div>
 
       <!-- 👇 БЛОК АВТОМАТИЧЕСКОГО РАСЧЕТА КУРСА 👇 -->
-      <div id="transferRateLabel" style="font-size: 0.8rem; color: #0284c7; background: #f0f9ff; padding: 6px 10px; border-radius: 6px; display: none; font-weight: 500;"></div>
+      <div id="transferRateLabel" class="finance-transfer-rate-label"></div>
       
       <!-- Дата перевода -->
       <div class="form-row-full">
-        <input id="transferDate" type="date" value="Дата" required 
-               style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem;">
+        <div class="finance-date-field">
+          <input id="transferDate" type="date" value="" required 
+                 class="finance-transfer-control">
+          <button type="button" class="finance-date-today-btn" onclick="setFinanceDateToday('transferDate')" title="Сегодня">
+            <i class="fa-solid fa-calendar-day"></i>
+          </button>
+        </div>
       </div>
       
       <!-- Комментарий -->
       <textarea id="transferComment" placeholder="Комментарий" 
-                style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; min-height: 60px; resize: vertical;"></textarea>
+                class="finance-transfer-comment"></textarea>
       
       <!-- Кнопка действия -->
       <button onclick="saveFinanceTransaction('transfer')" 
-              style="width: 100%; padding: 12px; border: none; background: #2563eb; color: white; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 0.95rem; margin-top: 4px;">
+              class="finance-transfer-submit">
         Создать перевод
       </button>
     </div>
     
-    <div id="financeTransferPreview" style="margin-top: 12px;"></div>
+    <div id="financeTransferPreview" class="finance-transfer-preview-container"></div>
   `;
 
   fillFinanceTransactionSelects('transfer');
@@ -659,9 +702,9 @@ function renderFinanceTransfers() {
       const rateReverse = (amountFrom / amountTo).toFixed(4); // Обратный курс
 
       rateLabel.innerHTML = `
-        <div style="display: flex; justify-content: space-between;">
+        <div class="finance-transfer-rate-row">
           <span>Курс: 1 ${curFrom} = ${rateDirect} ${curTo}</span>
-          <span style="color: #0369a1;">Обратный: 1 ${curTo} = ${rateReverse} ${curFrom}</span>
+          <span class="finance-transfer-rate-reverse">Обратный: 1 ${curTo} = ${rateReverse} ${curFrom}</span>
         </div>
       `;
       rateLabel.style.display = 'block';
@@ -2507,6 +2550,7 @@ function initFinanceTabs() {
       if (panel) panel.classList.remove('hidden');
 
       triggerPanelSpecificRender(view);
+      focusFinanceAmountField(view);
 
       if (panel) {
         setTimeout(() => {
