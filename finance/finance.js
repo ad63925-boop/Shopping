@@ -581,10 +581,12 @@ function renderFinanceExpenses() {
 }
 
 // Функция для рендеринга финансовых переводов
-// Функция для рендеринга финансовых переводов
 function renderFinanceTransfers() {
   const panel = document.getElementById('financePanel-transfers');
   if (!panel) return;
+
+  // Устанавливаем сегодняшнюю дату по умолчанию (YYYY-MM-DD)
+  const today = new Date().toISOString().slice(0, 10);
 
   panel.innerHTML = `
     <div class="finance-section-title finance-transfer-title">
@@ -596,11 +598,11 @@ function renderFinanceTransfers() {
       <!-- Выбор кошельков -->
       <div class="form-row finance-transfer-row">
         <div class="finance-transfer-half">
-          <select id="transferFrom" class="finance-transfer-control"></select>
+          <select id="transferFrom" class="finance-transfer-control" onchange="window.updateFinanceTransferLabels()"></select>
           <div id="currencyFromLabel" class="finance-currency-label">Валюта: --</div>
         </div>
         <div class="finance-transfer-half">
-          <select id="transferTo" class="finance-transfer-control"></select>
+          <select id="transferTo" class="finance-transfer-control" onchange="window.updateFinanceTransferLabels()"></select>
           <div id="currencyToLabel" class="finance-currency-label">Валюта: --</div>
         </div>
       </div>
@@ -608,20 +610,22 @@ function renderFinanceTransfers() {
       <!-- Сумма отправления и Сумма приема -->
       <div class="form-row finance-transfer-row">
         <div class="finance-transfer-half">
-          <input id="transferAmountFrom" type="number" step="0.01" placeholder="Сумма списания">
+          <input id="transferAmountFrom" type="number" step="0.01" placeholder="Сумма списания" 
+                 class="finance-transfer-control" oninput="window.handleTransferAmountInput('from')">
         </div>
         <div class="finance-transfer-half">
-          <input id="transferAmountTo" type="number" step="0.01" placeholder="Сумма зачисления">
+          <input id="transferAmountTo" type="number" step="0.01" placeholder="Сумма зачисления" 
+                 class="finance-transfer-control" oninput="window.handleTransferAmountInput('to')">
         </div>
       </div>
 
-      <!-- 👇 БЛОК АВТОМАТИЧЕСКОГО РАСЧЕТА КУРСА 👇 -->
-      <div id="transferRateLabel" class="finance-transfer-rate-label"></div>
+      <!-- Блок автоматического расчета курса -->
+      <div id="transferRateLabel" class="finance-transfer-rate-label" style="display: none;"></div>
       
       <!-- Дата перевода -->
       <div class="form-row-full">
         <div class="finance-date-field">
-          <input id="transferDate" type="date" value="" required 
+          <input id="transferDate" type="date" value="${today}" required 
                  class="finance-transfer-control">
           <button type="button" class="finance-date-today-btn" onclick="setFinanceDateToday('transferDate')" title="Сегодня">
             <i class="fa-solid fa-calendar-day"></i>
@@ -643,25 +647,53 @@ function renderFinanceTransfers() {
     <div id="financeTransferPreview" class="finance-transfer-preview-container"></div>
   `;
 
+  // Заполняем выпадающие списки кошельков
   fillFinanceTransactionSelects('transfer');
 
-  // Функция для обновления текстовых меток валюты под кошельками
-  const updateCurrencyLabels = () => {
+  // Глобальная функция для обновления текстовых меток валюты
+  window.updateFinanceTransferLabels = () => {
     const fromId = document.getElementById('transferFrom')?.value;
     const toId = document.getElementById('transferTo')?.value;
 
     const fromWallet = financeState.wallets.find(w => w.id === fromId);
     const toWallet = financeState.wallets.find(w => w.id === toId);
 
-    document.getElementById('currencyFromLabel').innerText = fromWallet ? `Валюта: ${fromWallet.currency || 'RUP'}` : 'Валюта: --';
-    document.getElementById('currencyToLabel').innerText = toWallet ? `Валюта: ${toWallet.currency || 'RUP'}` : 'Валюта: --';
+    const curFromLabel = document.getElementById('currencyFromLabel');
+    const curToLabel = document.getElementById('currencyToLabel');
+
+    if (curFromLabel) curFromLabel.innerText = fromWallet ? `Валюта: ${fromWallet.currency || 'RUP'}` : 'Валюта: --';
+    if (curToLabel) curToLabel.innerText = toWallet ? `Валюта: ${toWallet.currency || 'RUP'}` : 'Валюта: --';
     
-    // Пересчитываем курс при смене кошельков (если суммы уже были введены)
-    calculateExchangeRate();
+    // Синхронизируем суммы, если валюты одинаковые
+    if (fromWallet && toWallet && (fromWallet.currency || 'RUP') === (toWallet.currency || 'RUP')) {
+      const amountFrom = document.getElementById('transferAmountFrom')?.value;
+      const inputTo = document.getElementById('transferAmountTo');
+      if (inputTo && amountFrom) inputTo.value = amountFrom;
+    }
+
+    window.calculateFinanceExchangeRate();
   };
 
-  // Функция автоматического подсчета курса
-  const calculateExchangeRate = () => {
+  // Обработка ввода сумм
+  window.handleTransferAmountInput = (source) => {
+    const fromId = document.getElementById('transferFrom')?.value;
+    const toId = document.getElementById('transferTo')?.value;
+    const fromWallet = financeState.wallets.find(w => w.id === fromId);
+    const toWallet = financeState.wallets.find(w => w.id === toId);
+
+    // Если валюты кошельков совпадают — автоматически дублируем введенную сумму во второе поле
+    if (fromWallet && toWallet && (fromWallet.currency || 'RUP') === (toWallet.currency || 'RUP')) {
+      const inputFrom = document.getElementById('transferAmountFrom');
+      const inputTo = document.getElementById('transferAmountTo');
+      if (source === 'from' && inputTo) inputTo.value = inputFrom.value;
+      if (source === 'to' && inputFrom) inputFrom.value = inputTo.value;
+    }
+
+    window.calculateFinanceExchangeRate();
+  };
+
+  // Автоматический подсчет курса
+  window.calculateFinanceExchangeRate = () => {
     const fromId = document.getElementById('transferFrom')?.value;
     const toId = document.getElementById('transferTo')?.value;
     const fromWallet = financeState.wallets.find(w => w.id === fromId);
@@ -671,7 +703,9 @@ function renderFinanceTransfers() {
     const amountTo = Number(document.getElementById('transferAmountTo')?.value || 0);
     const rateLabel = document.getElementById('transferRateLabel');
 
-    // Если кошельки одинаковые или один не выбран — курс не имеет смысла
+    if (!rateLabel) return;
+
+    // Скрываем плашку, если кошельки одинаковые или не выбраны
     if (!fromWallet || !toWallet || fromWallet.id === toWallet.id) {
       rateLabel.style.display = 'none';
       return;
@@ -680,16 +714,16 @@ function renderFinanceTransfers() {
     const curFrom = fromWallet.currency || 'RUP';
     const curTo = toWallet.currency || 'RUP';
 
-    // Если валюты кошельков совпадают, курс всегда 1:1, прячем плашку, чтобы не захламлять экран
+    // При одинаковых валютах курс 1:1 — скрываем плашку
     if (curFrom === curTo) {
       rateLabel.style.display = 'none';
       return;
     }
 
-    // Считаем курс, только если введены обе суммы и они больше нуля
+    // Расчет курса
     if (amountFrom > 0 && amountTo > 0) {
-      const rateDirect = (amountTo / amountFrom).toFixed(4); // Сколько получаем за 1 ед. отправления
-      const rateReverse = (amountFrom / amountTo).toFixed(4); // Обратный курс
+      const rateDirect = (amountTo / amountFrom).toFixed(4);
+      const rateReverse = (amountFrom / amountTo).toFixed(4);
 
       rateLabel.innerHTML = `
         <div class="finance-transfer-rate-row">
@@ -703,15 +737,12 @@ function renderFinanceTransfers() {
     }
   };
 
-  // Слушатели событий
-  document.getElementById('transferFrom').addEventListener('change', updateCurrencyLabels);
-  document.getElementById('transferTo').addEventListener('change', updateCurrencyLabels);
-  
-  // Пересчитываем курс в реальном времени при вводе цифр пользователем
-  document.getElementById('transferAmountFrom').addEventListener('input', calculateExchangeRate);
-  document.getElementById('transferAmountTo').addEventListener('input', calculateExchangeRate);
-
-  setTimeout(updateCurrencyLabels, 50); 
+  // Подтягиваем начальные метки с небольшим таймаутом после инициализации селектов
+  setTimeout(() => {
+    if (typeof window.updateFinanceTransferLabels === 'function') {
+      window.updateFinanceTransferLabels();
+    }
+  }, 50);
 }
 
 //Функция для фильтрации финансовых транзакций по поисковому запросу, кошельку и дате
@@ -1003,49 +1034,110 @@ function renderFinanceHistory() {
 }
 
 //Функция для рендеринга списка финансовых транзакций с группировкой по дате 2
+// Вспомогательная функция для генерации списка транзакций
 function renderFinanceHistoryList() {
-  const listContainer = document.getElementById('financeHistoryList');
-  if (!listContainer) return;
+  const container = document.getElementById('financeHistoryList');
+  if (!container) return;
 
-  const transactions = getFilteredFinanceTransactions();
+  // 1. Фильтрация транзакций
+  let filtered = (financeState.transactions || []).filter(tx => {
+    // Фильтр по счету (учитываем, что у перевода есть и fromWalletId, и toWalletId)
+    if (financeState.historyFilters.walletId && financeState.historyFilters.walletId !== 'all') {
+      const selectedWallet = financeState.historyFilters.walletId;
+      const isRelatedWallet = tx.walletId === selectedWallet || 
+                              tx.fromWalletId === selectedWallet || 
+                              tx.toWalletId === selectedWallet;
+      if (!isRelatedWallet) return false;
+    }
 
-  // Группируем по дате (YYYY-MM-DD)
-  const grouped = {};
-  transactions.forEach(tx => {
-    const date = new Date(tx.date).toISOString().slice(0, 10);
-    if (!grouped[date]) grouped[date] = [];
-    grouped[date].push(tx);
+    // Фильтр по точной дате
+    if (financeState.historyFilters.date && tx.date !== financeState.historyFilters.date) {
+      return false;
+    }
+
+    // Фильтр по диапазону дат
+    if (financeState.historyFilters.startDate && tx.date < financeState.historyFilters.startDate) {
+      return false;
+    }
+    if (financeState.historyFilters.endDate && tx.date > financeState.historyFilters.endDate) {
+      return false;
+    }
+
+    // Поиск по тексту
+    if (financeState.searchQuery) {
+      const q = financeState.searchQuery.toLowerCase();
+      const matchName = (tx.name || '').toLowerCase().includes(q);
+      const matchComment = (tx.comment || '').toLowerCase().includes(q);
+      const matchCategory = (tx.category || '').toLowerCase().includes(q);
+      const matchFrom = (tx.fromWalletName || '').toLowerCase().includes(q);
+      const matchTo = (tx.toWalletName || '').toLowerCase().includes(q);
+      
+      if (!matchName && !matchComment && !matchCategory && !matchFrom && !matchTo) {
+        return false;
+      }
+    }
+
+    return true;
   });
 
-  // Сортируем даты по убыванию
-  const sortedDates = Object.keys(grouped).sort().reverse();
-
-  let html = '';
-
-  if (sortedDates.length === 0) {
-    html = '<div class="finance-empty-state">Нет транзакций по выбранным фильтрам</div>';
-  } else {
-    sortedDates.forEach(date => {
-      const dateObj = new Date(date);
-      const formattedDate = dateObj.toLocaleDateString('ru-RU', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
-
-      html += `
-        <div class="finance-history-date-header">
-          ${formattedDate}
-        </div>
-        <div class="finance-history-group">
-          ${grouped[date].map(tx => renderTransactionListItem(tx)).reverse().join('')}
-        </div>
-      `;
-    });
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="finance-empty-state" style="text-align: center; color: #94a3b8; padding: 20px;">Транзакции не найдены</div>`;
+    return;
   }
 
-  listContainer.innerHTML = html;
+  // 2. Рендеринг элементов списка
+  container.innerHTML = filtered.map(tx => {
+    const isTransfer = tx.type === 'transfer';
+    const isExpense = tx.type === 'expense';
+
+    // Формируем корректный текст суммы и CSS-класс
+    let amountText = '';
+    let amountClass = '';
+
+    if (isTransfer) {
+      const amtFrom = Number(tx.amountFrom || 0).toLocaleString('ru-RU');
+      const amtTo = Number(tx.amountTo || 0).toLocaleString('ru-RU');
+      const curFrom = tx.currencyFrom || 'RUP';
+      const curTo = tx.currencyTo || 'RUP';
+
+      // Если переводили в разных валютах — показываем обе суммы
+      if (curFrom !== curTo) {
+        amountText = `-${amtFrom} ${curFrom} ➔ +${amtTo} ${curTo}`;
+      } else {
+        amountText = `-${amtFrom} ${curFrom}`;
+      }
+      amountClass = 'text-red'; // Или нужный вам класс стиля
+    } else if (isExpense) {
+      const amt = Number(tx.amount || 0).toLocaleString('ru-RU');
+      amountText = `-${amt} ${tx.currency || 'RUP'}`;
+      amountClass = 'text-red';
+    } else {
+      const amt = Number(tx.amount || 0).toLocaleString('ru-RU');
+      amountText = `+${amt} ${tx.currency || 'RUP'}`;
+      amountClass = 'text-green';
+    }
+
+    // Подзаголовок для перевода
+    const subtitle = isTransfer 
+      ? `${tx.fromWalletName || 'Кошелек'} ➔ ${tx.toWalletName || 'Кошелек'}`
+      : (tx.category || tx.walletName || '');
+
+    return `
+      <div class="finance-history-item" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9;">
+        <div class="finance-tx-info">
+          <div class="finance-tx-name" style="font-weight: 500;">${tx.name || (isTransfer ? 'Перевод' : 'Операция')}</div>
+          <div class="finance-tx-sub" style="font-size: 0.8rem; color: #64748b;">${subtitle}</div>
+          ${tx.comment ? `<div class="finance-tx-comment" style="font-size: 0.75rem; color: #94a3b8;">${tx.comment}</div>` : ''}
+        </div>
+        <div class="finance-tx-right" style="text-align: right;">
+          <div class="finance-tx-amount ${amountClass}" style="font-weight: 600;">${amountText}</div>
+          <div class="finance-tx-date" style="font-size: 0.75rem; color: #94a3b8;">${tx.date || ''}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
+
 
 //Функция для рендеринга элемента списка финансовых транзакций
 function renderTransactionListItem(tx, isEditing = false) {
