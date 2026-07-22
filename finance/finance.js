@@ -1,4 +1,27 @@
 ﻿//-----------КНОПКИ--------------
+
+// Глобальная функция для парсинга даты транзакции (используется в нескольких местах)
+function parseTxDate(dateValue) {
+  // Если уже Date — возвращаем как есть
+  if (dateValue instanceof Date) return dateValue;
+
+  // Если timestamp (число) — конвертируем
+  if (typeof dateValue === 'number') return new Date(dateValue);
+
+  // Если строка — разбираем форматы
+  if (typeof dateValue === 'string') {
+    // Формат "ДД.ММ.ГГГГ"
+    const parts = dateValue.split('.');
+    if (parts.length === 3) {
+      return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+    }
+    // ISO строка "2026-07-12T14:30:00" или "2026-07-12" — доверяем конструктору Date
+    return new Date(dateValue);
+  }
+
+  return new Date(); // fallback
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Закрытие экрана финансов
   const closeBtn = document.getElementById('financeCloseBtn');
@@ -19,28 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
     { btnId: 'financeNavCategories', panelId: 'financePanel-categories' },
     { btnId: 'financeNavHistory', panelId: 'financePanel-history' }
   ];
-
-  // Функция для парсинга даты транзакции
-  function parseTxDate(dateValue) {
-  // Если уже Date — возвращаем как есть
-  if (dateValue instanceof Date) return dateValue;
-
-  // Если timestamp (число) — конвертируем
-  if (typeof dateValue === 'number') return new Date(dateValue);
-
-  // Если ISO строка "2026-07-12T14:30:00" — new Date() справится
-  if (typeof dateValue === 'string') {
-    // Формат "ДД.ММ.ГГГГ"
-    const parts = dateValue.split('.');
-    if (parts.length === 3) {
-      return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
-    }
-    // Любой другой строковый формат — доверяем конструктору Date
-    return new Date(dateValue);
-  }
-
-  return new Date(); // fallback
-}
 
   tabs.forEach(({ btnId, panelId }) => {
     const btn = document.getElementById(btnId);
@@ -423,42 +424,55 @@ function renderFinanceWallets() {
 }
 
 
-//Функция для рендеринга финансовых категорий
+// Функция для рендеринга финансовых категорий с поддержкой подкатегорий
 function renderFinanceCategories() {
     const panel = document.getElementById('financePanel-categories');
     if (!panel) return;
+
+    // Вспомогательная функция для генерации HTML подкатегорий
+    const renderSubcategoriesHtml = (cat) => {
+        const subs = cat.subcategories || [];
+        if (subs.length === 0) {
+            return '<div class="finance-subcategory-empty">Нет подкатегорий</div>';
+        }
+        return subs.map(sub => `
+            <div class="finance-subcategory-item">
+                <span class="finance-subcategory-name">• ${sub.name}</span>
+                <button type="button" class="finance-btn-sub-delete" onclick="removeFinanceSubcategory('${cat.id}', '${sub.id}')" title="Удалить подкатегорию">✕</button>
+            </div>
+        `).join('');
+    };
+
+    // Вспомогательная функция для генерации карточки категории
+    const createCategoryCard = (cat) => `
+        <div class="finance-item-card finance-category-card">
+            <div class="finance-category-header">
+                <div>
+                    <span class="finance-category-swatch" style="background:${cat.color || (cat.type === 'income' ? '#22c55e' : '#ef4444')}"></span>
+                    <strong>${cat.name}</strong>
+                </div>
+                
+                <div class="finance-item-actions">
+                    <button style="background: #10b981;" onclick="addFinanceSubcategory('${cat.id}')">+ Подкатегория</button>
+                    <button style="background: #2563eb;" onclick="editFinanceCategory('${cat.id}')">✎ Редактировать</button>
+                    <button style="background: #dc2626;" onclick="removeFinanceCategory('${cat.id}')">🗑 Удалить</button>
+                </div>
+            </div>
+
+            <!-- Блок подкатегорий -->
+            <div class="finance-subcategories-list">
+                ${renderSubcategoriesHtml(cat)}
+            </div>
+        </div>
+    `;
 
     // Разделяем категории на доходы и расходы
     const incomeCats = financeState.categories.filter(cat => cat.type === 'income');
     const expenseCats = financeState.categories.filter(cat => cat.type === 'expense');
 
-    // Формируем HTML для доходов
-    const incomeHtml = incomeCats.map(cat => `
-        <div class="finance-item-card">
-            <div>
-                <span class="finance-category-swatch" style="background:${cat.color || '#22c55e'}"></span> ${cat.name}
-            </div>
-            
-            <div class="finance-item-actions">
-                <button style="background: #2563eb;" onclick="editFinanceCategory('${cat.id}')">✎ Редактировать</button>
-                <button style="background: #dc2626;" onclick="removeFinanceCategory('${cat.id}')">🗑 Удалить</button>
-            </div>
-        </div>
-    `).join('') || '<div class="finance-item-card">Нет категорий доходов</div>';
-
-    // Формируем HTML для расходов
-    const expenseHtml = expenseCats.map(cat => `
-        <div class="finance-item-card">
-            <div>
-                <span class="finance-category-swatch" style="background:${cat.color || '#ef4444'}"></span> ${cat.name}
-            </div>
-            
-            <div class="finance-item-actions">
-                <button style="background: #2563eb;" onclick="editFinanceCategory('${cat.id}')">✎ Редактировать</button>
-                <button style="background: #dc2626;" onclick="removeFinanceCategory('${cat.id}')">🗑 Удалить</button>
-            </div>
-        </div>
-    `).join('') || '<div class="finance-item-card">Нет категорий расходов</div>';
+    // Формируем HTML для доходов и расходов
+    const incomeHtml = incomeCats.map(createCategoryCard).join('') || '<div class="finance-item-card">Нет категорий доходов</div>';
+    const expenseHtml = expenseCats.map(createCategoryCard).join('') || '<div class="finance-item-card">Нет категорий расходов</div>';
 
     // Обновляем HTML панели
     panel.innerHTML = `
@@ -519,49 +533,165 @@ function renderFinanceCategories() {
             if (icon) icon.textContent = isHidden ? '▸' : '▼';
         });
     }
-
 }
 
+// Добавление подкатегории
+async function addFinanceSubcategory(categoryId) {
+    const subName = prompt('Введите название подкатегории:');
+    if (!subName || !subName.trim()) return;
 
-//Функция для рендеринга финансовых доходов
+    const category = financeState.categories.find(c => c.id === categoryId);
+    if (!category) return;
+
+    if (!Array.isArray(category.subcategories)) {
+        category.subcategories = [];
+    }
+
+    const newSubcategory = {
+        id: 'sub_' + Date.now(),
+        name: subName.trim()
+    };
+
+    category.subcategories.push(newSubcategory);
+
+    // Сохранение в Firebase (или вашу базу данных)
+    if (typeof saveFinanceDataToFirebase === 'function') {
+        await saveFinanceDataToFirebase();
+    }
+
+    renderFinanceCategories();
+}
+
+// Удаление подкатегории
+async function removeFinanceSubcategory(categoryId, subcategoryId) {
+    if (!confirm('Удалить эту подкатегорию?')) return;
+
+    const category = financeState.categories.find(c => c.id === categoryId);
+    if (!category || !Array.isArray(category.subcategories)) return;
+
+    category.subcategories = category.subcategories.filter(sub => sub.id !== subcategoryId);
+
+    // Сохранение в Firebase
+    if (typeof saveFinanceDataToFirebase === 'function') {
+        await saveFinanceDataToFirebase();
+    }
+
+    renderFinanceCategories();
+}
+
+// Функция для рендеринга финансовых доходов
 function renderFinanceIncome() {
   const panel = document.getElementById('financePanel-income');
   if (!panel) return;
+
   panel.innerHTML = `
     <div class="finance-section-title finance-income-title"><span>Доходы</span></div>
     <div class="finance-form">
       <div class="form-row">
         <select id="incomeWallet"></select>
-        <select id="incomeCategory"></select>
+      </div>
+      <div class="form-row">
+        <select id="incomeCategory" onchange="onCategoryChange('income')">
+          <option value="">Выберите категорию</option>
+        </select>
+        <select id="incomeSubcategory" onchange="onSubcategoryChange('income')">
+          <option value="">Без подкатегории</option>
+        </select>
       </div>
       <div class="form-row">
         <input id="incomeAmount" type="number" placeholder="Сумма">
         <div class="finance-date-field">
-          <input id="incomeDate" type="date" value="">
+          <input id="incomeDate" type="date" value="" required>
           <button type="button" class="finance-date-today-btn" onclick="setFinanceDateToday('incomeDate')" title="Сегодня">
             <i class="fa-solid fa-calendar-day"></i>
           </button>
         </div>
       </div>
       <textarea id="incomeComment" placeholder="Комментарий"></textarea>
-      <button onclick="saveFinanceTransaction('income')">Создать доход</button>
+      <button style="background-color: green;" onclick="saveFinanceTransaction('income')">Создать доход</button>
     </div>
-    
   `;
+
   fillFinanceTransactionSelects('income');
   renderFinanceTransactionList('income', 'financeTransactionListIncome');
 }
 
-//Функция для рендеринга финансовых расходов
+// Функция заполнения списка подкатегорий на основе выбранной категории
+function updateSubcategoriesSelect(type) {
+  const catSelect = document.getElementById(`${type}Category`);
+  const subCatSelect = document.getElementById(`${type}Subcategory`);
+  if (!catSelect || !subCatSelect) return;
+
+  const selectedCatId = catSelect.value;
+  const currentSubId = subCatSelect.value;
+
+  // Очищаем селект подкатегорий
+  subCatSelect.innerHTML = '<option value="">Без подкатегории</option>';
+
+  if (!selectedCatId) return;
+
+  // Находим выбранную категорию и берем ее подкатегории
+  const category = (financeState.categories || []).find(c => c.id === selectedCatId);
+  if (category && Array.isArray(category.subcategories)) {
+    category.subcategories.forEach(sub => {
+      const option = document.createElement('option');
+      option.value = sub.id || sub.name; // Зависит от структуры ваших данных
+      option.textContent = sub.name;
+      subCatSelect.appendChild(option);
+    });
+  }
+
+  // Восстанавливаем ранее выбранное значение, если оно подходит к новой категории
+  subCatSelect.value = currentSubId;
+}
+
+// При изменении подкатегории -> подтягиваем родительскую категорию
+function onSubcategoryChange(type) {
+  const subCatSelect = document.getElementById(`${type}Subcategory`);
+  const catSelect = document.getElementById(`${type}Category`);
+  if (!subCatSelect || !catSelect) return;
+
+  const selectedSubId = subCatSelect.value;
+  if (!selectedSubId) return;
+
+  // Ищем категорию, содержащую эту подкатегорию
+  const parentCategory = (financeState.categories || []).find(cat => 
+    cat.type === type && 
+    Array.isArray(cat.subcategories) && 
+    cat.subcategories.some(sub => (sub.id || sub.name) === selectedSubId)
+  );
+
+  if (parentCategory) {
+    catSelect.value = parentCategory.id;
+    // Обновляем список доступных подкатегорий под эту категорию
+    updateSubcategoriesSelect(type);
+    subCatSelect.value = selectedSubId;
+  }
+}
+
+// При изменении категории -> обновляем список доступных подкатегорий
+function onCategoryChange(type) {
+  updateSubcategoriesSelect(type);
+}
+
+// Функция для рендеринга финансовых расходов
 function renderFinanceExpenses() {
   const panel = document.getElementById('financePanel-expenses');
   if (!panel) return;
+
   panel.innerHTML = `
     <div class="finance-section-title finance-expense-title"><span>Расходы</span></div>
     <div class="finance-form">
       <div class="form-row">
         <select id="expenseWallet"></select>
-        <select id="expenseCategory"></select>
+      </div>
+      <div class="form-row">
+        <select id="expenseCategory" onchange="onCategoryChange('expense')">
+          <option value="">Выберите категорию</option>
+        </select>
+        <select id="expenseSubcategory" onchange="onSubcategoryChange('expense')">
+          <option value="">Без подкатегории</option>
+        </select>
       </div>
       <div class="form-row">
         <input id="expenseAmount" type="number" placeholder="Сумма">
@@ -573,9 +703,10 @@ function renderFinanceExpenses() {
         </div>
       </div>
       <textarea id="expenseComment" placeholder="Комментарий"></textarea>
-      <button onclick="saveFinanceTransaction('expense')">Создать расход</button>
+      <button style="background-color: red;" onclick="saveFinanceTransaction('expense')">Создать расход</button>
     </div>
   `;
+
   fillFinanceTransactionSelects('expense');
   renderFinanceTransactionList('expense', 'financeTransactionListExpense');
 }
@@ -625,7 +756,7 @@ function renderFinanceTransfers() {
       <!-- Дата перевода -->
       <div class="form-row-full">
         <div class="finance-date-field">
-          <input id="transferDate" type="date" value="${today}" required 
+          <input id="transferDate" type="date" value="" required 
                  class="finance-transfer-control">
           <button type="button" class="finance-date-today-btn" onclick="setFinanceDateToday('transferDate')" title="Сегодня">
             <i class="fa-solid fa-calendar-day"></i>
@@ -852,29 +983,41 @@ function buildFinanceTransactionsPayload(transactionsArray) {
   
   return list.reduce((acc, tx) => {
     if (!tx.id) return acc;
-    
+
+    // Для переводов tx.amount может быть undefined — берём безопасный fallback
+    const rawAmount = tx.amount ?? tx.amountFrom ?? tx.amountTo ?? 0;
+    const safeAmount = isNaN(Number(rawAmount)) ? 0 : Number(rawAmount);
+
     // Формируем чистый объект для каждой транзакции, исключая мусорные свойства DOM
     acc[tx.id] = {
       id: tx.id,
       name: tx.name || '',
       type: tx.type,
-      amount: Number(tx.amount), // Принудительно приводим к числу перед отправкой
-      currency: tx.currency,
+      amount: safeAmount,
+      currency: tx.currency || '',
       comment: tx.comment || '',
       date: tx.date
     };
 
     // Добавляем специфичные поля в зависимости от типа операции
     if (tx.type === 'transfer') {
-      acc[tx.id].fromWalletId = tx.fromWalletId;
-      acc[tx.id].fromWalletName = tx.fromWalletName;
-      acc[tx.id].toWalletId = tx.toWalletId;
-      acc[tx.id].toWalletName = tx.toWalletName;
+      acc[tx.id].fromWalletId   = tx.fromWalletId   || '';
+      acc[tx.id].fromWalletName = tx.fromWalletName  || '';
+      acc[tx.id].toWalletId     = tx.toWalletId      || '';
+      acc[tx.id].toWalletName   = tx.toWalletName    || '';
+      // Раздельные суммы и валюты перевода — сохраняем явно, чтобы не терять данные
+      const amtFrom = Number(tx.amountFrom ?? tx.amount ?? 0);
+      const amtTo   = Number(tx.amountTo   ?? tx.amount ?? 0);
+      acc[tx.id].amountFrom   = isNaN(amtFrom) ? 0 : amtFrom;
+      acc[tx.id].amountTo     = isNaN(amtTo)   ? 0 : amtTo;
+      acc[tx.id].currencyFrom = tx.currencyFrom || tx.currency || '';
+      acc[tx.id].currencyTo   = tx.currencyTo   || tx.currency || '';
+      acc[tx.id].exchangeRate = Number(tx.exchangeRate) || 1;
     } else {
-      acc[tx.id].walletId = tx.walletId;
-      acc[tx.id].walletName = tx.walletName;
+      acc[tx.id].walletId   = tx.walletId   || '';
+      acc[tx.id].walletName = tx.walletName || '';
       acc[tx.id].categoryId = tx.categoryId || '';
-      acc[tx.id].category = tx.category || '';
+      acc[tx.id].category   = tx.category   || '';
     }
 
     return acc;
@@ -1027,11 +1170,30 @@ const displayAmount = Number(
 
   // Если этот элемент сейчас РЕДАКТИРУЕТСЯ прямо в списке
   if (isEditing) {
+    // Форматируем текущую дату транзакции в YYYY-MM-DD для input[type=date]
+    const txDateObj = parseTxDate(tx.date);
+    const txDateFormatted = txDateObj instanceof Date && !isNaN(txDateObj)
+      ? txDateObj.toISOString().slice(0, 10)
+      : (tx.date ? String(tx.date).slice(0, 10) : getTodayDateValue());
+
     return `
       <div class="finance-transaction-item editing-mode" data-id="${tx.id}">
         <div class="finance-tx-edit-container" style="padding: 10px; background: #f9fafb; border-radius: 6px;">
           <h4 style="margin: 0 0 8px 0; font-size: 0.9rem; color: #374151;">Редактирование операции</h4>
-          
+
+          <div style="margin-bottom: 8px;">
+            <label style="font-size: 0.75rem; color: #6b7280;">Дата</label>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <input type="date" id="inline-date-${tx.id}" value="${txDateFormatted}" style="flex:1; padding:4px;">
+              <button type="button"
+                onclick="document.getElementById('inline-date-${tx.id}').value = getTodayDateValue()"
+                title="Сегодня"
+                style="padding:4px 7px; border:1px solid #cbd5e1; border-radius:4px; background:#f1f5f9; cursor:pointer; font-size:0.8rem;">
+                <i class="fa-solid fa-calendar-day"></i>
+              </button>
+            </div>
+          </div>
+
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
             <div>
               <label style="font-size: 0.75rem; color: #6b7280;">Сумма</label>
@@ -1237,22 +1399,29 @@ function saveInlineEdit(id) {
   console.log("[Inline Save] Исходный объект транзакции до изменений:", { ...tx });
 
   // 2. Сбор базовых данных из инпутов инлайн-формы
-  const amountEl = document.getElementById(`inline-amount-${id}`);
+  const dateEl     = document.getElementById(`inline-date-${id}`);
+  const amountEl   = document.getElementById(`inline-amount-${id}`);
   const currencyEl = document.getElementById(`inline-currency-${id}`);
-  const commentEl = document.getElementById(`inline-comment-${id}`);
+  const commentEl  = document.getElementById(`inline-comment-${id}`);
 
-  if (!amountEl || !currencyEl || !commentEl) {
+  if (!dateEl || !amountEl || !currencyEl || !commentEl) {
     console.error("[Inline Save Error] Не удалось найти базовые инпуты редактирования в DOM!", {
-      amountEl, currencyEl, commentEl
+      dateEl, amountEl, currencyEl, commentEl
     });
     return;
   }
 
-  const amount = Number(amountEl.value || 0);
+  const newDate = dateEl.value;
+  const amount   = Number(amountEl.value || 0);
   const currency = currencyEl.value;
-  const comment = commentEl.value.trim();
+  const comment  = commentEl.value.trim();
 
-  console.log("[Inline Save] Считанные базовые данные:", { amount, currency, comment });
+  if (!newDate) {
+    Swal.fire({ icon: 'warning', title: 'Дата не указана', text: 'Пожалуйста, выберите дату операции', confirmButtonColor: '#2563eb' });
+    return;
+  }
+
+  console.log("[Inline Save] Считанные базовые данные:", { newDate, amount, currency, comment });
 
   if (amount <= 0) {
     console.warn(`[Inline Save Validation] Некорректная сумма: ${amount}. Остановка сохранения.`);
@@ -1265,7 +1434,7 @@ function saveInlineEdit(id) {
     return;
   }
 
-  let updatedTx = { ...tx, amount, currency, comment };
+  let updatedTx = { ...tx, date: newDate, amount, currency, comment };
 
   // 3. Сбор специфичных данных в зависимости от типа транзакции
   if (tx.type === 'transfer') {
@@ -1755,7 +1924,7 @@ function showAddWalletForm() {
 
   // Создаем блок формы
   const formHtml = `
-    <div class="finance-item-card finance-wallet-add-box" style="background: #f9fafb; border: 2px dashed #cbd5e1; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+    <div class="finance-item-card finance-wallet-add-box">
       <h4 style="margin: 0 0 10px 0; font-size: 1rem; color: #1e293b;">Новый кошелек / счет</h4>
       
       <div style="margin-bottom: 8px;">
@@ -2118,103 +2287,6 @@ async function removeFinanceWallet(walletId, hasTransactions) {
     }
   }
 }
-/*
-//Функция для удаления финансового кошелька
-async function removeFinanceWallet(walletId, hasTransactions) {
-  if (hasTransactions) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Внимание',
-      text: 'Нельзя удалить кошелёк, по которому есть транзакции. Сначала удалите или перенесите операции.'
-    });
-    return;
-  }
-
-  // Красивое окно подтверждения
-  const result = await Swal.fire({
-    title: 'Вы уверены?',
-    text: "Это действие нельзя будет отменить!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#dc2626',
-    cancelButtonColor: '#64748b',
-    confirmButtonText: 'Да, удалить!',
-    cancelButtonText: 'Отмена'
-  });
-
-  // Если пользователь подтвердил
-  if (result.isConfirmed) {
-    try {
-      await financeDb.child('wallets').child(walletId).remove();
-      Swal.fire({
-        icon: 'success',
-        title: 'Удалено!',
-        text: 'Кошелёк успешно удалён.',
-        timer: 1500,
-        showConfirmButton: false
-      });
-    } catch (err) {
-      console.error(err);
-      Swal.fire({ icon: 'error', title: 'Ошибка', text: 'Ошибка при удалении кошелька.' });
-    }
-  }
-}
-*/
-
-/*
-//Функция для удаления финансового кошелька
-async function removeFinanceWallet(walletId, hasTransactions) {
-  if (hasTransactions) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Внимание',
-      text: 'Нельзя удалить кошелёк, по которому есть транзакции. Сначала удалите или перенесите операции.'
-    });
-    return;
-  }
-
-  const confirmResult = await Swal.fire({
-    title: 'Вы уверены?',
-    text: "Это действие нельзя будет отменить!",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#dc2626',
-    cancelButtonColor: '#64748b',
-    confirmButtonText: 'Да, удалить!',
-    cancelButtonText: 'Отмена'
-  });
-  if (!confirmResult.isConfirmed) return;
-
-  try {
-    // 1. Удалить из Firebase
-    const db = firebase.firestore();
-    await db.collection('wallets').doc(walletId).delete();
-
-    // 2. Удалить локально
-    financeState.wallets = financeState.wallets.filter(w => w.id !== walletId);
-
-    renderFinanceWallets();
-    renderFinanceHistoryList(); // если где-то отображаются кошельки
-    Swal.fire({
-      icon: 'success',
-      title: 'Кошелёк удалён.',
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 2000,
-      timerProgressBar: true
-    });
-  } catch (err) {
-console.error(err);
-    Swal.fire({
-      icon: 'error',
-      title: 'Ошибка удаления',
-      text: 'Ошибка при удалении кошелька.',
-      confirmButtonColor: '#dc2626'
-    });
-  }
-}
-*/
 
 //Функция для редактирования финансовой категории
 function editFinanceCategory(id) {
@@ -2327,135 +2399,6 @@ function removeFinanceCategory(id) {
   }, {});
   financeDb.child('categories').set(payload);
 }
-/*
-//функция для сохранения финансовой транзакции (доход, расход, перевод)
-function saveFinanceTransaction(type) {
-  const amountInput = document.getElementById(`${type === 'income' ? 'incomeAmount' : type === 'expense' ? 'expenseAmount' : 'transferAmount'}`);
-  const amount = Number(amountInput?.value || 0);
-  const comment = document.getElementById(`${type === 'income' ? 'incomeComment' : type === 'expense' ? 'expenseComment' : 'transferComment'}`)?.value || '';
-  const date = document.getElementById(`${type === 'income' ? 'incomeDate' : type === 'expense' ? 'expenseDate' : 'transferDate'}`)?.value || '';
-
-  // ПРОВЕРКА: если даты нет — показываем ошибку и прерываем
-  if (!date) {
-
-    Swal.fire({ 
-      icon: 'warning', 
-      title: 'Дата не указана', 
-      text: 'Пожалуйста, выберите дату операции', 
-      confirmButtonColor: '#2563eb' 
-    });  
-
-    document.getElementById(`${type === 'income' ? 'incomeDate' : type === 'expense' ? 'expenseDate' : 'transferDate'}`)?.focus();
-    return; // прерываем функцию сохранения
-  }
-
-  if (amount <= 0) {
-    Swal.fire({ icon: 'warning', title: 'Некорректная сумма', text: 'Сумма должна быть больше 0', confirmButtonColor: '#2563eb' });
-    return;
-  }
-
-  // Логика для ПЕРЕВОДА (остается прежней, валюта берется из селекта)
-  if (type === 'transfer') {
-    const currency = document.getElementById('transferCurrency')?.value || 'RUP';
-    const fromId = document.getElementById('transferFrom')?.value;
-    const toId = document.getElementById('transferTo')?.value;
-    if (!fromId || !toId || fromId === toId) {
-      Swal.fire({ icon: 'warning', title: 'Проверьте счета', text: 'Выберите разные счета для перевода', confirmButtonColor: '#2563eb' });
-      return;
-    }
-    const fromWallet = financeState.wallets.find(item => item.id === fromId);
-    const toWallet = financeState.wallets.find(item => item.id === toId);
-    if (!fromWallet || !toWallet) return;
-    const fromAmount = convertCurrency(amount, currency, fromWallet.currency);
-    const toAmount = convertCurrency(amount, currency, toWallet.currency);
-    const updatedWallets = financeState.wallets.reduce((acc, wallet) => {
-      if (wallet.id === fromWallet.id) {
-        acc[wallet.id] = { ...wallet, balance: Number(wallet.balance || 0) - fromAmount };
-      } else if (wallet.id === toWallet.id) {
-        acc[wallet.id] = { ...wallet, balance: Number(wallet.balance || 0) + toAmount };
-      } else {
-        acc[wallet.id] = { ...wallet };
-      }
-      return acc;
-    }, {});
-    financeDb.child('wallets').set(updatedWallets);
-    const txId = `tx-${Date.now()}`;
-    const transaction = {
-      id: txId,
-      name: 'Перевод',
-      type: 'transfer',
-      amount,
-      currency,
-      comment,
-      date,
-      fromWalletId: fromWallet.id,
-      fromWalletName: fromWallet.name,
-      toWalletId: toWallet.id,
-      toWalletName: toWallet.name
-    };
-    const payload = financeState.transactions.reduce((acc, tx) => ({ ...acc, [tx.id]: tx }), {});
-    payload[txId] = transaction;
-    financeDb.child('transactions').set(payload);
-    
-    Swal.fire({ icon: 'success', title: 'Перевод сохранен', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
-    renderFinanceTransfers();
-    renderFinanceHistory();
-    return;
-  }
-
-  // Логика для ДОХОДА и РАСХОДА (ИСПРАВЛЕНО)
-  const name = document.getElementById(`${type === 'income' ? 'incomeName' : 'expenseName'}`)?.value || (type === 'income' ? 'Доход' : 'Расход');
-  const walletId = document.getElementById(`${type === 'income' ? 'incomeWallet' : 'expenseWallet'}`)?.value;
-  const categoryId = document.getElementById(`${type === 'income' ? 'incomeCategory' : 'expenseCategory'}`)?.value;
-  
-  const wallet = financeState.wallets.find(item => item.id === walletId);
-  const category = financeState.categories.find(item => item.id === categoryId);
-  
-  if (!wallet) {
-    Swal.fire({ icon: 'warning', title: 'Ошибка выбора', text: 'Выберите корректный кошелек', confirmButtonColor: '#2563eb' });
-    return;
-  }
-
-  // 👇 ВАЛЮТА ПРИНУДИТЕЛЬНО БЕРЕТСЯ ИЗ ВЫБРАННОГО КОШЕЛЬКА 👇
-  const currency = wallet.currency || 'RUP';
-
-  const payloadWallets = financeState.wallets.reduce((acc, item) => {
-    if (item.id === wallet.id) {
-      const delta = type === 'income' ? amount : -amount;
-      acc[item.id] = { ...item, balance: Number(item.balance || 0) + delta };
-    } else {
-      acc[item.id] = { ...item };
-    }
-    return acc;
-  }, {});
-  
-  financeDb.child('wallets').set(payloadWallets);
-  
-  const txId = `tx-${Date.now()}`;
-  const transaction = {
-    id: txId,
-    name,
-    type,
-    amount,
-    currency, // запишется валюта кошелька
-    comment,
-    date,
-    walletId: wallet.id,
-    walletName: wallet.name,
-    category: category ? category.name : '',
-    categoryId: category?.id || ''
-  };
-  
-  const payload = financeState.transactions.reduce((acc, tx) => ({ ...acc, [tx.id]: tx }), {});
-  payload[txId] = transaction;
-  financeDb.child('transactions').set(payload);
-  
-  Swal.fire({ icon: 'success', title: type === 'income' ? 'Доход сохранен' : 'Расход сохранен', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
-  
-  renderFinanceTransactionList(type, type === 'income' ? 'financeTransactionListIncome' : 'financeTransactionListExpense');
-  renderFinanceHistory();
-}
-*/
 
 // функция для сохранения финансовой транзакции (доход, расход, перевод)
 function saveFinanceTransaction(type) {
