@@ -1199,7 +1199,7 @@ function renderFinanceHistoryList() {
     const transactions = groupedByDate[date];
 
     // Обычный рендеринг карточек
-    const itemsHtml = transactions.map(tx => renderTransactionListItem(tx, false)).join('');
+    const itemsHtml = transactions.map(tx => renderTransactionListItem(tx, false)).reverse().join('');
 
     return `
       <div class="finance-history-date-group">
@@ -1213,7 +1213,6 @@ function renderFinanceHistoryList() {
     `;
   }).join('');
 }
-
 
 //Функция для переключения видимости деталей транзакции
 function toggleTransactionDetails(element, event) {

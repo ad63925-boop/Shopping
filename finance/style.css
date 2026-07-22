@@ -758,15 +758,6 @@
   font-size: 1.7rem;
 }
 
-/* Родительский контейнер шапки карточки */
-.finance-tx-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Разносит название влево, а сумму вправо */
-  gap: 8px;
-  width: 100%;
-}
-
 /* Общие стили для суммы */
 .finance-tx-amount {
   font-weight: 600;
@@ -807,4 +798,10 @@
   max-height: 50px; /* Плавно расширяем до высоты кнопок */
   opacity: 1; /* Делаем кнопки видимыми */
   margin-top: 8px; /* Добавляем отступ сверху от инфо-плашки */
+}
+
+.wallet-main-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
