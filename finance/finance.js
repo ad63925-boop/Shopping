@@ -181,7 +181,7 @@ function setupFinanceEvents() {
       }, 50);
     });
   };
-  document.getElementById('financeCloseBtn')?.addEventListener('click', closeFinanceScreen);
+  
   document.getElementById('financeNavDashboard')?.addEventListener('click', () => showFinancePanel('dashboard'));
   document.getElementById('financeNavWallets')?.addEventListener('click', () => showFinancePanel('wallets'));
   document.getElementById('financeNavIncome')?.addEventListener('click', () => showFinancePanel('income'));
@@ -368,7 +368,7 @@ function renderFinanceWallets() {
     // Внутренняя разметка: верхняя инфо-плашка + выезжающая панель действий
     walletCard.innerHTML = `
       <!-- Кликабельная шапка кошелька -->
-      <div class="wallet-main-info">
+      <div class="wallet-main-info" style="display: flex; align-items: center; justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 1.2rem; flex-shrink: 0;">${icon}</span>
           <div style="display: flex; flex-direction: column;">
@@ -892,61 +892,6 @@ function getLocalDateKey(dateValue) {
   return `${y}-${m}-${day}`;
 }
 
-/*
-// Функция для рендеринга карточки финансовых транзакций 1
-function renderFinanceHistoryList() {
-  const listContainer = document.getElementById('financeHistoryList');
-  if (!listContainer) return;
-
-  const transactions = getFilteredFinanceTransactions();
-
-  // Группируем по дате (YYYY-MM-DD)
-  const grouped = {};
-  transactions.forEach(tx => {
-    const d = parseTxDate(tx.date);
-    const dateKey = d.toISOString().slice(0, 10); // YYYY-MM-DD
-    if (!grouped[dateKey]) grouped[dateKey] = [];
-    grouped[dateKey].push(tx);
-  });
-
-  // Сортируем даты по убыванию: сначала новые дни
-  const sortedDates = Object.keys(grouped).sort().reverse();
-
-  let html = '';
-
-  if (sortedDates.length === 0) {
-    html = '<div class="finance-empty-state">Нет транзакций по выбранным фильтрам</div>';
-  } else {
-    sortedDates.forEach(dateKey => {
-      const dateObj = new Date(dateKey);
-      const formattedDate = dateObj.toLocaleDateString('ru-RU', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
-
-      // Сортируем транзакции внутри дня по убыванию (новые первыми)
-      const sortedTxs = grouped[dateKey].sort((a, b) => {
-        const da = parseTxDate(a.date).getTime();
-        const db = parseTxDate(b.date).getTime();
-        return db - da; // обратный порядок: новые раньше
-      });
-
-      html += `
-        <div class="finance-history-date-header">
-          ----- ${formattedDate} -----
-        </div>
-        <div class="finance-history-group">
-          ${sortedTxs.map(tx => renderTransactionListItem(tx)).join('')}
-        </div>
-      `;
-    });
-  }
-
-  listContainer.innerHTML = html;
-}
-*/
-
 //Функция для рендеринга панели со всеми карточками истории финансовых транзакций
 function renderFinanceHistory() {
   const panel = document.getElementById('financePanel-history');
@@ -1035,112 +980,30 @@ function renderFinanceHistory() {
 
 //Функция для рендеринга списка финансовых транзакций с группировкой по дате 2
 // Вспомогательная функция для генерации списка транзакций
-function renderFinanceHistoryList() {
-  const container = document.getElementById('financeHistoryList');
-  if (!container) return;
 
-  // 1. Фильтрация транзакций
-  let filtered = (financeState.transactions || []).filter(tx => {
-    // Фильтр по счету (учитываем, что у перевода есть и fromWalletId, и toWalletId)
-    if (financeState.historyFilters.walletId && financeState.historyFilters.walletId !== 'all') {
-      const selectedWallet = financeState.historyFilters.walletId;
-      const isRelatedWallet = tx.walletId === selectedWallet || 
-                              tx.fromWalletId === selectedWallet || 
-                              tx.toWalletId === selectedWallet;
-      if (!isRelatedWallet) return false;
-    }
 
-    // Фильтр по точной дате
-    if (financeState.historyFilters.date && tx.date !== financeState.historyFilters.date) {
-      return false;
-    }
 
-    // Фильтр по диапазону дат
-    if (financeState.historyFilters.startDate && tx.date < financeState.historyFilters.startDate) {
-      return false;
-    }
-    if (financeState.historyFilters.endDate && tx.date > financeState.historyFilters.endDate) {
-      return false;
-    }
+//Функция для рендеринга элемента списка финансовых транзакций 21.44
+function renderTransactionListItem(tx, isEditing = false) {
 
-    // Поиск по тексту
-    if (financeState.searchQuery) {
-      const q = financeState.searchQuery.toLowerCase();
-      const matchName = (tx.name || '').toLowerCase().includes(q);
-      const matchComment = (tx.comment || '').toLowerCase().includes(q);
-      const matchCategory = (tx.category || '').toLowerCase().includes(q);
-      const matchFrom = (tx.fromWalletName || '').toLowerCase().includes(q);
-      const matchTo = (tx.toWalletName || '').toLowerCase().includes(q);
-      
-      if (!matchName && !matchComment && !matchCategory && !matchFrom && !matchTo) {
-        return false;
-      }
-    }
-
-    return true;
-  });
-
-  if (filtered.length === 0) {
-    container.innerHTML = `<div class="finance-empty-state" style="text-align: center; color: #94a3b8; padding: 20px;">Транзакции не найдены</div>`;
-    return;
-  }
-
-  // 2. Рендеринг элементов списка
-  container.innerHTML = filtered.map(tx => {
-    const isTransfer = tx.type === 'transfer';
-    const isExpense = tx.type === 'expense';
-
-    // Формируем корректный текст суммы и CSS-класс
-    let amountText = '';
-    let amountClass = '';
-
-    if (isTransfer) {
-      const amtFrom = Number(tx.amountFrom || 0).toLocaleString('ru-RU');
-      const amtTo = Number(tx.amountTo || 0).toLocaleString('ru-RU');
-      const curFrom = tx.currencyFrom || 'RUP';
-      const curTo = tx.currencyTo || 'RUP';
-
-      // Если переводили в разных валютах — показываем обе суммы
-      if (curFrom !== curTo) {
-        amountText = `-${amtFrom} ${curFrom} ➔ +${amtTo} ${curTo}`;
-      } else {
-        amountText = `-${amtFrom} ${curFrom}`;
-      }
-      amountClass = 'text-red'; // Или нужный вам класс стиля
-    } else if (isExpense) {
-      const amt = Number(tx.amount || 0).toLocaleString('ru-RU');
-      amountText = `-${amt} ${tx.currency || 'RUP'}`;
-      amountClass = 'text-red';
-    } else {
-      const amt = Number(tx.amount || 0).toLocaleString('ru-RU');
-      amountText = `+${amt} ${tx.currency || 'RUP'}`;
-      amountClass = 'text-green';
-    }
-
-    // Подзаголовок для перевода
-    const subtitle = isTransfer 
-      ? `${tx.fromWalletName || 'Кошелек'} ➔ ${tx.toWalletName || 'Кошелек'}`
-      : (tx.category || tx.walletName || '');
-
-    return `
-      <div class="finance-history-item" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9;">
-        <div class="finance-tx-info">
-          <div class="finance-tx-name" style="font-weight: 500;">${tx.name || (isTransfer ? 'Перевод' : 'Операция')}</div>
-          <div class="finance-tx-sub" style="font-size: 0.8rem; color: #64748b;">${subtitle}</div>
-          ${tx.comment ? `<div class="finance-tx-comment" style="font-size: 0.75rem; color: #94a3b8;">${tx.comment}</div>` : ''}
-        </div>
-        <div class="finance-tx-right" style="text-align: right;">
-          <div class="finance-tx-amount ${amountClass}" style="font-weight: 600;">${amountText}</div>
-          <div class="finance-tx-date" style="font-size: 0.75rem; color: #94a3b8;">${tx.date || ''}</div>
-        </div>
-      </div>
-    `;
-  }).join('');
+// Определяем цвет суммы в зависимости от типа операции
+let amountColorClass = '';
+if (tx.type === 'income') {
+  amountColorClass = 'text-green';
+} else if (tx.type === 'expense') {
+  amountColorClass = 'text-red';
+} else if (tx.type === 'transfer') {
+  amountColorClass = 'text-blue'; // Новый цвет для перевода
 }
 
+// Надежное получение суммы для любых типов транзакций
+const displayAmount = Number(
+  tx.type === 'transfer' 
+    ? (tx.amountFrom || tx.amountTo || tx.amount || 0)
+    : (tx.amount || 0)
+).toFixed(2);
 
-//Функция для рендеринга элемента списка финансовых транзакций
-function renderTransactionListItem(tx, isEditing = false) {
+
   let icon = '💵';
   let sign = '';
   if (tx.type === 'income') { icon = '➕'; sign = '+'; }
@@ -1233,9 +1096,10 @@ function renderTransactionListItem(tx, isEditing = false) {
     <div class="finance-transaction-item" data-id="${tx.id}" onclick="toggleTransactionDetails(this, event)">
       <div class="finance-tx-summary">
         ${icon} ${sourceName} ${categoryName ? '<span class="finance-tx-category">' + categoryName + '</span>' : ''}
-        <span class="finance-tx-amount ${tx.type === 'income' ? 'text-green' : 'text-red'}">
-          ${sign} ${Number(tx.amount || 0).toFixed(2)} ${tx.currency || ''}
-        </span>
+        <span class="finance-tx-amount ${amountColorClass}">
+  ${sign} ${displayAmount} ${tx.currency || tx.currencyFrom || ''}
+</span>
+
       </div>
       ${commentPreview ? `<div class="finance-tx-comment-preview">💬 ${commentPreview}</div>` : ''}
       
@@ -1262,6 +1126,94 @@ function renderTransactionListItem(tx, isEditing = false) {
     </div>
   `;
 }
+
+// Основная функция рендеринга истории финансовых транзакций
+function renderFinanceHistoryList() {
+  const container = document.getElementById('financeHistoryList');
+  if (!container) return;
+
+  // 1. ФИЛЬТРАЦИЯ
+  let filtered = (financeState.transactions || []).filter(tx => {
+    // Фильтр по кошельку (списание, зачисление или обычный счет)
+    if (financeState.historyFilters.walletId && financeState.historyFilters.walletId !== 'all') {
+      const selectedWallet = financeState.historyFilters.walletId;
+      const isRelated = tx.walletId === selectedWallet || 
+                        tx.fromWalletId === selectedWallet || 
+                        tx.toWalletId === selectedWallet;
+      if (!isRelated) return false;
+    }
+
+    // Фильтры по датам
+    if (financeState.historyFilters.date && tx.date.slice(0, 10) !== financeState.historyFilters.date) return false;
+    if (financeState.historyFilters.startDate && tx.date.slice(0, 10) < financeState.historyFilters.startDate) return false;
+    if (financeState.historyFilters.endDate && tx.date.slice(0, 10) > financeState.historyFilters.endDate) return false;
+
+    // Текстовый поиск
+    if (financeState.searchQuery) {
+      const q = financeState.searchQuery.toLowerCase();
+      const matchName = (tx.name || '').toLowerCase().includes(q);
+      const matchComment = (tx.comment || '').toLowerCase().includes(q);
+      const matchCategory = (tx.category || '').toLowerCase().includes(q);
+      const matchFrom = (tx.fromWalletName || '').toLowerCase().includes(q);
+      const matchTo = (tx.toWalletName || '').toLowerCase().includes(q);
+      
+      if (!matchName && !matchComment && !matchCategory && !matchFrom && !matchTo) return false;
+    }
+
+    return true;
+  });
+
+  // Пустое состояние
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="finance-empty-state">Транзакции не найдены</div>`;
+    return;
+  }
+
+  // 2. СОРТИРОВКА: Новые операции сверху
+  filtered.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+  // 3. ГРУППИРОВКА ПО ДАТАМ (по первым 10 символам YYYY-MM-DD)
+  const groupedByDate = filtered.reduce((groups, tx) => {
+    const dateKey = tx.date ? tx.date.slice(0, 10) : 'Без даты';
+    if (!groups[dateKey]) groups[dateKey] = [];
+    groups[dateKey].push(tx);
+    return groups;
+  }, {});
+
+  // 4. ФОРМАТИРОВАНИЕ ЗАГОЛОВКА ДАТЫ
+  const formatDateHeader = (dateStr) => {
+    if (dateStr === 'Без даты') return dateStr;
+    
+    const todayStr = new Date().toISOString().slice(0, 10);
+    if (dateStr === todayStr) return 'Сегодня';
+
+    const [year, month, day] = dateStr.split('-');
+    const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+    const monthName = months[parseInt(month, 10) - 1] || '';
+    
+    return `${parseInt(day, 10)} ${monthName} ${year}`;
+  };
+
+  // 5. РЕНДЕРИНГ HTML (рендерим обычные карточки, isEditing = false)
+  container.innerHTML = Object.keys(groupedByDate).map(date => {
+    const transactions = groupedByDate[date];
+
+    // Обычный рендеринг карточек
+    const itemsHtml = transactions.map(tx => renderTransactionListItem(tx, false)).join('');
+
+    return `
+      <div class="finance-history-date-group">
+        <div class="finance-history-date-header">
+          <span>${formatDateHeader(date)}</span>
+        </div>
+        <div class="finance-history-date-items">
+          ${itemsHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
 
 //Функция для переключения видимости деталей транзакции
 function toggleTransactionDetails(element, event) {
@@ -1552,144 +1504,207 @@ function renderFinanceTransactionList(type, containerId) {
   }).join('');
 }
 
-/*
-//Функция для редактирования финансовой транзакции
-function editFinanceTransaction(id) {
-  const tx = financeState.transactions.find(item => item.id === id);
-  if (!tx) return;
+//Функция редактирования транзакции (editFinanceTransaction)
+async function editFinanceTransaction(txId) {
+  const tx = financeState.transactions.find(t => String(t.id) === String(txId));
+  if (!tx) {
+    Swal.fire('Ошибка', 'Транзакция не найдена', 'error');
+    return;
+  }
+
+  // Форматируем текущую дату транзакции в YYYY-MM-DD для input[type="date"]
+  const dateObj = parseTxDate(tx.date);
+  const formattedDate = dateObj ? dateObj.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+
+  // Формируем список опций для кошельков
+  const walletOptions = financeState.wallets
+    .map(w => `<option value="${w.id}" ${w.id === tx.walletId ? 'selected' : ''}>${escapeHtml(w.name)} (${w.currency || 'USD'})</option>`)
+    .join('');
+
+  // HTML формы внутри SweetAlert2
+  let modalHtml = '';
 
   if (tx.type === 'transfer') {
-    const fromName = prompt('Счет отправления', tx.fromWalletName || '') || tx.fromWalletName || '';
-    const toName = prompt('Счет получения', tx.toWalletName || '') || tx.toWalletName || '';
-    const fromWallet = financeState.wallets.find(item => item.name === fromName) || financeState.wallets.find(item => item.id === tx.fromWalletId);
-    const toWallet = financeState.wallets.find(item => item.name === toName) || financeState.wallets.find(item => item.id === tx.toWalletId);
-    if (!fromWallet || !toWallet) {
-      Swal.fire({
-  icon: 'warning',
-  title: 'Проверьте счета',
-  text: 'Выберите разные счета для перевода',
-  confirmButtonColor: '#2563eb'
-});
-      return;
+    const fromOptions = financeState.wallets
+      .map(w => `<option value="${w.id}" ${w.id === tx.fromWalletId ? 'selected' : ''}>${escapeHtml(w.name)}</option>`)
+      .join('');
+    const toOptions = financeState.wallets
+      .map(w => `<option value="${w.id}" ${w.id === tx.toWalletId ? 'selected' : ''}>${escapeHtml(w.name)}</option>`)
+      .join('');
+
+    modalHtml = `
+      <div style="text-align: left; display: flex; flex-direction: column; gap: 12px;">
+        <label>
+          <b>Дата:</b>
+          <input type="date" id="swal-tx-date" class="swal2-input" value="${formattedDate}" style="margin-top: 4px; width: 100%;">
+        </label>
+        <label>
+          <b>Откуда:</b>
+          <select id="swal-tx-from" class="swal2-select" style="margin-top: 4px; width: 100%;">${fromOptions}</select>
+        </label>
+        <label>
+          <b>Сумма списания:</b>
+          <input type="number" step="0.01" id="swal-tx-amount-from" class="swal2-input" value="${tx.amountFrom || tx.amount}" style="margin-top: 4px; width: 100%;">
+        </label>
+        <label>
+          <b>Куда:</b>
+          <select id="swal-tx-to" class="swal2-select" style="margin-top: 4px; width: 100%;">${toOptions}</select>
+        </label>
+        <label>
+          <b>Сумма зачисления:</b>
+          <input type="number" step="0.01" id="swal-tx-amount-to" class="swal2-input" value="${tx.amountTo || tx.amount}" style="margin-top: 4px; width: 100%;">
+        </label>
+        <label>
+          <b>Комментарий:</b>
+          <input type="text" id="swal-tx-comment" class="swal2-input" value="${escapeHtml(tx.comment || '')}" placeholder="Комментарий" style="margin-top: 4px; width: 100%;">
+        </label>
+      </div>
+    `;
+  } else {
+    // Для Дохода (income) и Расхода (expense)
+    const categoryOptions = (financeState.categories || [])
+      .filter(c => c.type === tx.type)
+      .map(c => `<option value="${c.name}" ${c.name === tx.category ? 'selected' : ''}>${escapeHtml(c.name)}</option>`)
+      .join('');
+
+    modalHtml = `
+      <div style="text-align: left; display: flex; flex-direction: column; gap: 12px;">
+        <label>
+          <b>Дата:</b>
+          <input type="date" id="swal-tx-date" class="swal2-input" value="${formattedDate}" style="margin-top: 4px; width: 100%;">
+        </label>
+        <label>
+          <b>Кошелек:</b>
+          <select id="swal-tx-wallet" class="swal2-select" style="margin-top: 4px; width: 100%;">${walletOptions}</select>
+        </label>
+        <label>
+          <b>Сумма:</b>
+          <input type="number" step="0.01" id="swal-tx-amount" class="swal2-input" value="${tx.amount}" style="margin-top: 4px; width: 100%;">
+        </label>
+        <label>
+          <b>Категория:</b>
+          <select id="swal-tx-category" class="swal2-select" style="margin-top: 4px; width: 100%;">${categoryOptions}</select>
+        </label>
+        <label>
+          <b>Комментарий:</b>
+          <input type="text" id="swal-tx-comment" class="swal2-input" value="${escapeHtml(tx.comment || '')}" placeholder="Комментарий" style="margin-top: 4px; width: 100%;">
+        </label>
+      </div>
+    `;
+  }
+
+  const { value: formValues } = await Swal.fire({
+    title: 'Редактировать транзакцию',
+    html: modalHtml,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: 'Сохранить',
+    cancelButtonText: 'Отмена',
+    preConfirm: () => {
+      const newDateVal = document.getElementById('swal-tx-date').value;
+      if (!newDateVal) {
+        Swal.showValidationMessage('Укажите дату!');
+        return false;
+      }
+
+      if (tx.type === 'transfer') {
+        const fromId = document.getElementById('swal-tx-from').value;
+        const toId = document.getElementById('swal-tx-to').value;
+        const amountFrom = parseFloat(document.getElementById('swal-tx-amount-from').value);
+        const amountTo = parseFloat(document.getElementById('swal-tx-amount-to').value);
+
+        if (fromId === toId) {
+          Swal.showValidationMessage('Кошельки списания и зачисления должны отличаться!');
+          return false;
+        }
+        if (isNaN(amountFrom) || amountFrom <= 0 || isNaN(amountTo) || amountTo <= 0) {
+          Swal.showValidationMessage('Укажите корректные суммы!');
+          return false;
+        }
+
+        return {
+          date: newDateVal,
+          fromWalletId: fromId,
+          toWalletId: toId,
+          amountFrom,
+          amountTo,
+          comment: document.getElementById('swal-tx-comment').value.trim()
+        };
+      } else {
+        const walletId = document.getElementById('swal-tx-wallet').value;
+        const amount = parseFloat(document.getElementById('swal-tx-amount').value);
+        const category = document.getElementById('swal-tx-category').value;
+
+        if (isNaN(amount) || amount <= 0) {
+          Swal.showValidationMessage('Введите корректную сумму!');
+          return false;
+        }
+
+        return {
+          date: newDateVal,
+          walletId,
+          amount,
+          category,
+          comment: document.getElementById('swal-tx-comment').value.trim()
+        };
+      }
     }
-
-    const amount = Number(prompt('Сумма', tx.amount || '0') || 0);
-    const currency = prompt('Валюта', tx.currency || 'RUP') || tx.currency || 'RUP';
-    const date = prompt('Дата (YYYY-MM-DD)', tx.date ? tx.date.slice(0, 10) : '') || tx.date || new Date().toISOString().slice(0, 10);
-    const comment = prompt('Комментарий', tx.comment || '') || tx.comment || '';
-
-    if (amount <= 0) {
-      Swal.fire({
-  icon: 'warning',
-  title: 'Некорректная сумма',
-  text: 'Сумма должна быть больше 0',
-  confirmButtonColor: '#2563eb'
-});
-      return;
-    }
-
-    const updatedWallets = applyFinanceTransactionToWallets(revertFinanceTransactionFromWallets(financeState.wallets.map(wallet => ({ ...wallet })), tx), {
-      ...tx,
-      amount,
-      currency,
-      date,
-      comment,
-      fromWalletId: fromWallet.id,
-      fromWalletName: fromWallet.name,
-      toWalletId: toWallet.id,
-      toWalletName: toWallet.name
-    });
-
-    const updatedTx = {
-      ...tx,
-      amount,
-      currency,
-      date,
-      comment,
-      fromWalletId: fromWallet.id,
-      fromWalletName: fromWallet.name,
-      toWalletId: toWallet.id,
-      toWalletName: toWallet.name
-    };
-
-    financeState.wallets = updatedWallets;
-    financeState.transactions = financeState.transactions.map(item => item.id === id ? updatedTx : item);
-    financeDb.child('wallets').set(buildFinanceWalletPayload(updatedWallets));
-    financeDb.child('transactions').set(buildFinanceTransactionsPayload(financeState.transactions));
-    renderFinancePanel();
-    return;
-  }
-
-  const walletName = prompt('Кошелек', tx.walletName || '') || tx.walletName || '';
-  const wallet = financeState.wallets.find(item => item.name === walletName) || financeState.wallets.find(item => item.id === tx.walletId);
-  if (!wallet) {
-    Swal.fire({
-  icon: 'warning',
-  title: 'Ошибка выбора',
-  text: 'Выберите корректный кошелек',
-  confirmButtonColor: '#2563eb'
-});
-    return;
-  }
-
-  const categoryName = prompt('Категория', tx.category || '') || tx.category || '';
-  const category = financeState.categories.find(item => item.name === categoryName) || financeState.categories.find(item => item.id === tx.categoryId);
-  const name = prompt('Название', tx.name || '') || tx.name || (tx.type === 'income' ? 'Доход' : 'Расход');
-  const amount = Number(prompt('Сумма', tx.amount || '0') || 0);
-  const currency = prompt('Валюта', tx.currency || 'RUP') || tx.currency || 'RUP';
-  const date = prompt('Дата (YYYY-MM-DD)', tx.date ? tx.date.slice(0, 10) : '') || tx.date || new Date().toISOString().slice(0, 10);
-  const comment = prompt('Комментарий', tx.comment || '') || tx.comment || '';
-
-  if (amount <= 0) {
-    Swal.fire({
-  icon: 'warning',
-  title: 'Некорректная сумма',
-  text: 'Сумма должна быть больше 0',
-  confirmButtonColor: '#2563eb'
-});
-
-Swal.fire({
-  icon: 'warning',
-  title: 'Проверьте счета',
-  text: 'Выберите разные счета для перевода',
-  confirmButtonColor: '#2563eb'
-});
-    return;
-  }
-
-  const updatedWallets = applyFinanceTransactionToWallets(revertFinanceTransactionFromWallets(financeState.wallets.map(wallet => ({ ...wallet })), tx), {
-    ...tx,
-    name,
-    amount,
-    currency,
-    date,
-    comment,
-    walletId: wallet.id,
-    walletName: wallet.name,
-    category: category ? category.name : tx.category || '',
-    categoryId: category ? category.id : tx.categoryId || ''
   });
 
-  const updatedTx = {
-    ...tx,
-    name,
-    amount,
-    currency,
-    date,
-    comment,
-    walletId: wallet.id,
-    walletName: wallet.name,
-    category: category ? category.name : tx.category || '',
-    categoryId: category ? category.id : tx.categoryId || ''
-  };
+  if (!formValues) return;
 
-  financeState.wallets = updatedWallets;
-  financeState.transactions = financeState.transactions.map(item => item.id === id ? updatedTx : item);
-  financeDb.child('wallets').set(buildFinanceWalletPayload(updatedWallets));
-  financeDb.child('transactions').set(buildFinanceTransactionsPayload(financeState.transactions));
-  renderFinancePanel();
-}*/
+  try {
+    // 1. Откатываем старую транзакцию из баланса кошельков
+    revertFinanceTransactionFromWallets(tx);
 
+    // 2. Обновляем объект транзакции
+    tx.date = formValues.date;
+    tx.comment = formValues.comment;
+
+    if (tx.type === 'transfer') {
+      const fromWallet = financeState.wallets.find(w => w.id === formValues.fromWalletId);
+      const toWallet = financeState.wallets.find(w => w.id === formValues.toWalletId);
+
+      tx.fromWalletId = formValues.fromWalletId;
+      tx.fromWalletName = fromWallet ? fromWallet.name : '';
+      tx.toWalletId = formValues.toWalletId;
+      tx.toWalletName = toWallet ? toWallet.name : '';
+      tx.amountFrom = formValues.amountFrom;
+      tx.amountTo = formValues.amountTo;
+      tx.currencyFrom = fromWallet ? fromWallet.currency : 'USD';
+      tx.currencyTo = toWallet ? toWallet.currency : 'USD';
+      tx.amount = formValues.amountFrom; // Базовая сумма для совместимости
+    } else {
+      const wallet = financeState.wallets.find(w => w.id === formValues.walletId);
+
+      tx.walletId = formValues.walletId;
+      tx.walletName = wallet ? wallet.name : '';
+      tx.currency = wallet ? wallet.currency : 'USD';
+      tx.amount = formValues.amount;
+      tx.category = formValues.category;
+    }
+
+    // 3. Применяем обновленную транзакцию к балансам кошельков
+    applyFinanceTransactionToWallets(tx);
+
+    // 4. Сохраняем измененные данные в Firebase
+    await saveFinanceStateToDb();
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Успешно!',
+      text: 'Транзакция обновлена',
+      timer: 1500,
+      showConfirmButton: false
+    });
+
+  } catch (err) {
+    console.error('Ошибка при сохранении транзакции:', err);
+    Swal.fire('Ошибка', 'Не удалось сохранить изменения в базу данных', 'error');
+  }
+}
+
+//функция удаления транзакции.
 async function removeFinanceTransaction(id) {
   const tx = financeState.transactions.find(item => item.id === id);
   if (!tx) return;
@@ -1741,7 +1756,7 @@ function showAddWalletForm() {
 
   // Создаем блок формы
   const formHtml = `
-    <div class="finance-item-card finance-wallet-add-box">
+    <div class="finance-item-card finance-wallet-add-box" style="background: #f9fafb; border: 2px dashed #cbd5e1; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
       <h4 style="margin: 0 0 10px 0; font-size: 1rem; color: #1e293b;">Новый кошелек / счет</h4>
       
       <div style="margin-bottom: 8px;">
