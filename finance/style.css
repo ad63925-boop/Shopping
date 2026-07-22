@@ -1,62 +1,62 @@
 /* Стили финансового модуля */
 .finance-screen {
-    /* Базовые цвета и размеры */
-    --finance-bg: #f3f4f6;
-    --finance-surface: #ffffff;
-    --finance-border: #d1d5db;
-    --finance-border-soft: #cbd5e1;
-    --finance-text: #111827;
-    --finance-muted: #374151;
-    --finance-accent: #20a434;
-    --finance-accent-dark: #166534;
-    --finance-accent-blue: #2563eb;
-    --finance-danger: #dc2626;
-    --finance-success: #16a34a;
-    --finance-radius-sm: 12px;
-    --finance-radius-md: 14px;
-    --finance-radius-lg: 16px;
-    --finance-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    --finance-gap-sm: 8px;
-    --finance-gap-md: 12px;
-    --finance-gap-lg: 16px;
-    --finance-pad-sm: 6px;
-    --finance-pad-md: 10px;
-    --finance-pad-lg: 14px;
-    --finance-bg-income: #b7f7c9;
-    --finance-bg-expense: #f4bebe;
-    --finance-bg-transfer: #a8ccfc;
-    --finance-border-income: #16a34a;
-    --finance-border-expense: #dc2626;
-    --finance-border-transfer: #2563eb;
-    position: fixed;
-    inset: 0;
-    background: var(--finance-bg);
-    z-index: 1005;
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    width: 368px;
-    margin: 0 auto;
+  /* Базовые цвета и размеры */
+  --finance-bg: #f3f4f6;
+  --finance-surface: #ffffff;
+  --finance-border: #d1d5db;
+  --finance-border-soft: #cbd5e1;
+  --finance-text: #111827;
+  --finance-muted: #374151;
+  --finance-accent: #20a434;
+  --finance-accent-dark: #166534;
+  --finance-accent-blue: #2563eb;
+  --finance-danger: #dc2626;
+  --finance-success: #16a34a;
+  --finance-radius-sm: 12px;
+  --finance-radius-md: 14px;
+  --finance-radius-lg: 16px;
+  --finance-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  --finance-gap-sm: 8px;
+  --finance-gap-md: 12px;
+  --finance-gap-lg: 16px;
+  --finance-pad-sm: 6px;
+  --finance-pad-md: 10px;
+  --finance-pad-lg: 14px;
+  --finance-bg-income: #b7f7c9;
+  --finance-bg-expense: #f4bebe;
+  --finance-bg-transfer: #a8ccfc;
+  --finance-border-income: #16a34a;
+  --finance-border-expense: #dc2626;
+  --finance-border-transfer: #2563eb;
+  position: fixed;
+  inset: 0;
+  background: var(--finance-bg);
+  z-index: 1005;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  width: 368px;
+  margin: 0 auto;
 }
 
 .finance-screen.hidden {
-    display: none;
+  display: none;
 }
 
 #financeHistoryList {
-    height: 500px;
-    padding: 3px;
-    border-radius: 7px;
-    overflow: scroll;
-    background: lightgray;
+  height: 500px;
+  padding: 3px;
+  border-radius: 7px;
+  overflow: scroll;
+  background: lightgray;
 }
 
 .finance-category-section {
-    background: var(--finance-bg-income);
-    border-radius: var(--finance-radius-lg);
-    padding: 10px;
+  background: var(--finance-bg-income);
+  border-radius: var(--finance-radius-lg);
+  padding: 10px;
 }
-  
+
 /* Опционально: стили для заголовка-переключателя */
 .finance-history-header {
   cursor: pointer;
@@ -80,509 +80,514 @@
 
 /* Шапка и навигация */
 .finance-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--finance-gap-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--finance-gap-lg);
 }
 
 .finance-header h2 {
-    margin: 0;
-    font-size: 3rem;
-    text-decoration: underline;
-    color: var(--finance-text);
+  margin: 0 auto;
+  font-size: 3rem;
+  text-decoration: underline;
+  color: var(--finance-text);
 }
 
 .finance-panel-tabs {
-    display: flex;
-    justify-content: space-between; /* Растянет иконки равномерно по экрану */
-    position: fixed;
-    bottom: 0;
-    width: 368px; /* Ширина панели */
-    padding: 10px 5px;
-    background-color: var(--finance-bg-income);
+  display: flex;
+  justify-content: space-between; /* Растянет иконки равномерно по экрану */
+  position: fixed;
+  bottom: 0;
+  width: 368px; /* Ширина панели */
+  padding: 10px 5px;
+  background-color: var(--finance-bg-income);
 }
 
 .finance-panel-tabs button:hover,
 .finance-panel-tabs button.active {
-    background: #2563eb; /* Яркий синий цвет (можно заменить на свой бренд-цвет) */
-    color: #ffffff;      /* Белый текст */
-    border-color: #2563eb;
-    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
-    font-weight: bold;
+  background: #2563eb; /* Яркий синий цвет (можно заменить на свой бренд-цвет) */
+  color: #ffffff; /* Белый текст */
+  border-color: #2563eb;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+  font-weight: bold;
 }
 
 .finance-close-btn {
-    color: var(--finance-surface);
-    padding: 6px 10px;
-    background: var(--finance-danger);
-    border: none;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    cursor: pointer;
+  position: fixed;
+  top: 3px;
+  right: 10px;
+  color: var(--finance-surface);
+  padding: 6px 10px;
+  background: var(--finance-danger);
+  border: none;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
 
 /* Контентные панели */
 .finance-panel {
-    display: grid;
-    gap: 14px;
-    border: 4px solid var(--finance-border);
-    border-radius: var(--finance-radius-lg);
-    padding: 5px;
-    margin: 5px 0;
-    scroll-margin-top: 5px; /* Высота вашей фиксированной шапки, если она есть */
+  display: grid;
+  border: 4px solid var(--finance-border);
+  border-radius: var(--finance-radius-lg);
+  padding: 5px;
+  margin: 2px 0;
+  scroll-margin-top: 5px; /* Высота вашей фиксированной шапки, если она есть */
 }
 
 #financePanel-income {
-    background: var(--finance-bg-income);
-    border: 4px solid var(--finance-border-income);
+  background: var(--finance-bg-income);
+  border: 4px solid var(--finance-border-income);
 }
 
 #financePanel-expenses {
-    background: var(--finance-bg-expense);
-    border: 4px solid var(--finance-border-expense);
+  background: var(--finance-bg-expense);
+  border: 4px solid var(--finance-border-expense);
 }
 
 #financePanel-transfers {
-    background: var(--finance-bg-transfer);
-    border: 4px solid var(--finance-border-transfer);
+  background: var(--finance-bg-transfer);
+  border: 4px solid var(--finance-border-transfer);
 }
 
 .finance-dashboard-grid {
-    display: grid;
-    gap: var(--finance-gap-md);
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: grid;
+  gap: var(--finance-gap-md);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .finance-dashboard-card {
-    padding: var(--finance-pad-lg);
-    border-radius: var(--finance-radius-lg);
-    background: var(--finance-surface);
-    border: 1px solid var(--finance-border);
-    box-shadow: var(--finance-shadow);
+  padding: var(--finance-pad-lg);
+  border-radius: var(--finance-radius-lg);
+  background: var(--finance-surface);
+  border: 1px solid var(--finance-border);
+  box-shadow: var(--finance-shadow);
 }
 
 .finance-dashboard-card strong {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--finance-muted);
+  display: block;
+  margin-bottom: 8px;
+  color: var(--finance-muted);
 }
 
 /* Заголовки секций и карточки */
 .finance-section-title {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-    padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 6px 12px;
 }
 
 .finance-section-title span {
-    display: inline-block;
-    padding: 4px 10px;
-    color: var(--finance-accent-dark);
-    font-weight: 700;
-    font-size: 2rem;
+  display: inline-block;
+  padding: 4px 10px;
+  color: var(--finance-accent-dark);
+  font-weight: 700;
+  font-size: 2rem;
 }
 
 .finance-income-title span {
-    color: green;
+  color: green;
 }
 
 .finance-expense-title span {
-    color: var(--finance-danger);
+  color: var(--finance-danger);
 }
 
 .finance-collapsible {
-    display: grid;
-    gap: 0;
+  display: grid;
+  gap: 0;
 }
 
 .finance-collapsible-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
 }
 
 .finance-collapsible-icon {
-    font-size: 1.4rem;
-    color: var(--finance-accent-dark);
-    transition: transform 0.25s ease;
+  font-size: 1.4rem;
+  color: var(--finance-accent-dark);
+  transition: transform 0.25s ease;
 }
 
 .finance-collapsible.is-expanded .finance-collapsible-icon {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 .finance-collapsible-content {
-    display: grid;
-    gap: 12px;
-    overflow: hidden;
-    max-height: 2000px;
-    opacity: 1;
-    padding-top: 8px;
-    transition: max-height 0.35s ease, opacity 0.25s ease, padding-top 0.25s ease;
+  display: grid;
+  gap: 12px;
+  overflow: hidden;
+  max-height: 2000px;
+  opacity: 1;
+  padding-top: 8px;
+  transition:
+    max-height 0.35s ease,
+    opacity 0.25s ease,
+    padding-top 0.25s ease;
 }
 
 .finance-collapsible.is-collapsed .finance-collapsible-content {
-    max-height: 0;
-    opacity: 0;
-    padding-top: 0;
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
 }
 
 .finance-item-card {
-    background: white;
-    border: 3px solid var(--finance-border);
-    padding: 8px;
-    margin: 2px 0;
+  background: white;
+  border: 3px solid var(--finance-border);
+  padding: 8px;
+  margin: 2px 0;
+  border-radius: 10px;
 }
 
 .finance-transfer-preview {
-    padding: 8px 10px;
-    border-radius: var(--finance-radius-sm);
-    background: rgba(37, 99, 235, 0.08);
-    color: var(--finance-accent-blue);
-    font-size: 0.95rem;
-    min-height: 40px;
-    display: flex;
-    align-items: center;
+  padding: 8px 10px;
+  border-radius: var(--finance-radius-sm);
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--finance-accent-blue);
+  font-size: 0.95rem;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
 }
 
 .finance-transfer-title {
-    margin-bottom: 12px;
+  margin-bottom: 12px;
 }
 
 .finance-transfer-title span {
-    color: var(--finance-accent-blue);
-    font-weight: 600;
-    font-size: 1.1rem;
+  color: var(--finance-accent-blue);
+  font-weight: 600;
+  font-size: 1.1rem;
 }
 
 .finance-transfer-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .finance-form .finance-transfer-row {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  gap: 8px;
 }
 
 .finance-transfer-half {
-    flex: 1;
-    max-width: 50%;
+  flex: 1;
+  max-width: 50%;
 }
 
 .finance-transfer-control {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid var(--finance-border-soft);
-    border-radius: 8px;
-    font-size: 0.95rem;
-    background: var(--finance-surface);
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--finance-border-soft);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--finance-surface);
 }
 
 .finance-currency-label {
-    font-size: 0.75rem;
-    color: #64748b;
-    margin-top: 4px;
-    padding-left: 4px;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 4px;
+  padding-left: 4px;
 }
 
 .finance-transfer-rate-label {
-    display: none;
-    font-size: 0.8rem;
-    color: #0284c7;
-    background: #f0f9ff;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-weight: 500;
+  display: none;
+  font-size: 0.8rem;
+  color: #0284c7;
+  background: #f0f9ff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 500;
 }
 
 .finance-transfer-rate-row {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .finance-transfer-rate-reverse {
-    color: #0369a1;
+  color: #0369a1;
 }
 
 .finance-transfer-comment {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid var(--finance-border-soft);
-    border-radius: 8px;
-    font-size: 0.95rem;
-    min-height: 60px;
-    resize: vertical;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--finance-border-soft);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  min-height: 60px;
+  resize: vertical;
 }
 
 .finance-form .finance-transfer-submit {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    background: var(--finance-accent-blue);
-    color: white;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    font-size: 0.95rem;
-    margin-top: 4px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background: var(--finance-accent-blue);
+  color: white;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-top: 4px;
 }
 
 .finance-transfer-preview-container {
-    margin-top: 12px;
+  margin-top: 12px;
 }
 
 .finance-transfer-balance-preview {
-    background: rgba(22, 163, 74, 0.09);
-    color: var(--finance-success);
+  background: rgba(22, 163, 74, 0.09);
+  color: var(--finance-success);
 }
 
 .finance-category-section {
-    display: grid;
-    gap: 8px;
-    margin-top: 12px;
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 .finance-category-toggle {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--finance-border);
-    border-radius: var(--finance-radius-sm);
-    background: var(--finance-surface);
-    cursor: pointer;
-    font-weight: 600;
-    color: var(--finance-text);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--finance-border);
+  border-radius: var(--finance-radius-sm);
+  background: var(--finance-surface);
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--finance-text);
 }
 
 .finance-category-toggle-icon {
-    font-size: 2rem;
-    transition: transform 0.2s ease;
+  font-size: 2rem;
+  transition: transform 0.2s ease;
 }
 
 .finance-category-toggle.expanded .finance-category-toggle-icon {
-    transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 .finance-category-content {
-
 }
 
 .finance-category-content.hidden {
-    display: none;
+  display: none;
 }
 
 /* Суммы и действия */
 .finance-amount-positive {
-    color: var(--finance-success);
-    font-weight: 700;
-    text-align: right;
+  color: var(--finance-success);
+  font-weight: 700;
+  text-align: right;
 }
 
 .finance-amount-negative {
-    color: var(--finance-danger);
-    font-weight: 700;
-    text-align: right;
+  color: var(--finance-danger);
+  font-weight: 700;
+  text-align: right;
 }
 
 .finance-amount-neutral {
-    color: #3c4451;
-    font-weight: 700;
-    text-align: right;
+  color: #3c4451;
+  font-weight: 700;
+  text-align: right;
 }
 
 .finance-item-actions {
-    display: none;
+  display: none;
 }
 
 .finance-item-actions-vision {
-    display: flex;
-    gap: 6px;
-    justify-content: space-around;
+  display: flex;
+  gap: 6px;
+  justify-content: space-around;
 }
 
 .finance-item-actions button {
-    color: var(--finance-surface);
-    border: none;
-    border-radius: 10px;
-    padding: 6px 10px;
-    height: 32px;
-    cursor: pointer;
+  color: var(--finance-surface);
+  border: none;
+  border-radius: 10px;
+  padding: 6px 10px;
+  height: 32px;
+  cursor: pointer;
 }
 
 .btn-edit-wallet {
-    background: var(--finance-accent-blue);
+  background: var(--finance-accent-blue);
 }
 
 .btn-delete-wallet {
-    background: var(--finance-danger);
+  background: var(--finance-danger);
 }
 
 #financePanel-wallets {
-    border: 4px solid var(--finance-accent);
+  border: 4px solid var(--finance-accent);
 }
 
 .finance-category-swatch {
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    margin-right: 8px;
-    vertical-align: middle;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 .finance-details-panel {
-    display: grid;
-    gap: 14px;
+  display: grid;
+  gap: 14px;
 }
 
 /* Фильтры и поиск */
 .finance-history-filters {
-    display: grid;
-    gap: 10px;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    margin-bottom: 12px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  margin-bottom: 12px;
 }
 
 .finance-filter-group {
-    display: grid;
-    gap: 6px;
+  display: grid;
+  gap: 6px;
 }
 
 .finance-filter-group label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--finance-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--finance-muted);
 }
 
 .finance-filter-group input,
 .finance-filter-group select {
-    padding: 10px 12px;
-    border-radius: var(--finance-radius-sm);
-    border: 1px solid var(--finance-border-soft);
-    background: var(--finance-surface);
+  padding: 10px 12px;
+  border-radius: var(--finance-radius-sm);
+  border: 1px solid var(--finance-border-soft);
+  background: var(--finance-surface);
 }
 
 .finance-search-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .finance-search-row input {
-    flex: 1;
-    padding: 10px 12px;
-    border-radius: var(--finance-radius-sm);
-    border: 1px solid var(--finance-border-soft);
-    background: var(--finance-surface);
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: var(--finance-radius-sm);
+  border: 1px solid var(--finance-border-soft);
+  background: var(--finance-surface);
 }
 
 /* Кнопки и формы */
 .finance-inline-action {
-    background: var(--finance-accent);
-    color: var(--finance-surface);
-    border: none;
-    border-radius: var(--finance-radius-sm);
-    padding: 8px 12px;
-    cursor: pointer;
+  background: var(--finance-accent);
+  color: var(--finance-surface);
+  border: none;
+  border-radius: var(--finance-radius-sm);
+  padding: 8px 12px;
+  cursor: pointer;
 }
 
 .finance-buttons-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    flex-direction: column;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-direction: column;
 }
 
 .finance-buttons-row button {
-    background: var(--finance-accent);
-    color: var(--finance-surface);
-    border: none;
-    border-radius: var(--finance-radius-sm);
-    padding: 10px 14px;
-    cursor: pointer;
+  background: var(--finance-accent);
+  color: var(--finance-surface);
+  border: none;
+  border-radius: var(--finance-radius-sm);
+  padding: 10px 14px;
+  cursor: pointer;
 }
 
 .finance-form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    background: var(--finance-surface);
-    border-radius: 18px;
-    border: 1px solid var(--finance-border);
-    padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--finance-surface);
+  border-radius: 18px;
+  border: 1px solid var(--finance-border);
+  padding: 16px;
 }
 
 .finance-form input,
 .finance-form select,
 .finance-form textarea {
-    padding: 10px 12px;
-    border-radius: var(--finance-radius-sm);
-    border: 1px solid var(--finance-border-soft);
-    background: var(--finance-surface);
+  padding: 10px 12px;
+  border-radius: var(--finance-radius-sm);
+  border: 1px solid var(--finance-border-soft);
+  background: var(--finance-surface);
 }
 
 .finance-form textarea {
-    min-height: 80px;
+  min-height: 80px;
 }
 
 .finance-form .form-row {
-    display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .finance-form .form-row-full {
-    grid-column: span 2;
+  grid-column: span 2;
 }
 
 .finance-date-field {
-    display: flex;
-    align-items: stretch;
-    gap: 6px;
-    min-width: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  min-width: 0;
 }
 
 .finance-date-field input {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .finance-form .finance-date-today-btn {
-    flex: 0 0 42px;
-    padding: 0;
-    border-radius: var(--finance-radius-sm);
-    background: var(--finance-accent-blue);
-    color: var(--finance-surface);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  flex: 0 0 42px;
+  padding: 0;
+  border-radius: var(--finance-radius-sm);
+  background: var(--finance-accent-blue);
+  color: var(--finance-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .finance-form button {
-    background: #34a853;
-    color: var(--finance-surface);
-    border: none;
-    padding: 12px;
-    border-radius: 14px;
-    cursor: pointer;
+  background: #34a853;
+  color: var(--finance-surface);
+  border: none;
+  padding: 12px;
+  border-radius: 14px;
+  cursor: pointer;
 }
 
 /*История*/
 .finance-history-date-header {
   position: sticky;
-  top: 0;  
+  top: 0;
   margin: 16px 0;
   font-weight: bold;
   color: #4b5563;
@@ -602,7 +607,8 @@
   transition: box-shadow 0.2s;
 }
 
-#transferAmountFrom, #transferAmountTo {
+#transferAmountFrom,
+#transferAmountTo {
   width: 50%;
   padding: 8px;
   border: 1px solid #d1d5db;
@@ -611,24 +617,24 @@
 }
 
 #transferDate {
-    width: 50%;
-    padding: 8px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    margin-bottom: 10px;
+  width: 50%;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-bottom: 10px;
 }
 
 .finance-transaction-item:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .finance-tx-summary {
   display: flex;
-  flex-direction: column;  
+  flex-direction: column;
 }
 
 .finance-tx-category {
-  font-family: cursive;  
+  font-family: cursive;
   font-size: 0.85rem;
   color: #1a73e8;
   margin-left: 6px;
@@ -668,14 +674,14 @@
   margin: 8px 0 12px;
 }
 
-.text-green { 
-    color: #22c55e;
-    text-align: right; 
+.text-green {
+  color: #22c55e;
+  text-align: right;
 }
 
-.text-red { 
-    color: #ef4444;
-    text-align: right; 
+.text-red {
+  color: #ef4444;
+  text-align: right;
 }
 
 .finance-wallet-edit-form input,
@@ -705,7 +711,7 @@
 }
 
 #financePanel-history {
-    margin-bottom: 95px;/* Чтобы панель истории занимала оставшееся пространство */
+  margin-bottom: 95px; /* Чтобы панель истории занимала оставшееся пространство */
 }
 
 /* Стилизуем кнопки под круглые аккуратные табы */
@@ -713,7 +719,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;  /* Фиксированная ширина */
+  width: 44px; /* Фиксированная ширина */
   height: 44px; /* Фиксированная высота */
   min-width: 44px;
   border-radius: 50%; /* Делает кнопки круглыми. Если хотите скругленные квадраты — ставьте 10px */
@@ -721,8 +727,8 @@
   border: 1px solid #e2e8f0;
   color: #64748b;
   font-size: 1rem; /* Размер самой иконки */
-    cursor: pointer;
-    transition: background 0.2s ease;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 /* Эффект ховера */
@@ -741,35 +747,43 @@
 }
 
 #financeNavIncome {
-    color: green;
-    font-size: 1.7rem;
+  color: green;
+  font-size: 1.7rem;
 }
 
 #financeNavExpenses {
-    color: red;
-    font-size: 1.7rem;
+  color: red;
+  font-size: 1.7rem;
 }
 
 #financeNavTransfers {
-    color: blue;
-    font-size: 1.7rem;
+  color: blue;
+  font-size: 1.7rem;
 }
 
 /* 1. Состояние панели по умолчанию (когда класса .is-open НЕТ) */
 .category-actions-panel {
-  max-height: 0;            /* Полностью сжимаем панель по высоте */
-  opacity: 0;               /* Делаем её прозрачной */
-  overflow: hidden;         /* Прячем всё, что не помещается в нулевую высоту */
-  display: flex;            /* Выстраиваем кнопки в линию */
-  gap: 8px;                 /* Расстояние между кнопками */
+  max-height: 0; /* Полностью сжимаем панель по высоте */
+  opacity: 0; /* Делаем её прозрачной */
+  overflow: hidden; /* Прячем всё, что не помещается в нулевую высоту */
+  display: flex; /* Выстраиваем кнопки в линию */
+  gap: 8px; /* Расстояние между кнопками */
   margin-top: 0;
-  transition: max-height 0.25s ease-out, opacity 0.2s ease-out, margin-top 0.25s ease-out;
+  transition:
+    max-height 0.25s ease-out,
+    opacity 0.2s ease-out,
+    margin-top 0.25s ease-out;
 }
 
 /* 2. Состояние панели, когда JS добавляет класс .is-open */
 .category-actions-panel.is-open {
-  max-height: 50px;         /* Плавно расширяем до высоты кнопок */
-  opacity: 1;               /* Делаем кнопки видимыми */
-  margin-top: 8px;          /* Добавляем отступ сверху от инфо-плашки */
+  max-height: 50px; /* Плавно расширяем до высоты кнопок */
+  opacity: 1; /* Делаем кнопки видимыми */
+  margin-top: 8px; /* Добавляем отступ сверху от инфо-плашки */
 }
 
+.wallet-main-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

@@ -368,7 +368,7 @@ function renderFinanceWallets() {
     // Внутренняя разметка: верхняя инфо-плашка + выезжающая панель действий
     walletCard.innerHTML = `
       <!-- Кликабельная шапка кошелька -->
-      <div class="wallet-main-info" style="display: flex; align-items: center; justify-content: space-between;">
+      <div class="wallet-main-info">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 1.2rem; flex-shrink: 0;">${icon}</span>
           <div style="display: flex; flex-direction: column;">
@@ -1741,7 +1741,7 @@ function showAddWalletForm() {
 
   // Создаем блок формы
   const formHtml = `
-    <div class="finance-item-card finance-wallet-add-box" style="background: #f9fafb; border: 2px dashed #cbd5e1; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+    <div class="finance-item-card finance-wallet-add-box">
       <h4 style="margin: 0 0 10px 0; font-size: 1rem; color: #1e293b;">Новый кошелек / счет</h4>
       
       <div style="margin-bottom: 8px;">
