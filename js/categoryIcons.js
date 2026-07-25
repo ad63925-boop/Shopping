@@ -23,7 +23,7 @@ window.categoryIcons = {
 };
 
 window.categoryColors = {
-  "Разное": "#7c3aed",
+  "Разное": "silver",
   "Овощи": "#16a34a",
   "Молочка": "#f59e0b",
   "Вода": "#0ea5e9",

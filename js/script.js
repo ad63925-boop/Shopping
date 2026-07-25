@@ -175,6 +175,85 @@ function toggleExclamationHighlight(input) {
     input.classList.toggle('has-exclamation', input.value.includes('!'));
 }
 
+// Функция инициализации голосового ввода
+function initVoiceInput() {
+    const micBtn = document.getElementById('micBtn');
+    const nameInput = document.getElementById('itemName');
+
+    if (!micBtn || !nameInput) return;
+
+    // Проверяем поддержку Web Speech API браузером
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        micBtn.style.display = 'none'; // Скрываем кнопку, если браузер не поддерживает
+        console.warn('Web Speech API не поддерживается этим браузером.');
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ru-RU'; // Язык распознавания
+    recognition.interimResults = false; // Возвращать только финальный результат
+    recognition.maxAlternatives = 1;
+
+    let isRecording = false;
+
+    // Старт / Стоп по клику
+    micBtn.addEventListener('click', () => {
+        if (isRecording) {
+            recognition.stop();
+        } else {
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error('Ошибка запуска распознавания:', e);
+            }
+        }
+    });
+
+    // Событие: Начало записи
+    recognition.onstart = () => {
+        isRecording = true;
+        micBtn.classList.add('recording');
+        showNotification('Говорите название товара...', 'info');
+    };
+
+    // Событие: Получение результата
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        
+        // Убираем точку в конце, если браузер её добавил
+        const cleanText = transcript.replace(/\.$/, '');
+
+        // Записываем результат в поле itemName
+        nameInput.value = cleanText;
+
+        // Инициируем событие input, чтобы сработали подсказки (updateSuggestions)
+        nameInput.dispatchEvent(new Event('input'));
+
+        showNotification(`Распознано: "${cleanText}"`, 'success');
+    };
+
+    // Событие: Ошибка
+    recognition.onerror = (event) => {
+        console.error('Ошибка голосового ввода:', event.error);
+        if (event.error !== 'no-speech') {
+            showNotification('Не удалось распознать речь', 'error');
+        }
+    };
+
+    // Событие: Завершение записи
+    recognition.onend = () => {
+        isRecording = false;
+        micBtn.classList.remove('recording');
+    };
+}
+
+// Запускаем инициализацию при загрузке DOM
+document.addEventListener('DOMContentLoaded', () => {
+    initVoiceInput();
+});
+
 // Функция для добавления товара
 function addItem() {
     const nameInput = document.getElementById('itemName');
@@ -323,6 +402,10 @@ function toggleComment(id) {
     if (!block) return;
 
     block.classList.toggle('show');
+    const input = block.querySelector('input, textarea');
+    if (input && block.classList.contains('show')) {
+        input.focus();
+    }
     closeAllMenus();
 }
 

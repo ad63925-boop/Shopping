@@ -379,7 +379,7 @@ input:hover, input:active {
 }  
 
 .limit-ok { 
-    background-color: #e8f5e9 !important; 
+    background-color: silver !important; 
     transition: 0.3s; 
 } /* Зеленый */
 
@@ -483,6 +483,7 @@ input:hover, input:active {
     justify-content: space-between;
     align-items: center;
     transition: all 0.3s;
+    margin: 3px 0;
 }
 
 
@@ -520,7 +521,7 @@ input:hover, input:active {
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.3s ease;
-    height: 370px;
+    height: 300px;
     overflow: scroll;
 }
 
@@ -638,14 +639,26 @@ input:hover, input:active {
 }
 
 .input-row-top input {
-    padding: 6px;
     border-radius: 8px;
     outline: none;
 }
 
+.input-row-top .item-name {
+    width: 100%;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
 
+.input-row-top .inpPrice {
+    width: 80px;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
 
-.item-qty,
+.item-qty {
+    display: none;
+}
+
 .inpPrice {
     width: 55px;
     text-align: center;
@@ -970,6 +983,7 @@ input[type="checkbox"] {
     font-size: 1rem;
     border-radius: 5px;
     background-color: cornsilk;
+    border: 1px solid silver;
 }
 
 .total-summ-label {
@@ -1373,3 +1387,35 @@ input[type="checkbox"] {
             letter-spacing: 0.2px;
             white-space: nowrap;
         }
+
+        .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.mic-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px 8px;
+    transition: transform 0.2s, color 0.2s;
+    outline: none;
+    margin: 0 0 0 5px;
+}
+
+.mic-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Эффект при активной записи голоса */
+.mic-btn.recording {
+    color: #ff0000;
+    animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(1.2); opacity: 0.7; }
+}

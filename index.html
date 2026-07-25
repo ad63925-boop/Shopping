@@ -90,7 +90,7 @@
 
 <div class="input-card">
     <div class="input-row-top">
-        <div style="position: relative; flex: 2;">
+        <div>
             <input type="text" 
             id="itemName" 
             class="item-name" 
@@ -102,12 +102,18 @@
             class="autocomplete-suggestions"
             tabindex="4"></div>
         </div>
+
+        <!-- Кнопка микрофона -->
+<button type="button" id="micBtn" class="mic-btn" title="Голосовой ввод">
+    <i class="fa-solid fa-microphone"></i>
+</button>
+
         <div class="item-qty-wrapper">
             <input type="number" 
             id="itemQty" 
             class="item-qty" 
             step="0.01" 
-            min="0,01"
+            min="0.01"
             placeholder="шт" 
             value="1"
             tabindex="2">

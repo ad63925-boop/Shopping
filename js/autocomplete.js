@@ -79,3 +79,8 @@ nameInput.addEventListener('input', () => {
         autoList.style.display = 'none';
     }
 });
+
+// Запускаем инициализацию при загрузке DOM
+document.addEventListener('DOMContentLoaded', () => {
+    initVoiceInput();
+});
