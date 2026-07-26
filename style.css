@@ -561,9 +561,7 @@ input:hover, input:active {
 
 .autocomplete-suggestions {
     position: absolute;
-    top: 105%;
-    left: 0;
-    right: 0;
+    
     background: white;
     border-radius: 12px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
@@ -580,7 +578,8 @@ input:hover, input:active {
     align-items: center;
     padding: 4px 5px;
     cursor: pointer;
-    border-bottom: 1px solid silver;
+    border-bottom: 3px solid #00639b;
+    background: cornsilk;
     transition: background 0.2s;
 }
 
@@ -712,19 +711,6 @@ input:hover, input:active {
 .add-btn:hover {
     background: #1343aa;
     transform: translateY(-2px);
-}
-
-/* Подправляем стили подсказок, чтобы они не «раздували» карточку */
-.autocomplete-suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: -110px; /* Чтобы подсказка была шире, чем поле названия */
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    z-index: 100;
-    margin-top: 5px;
 }
 
 /* Убираем стрелочки у инпута цены */
@@ -979,11 +965,12 @@ input[type="checkbox"] {
 
 .limits {
     margin-top: 10px;
-    width: 170px;
+    width: 180px;
     font-size: 1rem;
     border-radius: 5px;
     background-color: cornsilk;
     border: 1px solid silver;
+    border: 5px solid #2196f3;
 }
 
 .total-summ-label {
