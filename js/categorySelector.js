@@ -21,7 +21,7 @@ nameInput.addEventListener('focus', () => {
             ${lastPrice ? `<span class="suggestion-price">(${lastPrice} ₽)</span>` : ''}
             ${lastQuantity ? `<span class="suggestion-qty">${lastQuantity}</span>` : ''}
                 </div>
-                <span class="suggestion-delete" onclick="deleteFromHistory('${name}')">🗑</span>
+                <span class="suggestion-delete" onclick="deleteFromHistory('${name}')"><i class="fa-solid fa-trash-can"></i></span>
             `;
             div.onclick = (e) => {
                 if (!e.target.classList.contains('suggestion-delete')) {

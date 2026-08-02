@@ -64,7 +64,6 @@ body {
     align-items: center;
     width: 100%;
     transition: transform 0.3s ease; /* Плавный переход */
-    padding-bottom: 140px; /* Отступ для фиксированных навигации и футера */
 }
 
 .main-content {
@@ -379,12 +378,12 @@ input:hover, input:active {
 }  
 
 .limit-ok { 
-    background-color: silver !important; 
+    background-color: #bbe6d0 !important; 
     transition: 0.3s; 
 } /* Зеленый */
 
 .limit-over { 
-    background-color: deeppink !important; 
+    background-color: #ec8d8d !important; 
     transition: 0.3s; 
 } /* Красный */
 
@@ -561,16 +560,17 @@ input:hover, input:active {
 
 .autocomplete-suggestions {
     position: absolute;
-    
+    margin: 5px auto;
+    margin-top: 4px;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0px 2px 7px 3px rgb(65, 64, 64);
     z-index: 1000;
-    max-height: 250px;
+    max-height: 400px;
     width: 350px;
     overflow-y: auto;
     display: none; /* Скрыто по умолчанию */
     border: 1px solid #ddd;
+    border-radius: 8px;
 }
 
 .suggestion-card {
@@ -578,9 +578,11 @@ input:hover, input:active {
     align-items: center;
     padding: 4px 5px;
     cursor: pointer;
-    border-bottom: 3px solid #00639b;
     background: cornsilk;
     transition: background 0.2s;
+    border-radius: 10px;
+    border: 2px solid blue;
+    margin: 3px 0;
 }
 
 .suggestion-card:hover { 
@@ -588,11 +590,12 @@ input:hover, input:active {
 }
 
 .suggestion-info { 
-    flex: 1; 
+    flex: 1;
     display: flex;
-    align-items: center;
-    gap: 10px; 
+    gap: 4px;
     padding-left: 5px;
+    align-items: flex-start;
+    flex-direction: column;
 }
 
 .suggestion-name { 
@@ -613,7 +616,9 @@ input:hover, input:active {
 .suggestion-qty{
     text-decoration: underline;
     text-align: center;
-    padding: 0 8px;
+    padding: 4px 8px;
+    background-color: silver;
+    border-radius: 5px;
 }
 
 .suggestion-delete {
@@ -649,7 +654,6 @@ input:hover, input:active {
 }
 
 .input-row-top .inpPrice {
-    width: 80px;
     font-size: 1.3rem;
     font-weight: bold;
 }
@@ -773,7 +777,7 @@ footer p {
 
 .shoppingLists {
     display: none;
-    margin-bottom: 50px;
+    margin-bottom: 100px;
     transition: all 0.9s;
     width: 100%;
     max-width: 368px;
@@ -964,13 +968,12 @@ input[type="checkbox"] {
 }
 
 .limits {
-    margin-top: 10px;
+    height: 100%;
     width: 180px;
     font-size: 1rem;
     border-radius: 5px;
     background-color: cornsilk;
-    border: 1px solid silver;
-    border: 5px solid #2196f3;
+    border: 3px solid #2196f3;
 }
 
 .total-summ-label {
@@ -994,6 +997,8 @@ input[type="checkbox"] {
 }
 
 .total-quantity {
+    height: 100%;
+    border: 3px solid #2196f3;
     text-align: left;
     color: #08a609;
     background-color: white;
@@ -1377,8 +1382,7 @@ input[type="checkbox"] {
 
         .input-wrapper {
     position: relative;
-    display: flex;
-    align-items: center;
+    width: 100%;
 }
 
 .mic-btn {
