@@ -477,6 +477,7 @@ function deleteCheckedItems() {
     });
 }
 
+console.log(item.completed);
 
 //КОМЕНТАРИИ к товарам
 async function updateItemComment(itemId, comment) {

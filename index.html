@@ -38,21 +38,6 @@
   <div class="menu-bottom" id="menuBottom"></div>
 </div>
 
-<!-- Форма входа для php
-<div id="loginClient" class="login-client">
-<h2>Вход в систему</h2>
-    <form action="login.php" method="post">
-        <label for="username">Имя пользователя:</label><br>
-        <input type="text" id="username" name="username" required><br><br>
-
-        <label for="password">Пароль:</label><br>
-        <input type="password" id="password" name="password" required minlength="8"><br><br>
-
-        <input type="submit" value="Войти">
-    </form>
-</div>
--->
-
 <div class="main-content">
 <div class="header-card" id="headerCard">
     
@@ -312,6 +297,12 @@
             <span class="nav-label">Основной</span>
         </button>
 
+        <!-- Список -->
+        <button onclick="showListProducts()" class="nav-item">
+            <i class="fa-solid fa-barcode"></i>
+            <span class="nav-label">Список</span>
+        </button>
+
         <!-- Избранное (сердечко) -->
         <button onclick="showLogs()" class="nav-item">
             <i class="fa-solid fa-book"></i>
@@ -343,6 +334,7 @@
 <script src="js/render.js" defer></script>
 <script src="js/categorySelector.js" defer></script>
 <script src="js/autocomplete.js" defer></script>
+<script src="js/showListProducts.js" defer></script>
 <script src="js/validation.js" defer></script>
 <script src="finance/finance.js" defer></script>
 <script src="../burgerMenu/menu.js" defer></script>
