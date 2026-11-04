@@ -16,7 +16,7 @@ autocompleteNameInput.addEventListener('focus', () => {
             div.className = 'suggestion-card';
             div.innerHTML = `
                 <div class="suggestion-info">
-                    <span class="item-photo-preview"><img src="${foto}" alt="${name}" class="item-foto-preview-image"></span>
+
                     <span class="suggestion-name">${name.charAt(0).toUpperCase() + name.slice(1)}</span>
                     <span class="suggestion-cat">${getCategoryIcon(category)} ${category}</span>
             ${lastPrice ? `<span class="suggestion-price">(${lastPrice} ₽)</span>` : ''}
@@ -77,6 +77,14 @@ autocompleteNameInput.addEventListener('input', () => {
         });
         autocompleteList.style.display = 'block';
     } else {
+        autocompleteList.style.display = 'none';
+    }
+
+});
+
+// Закрываем подсказки по клику вне поля ввода и списка.
+document.addEventListener('click', (event) => {
+    if (!autocompleteNameInput.contains(event.target) && !autocompleteList.contains(event.target)) {
         autocompleteList.style.display = 'none';
     }
 });

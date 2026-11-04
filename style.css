@@ -191,6 +191,18 @@ header, .header-card, .input-card {
     font-size: 0.9rem;
 }
 
+.item-photo {
+    display: block;
+    max-width: 100%;
+    max-height: 150px;
+    object-fit: contain;
+    box-sizing: border-box;
+    border-radius: 7px;
+    background-color: #b6c9ec;
+    margin: 5px auto;
+    box-shadow: 0px 0px 6px 1px;
+}
+
 .edit-name-input {
     display: flex;
     flex-wrap: wrap;
@@ -230,17 +242,6 @@ header, .header-card, .input-card {
     border-bottom: 1px solid black;
     margin: 0 5px 0 0;
 }
-
-.item-photo {
-    display: block;
-    width: 100%;
-    max-height: 220px;
-    flex: 0 0 100%;
-    object-fit: contain;
-    box-sizing: border-box;
-    border-radius: 7px;
-}
-
 
 .item-actions:hover {
     cursor: pointer;
