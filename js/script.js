@@ -256,8 +256,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Функция для добавления товара
 function addItem() {
+    const itemFotoInput = document.getElementById('itemFoto');
     const nameInput = document.getElementById('itemName');
-    const qtyInput = document.getElementById('itemQty'); // Получаем поле количества
+    const qtyInput = document.getElementById('itemQty'); 
+    // Получаем поле количества
     const priceInput = document.getElementById('itemPrice');
     const catInput = document.getElementById('itemCat');
     const itemName = nameInput.value.trim();
@@ -286,6 +288,7 @@ function addItem() {
     //Карточка товара
     const newItem = {
         id: Date.now().toString(),
+        foto: itemFotoInput.value || 'https://cdn-icons-png.flaticon.com/512/17630/17630625.png',
         name: itemName,
         quantity: qtyInput.value || 1, // Добавляем количество (по умолчанию 1)
         price: priceInput.value || 0,

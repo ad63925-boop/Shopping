@@ -23,34 +23,22 @@
         };
     }
 
-    function normalizeRows(rows) {
-        const source = Array.isArray(rows) ? rows : [];
-        const normalized = source.map(normalizeRow);
+    function ensureListSize(rows) {
+        const list = Array.isArray(rows) ? rows.map(normalizeRow) : [];
 
-        while (normalized.length < MIN_ROWS) {
-            normalized.push(makeEmptyRow());
+        while (list.length < MIN_ROWS) {
+            list.push(makeEmptyRow());
         }
 
-        while (normalized.length > MIN_ROWS && !rowHasData(normalized[normalized.length - 1])) {
-            normalized.pop();
+        while (list.length > MIN_ROWS && !rowHasData(list[list.length - 1])) {
+            list.pop();
         }
 
-        const lastIndex = normalized.length - 1;
-        if (normalized.length > MIN_ROWS && rowHasData(normalized[lastIndex])) {
-            normalized.push(makeEmptyRow());
+        if (rowHasData(list[list.length - 1])) {
+            list.push(makeEmptyRow());
         }
 
-        while (normalized.length > MIN_ROWS && !rowHasData(normalized[normalized.length - 1])) {
-            normalized.pop();
-        }
-
-        if (normalized.length < MIN_ROWS) {
-            while (normalized.length < MIN_ROWS) {
-                normalized.push(makeEmptyRow());
-            }
-        }
-
-        return normalized;
+        return list;
     }
 
     function ensureStyles() {
@@ -67,15 +55,15 @@
                 justify-content: center;
                 background: rgba(15, 23, 42, 0.5);
                 z-index: 2000;
-                padding: 20px;
+                padding: 10px;
             }
             #other-products-modal.visible {
                 display: flex;
             }
             .other-products-panel {
                 width: min(760px, 100%);
-                max-height: 86vh;
-                border-radius: 18px;
+                max-height: 95vh;
+                border-radius: 7px;
                 background: #fff;
                 box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
                 overflow: hidden;
@@ -86,8 +74,8 @@
                 align-items: center;
                 justify-content: space-between;
                 padding: 16px 20px;
-                background: #f8fafc;
-                border-bottom: 1px solid #e2e8f0;
+                background: #bddeff;
+                border-bottom: 1px solid #454647;
             }
             .other-products-header h3 {
                 margin: 0;
@@ -98,15 +86,12 @@
             .other-products-close {
                 width: 34px;
                 height: 34px;
-                border: none;
-                border-radius: 50%;
-                background: #e2e8f0;
-                color: #0f172a;
-                font-size: 1.4rem;
+                color: #ff0404;
                 cursor: pointer;
-            }
-            .other-products-close:hover {
-                background: #cbd5e1;
+                font-size: 3rem;
+                line-height: 0.8;
+                border: none;
+                background: transparent;
             }
             .other-products-body {
                 padding: 18px 20px 20px;
@@ -116,40 +101,22 @@
             .other-products-list {
                 margin: 0;
                 padding: 0;
-                list-style: decimal inside;
                 display: grid;
-                gap: 10px;
+                gap: 5px;
             }
             .other-product-row {
                 display: grid;
-                grid-template-columns: minmax(0, 1fr) minmax(120px, 190px) 42px;
-                gap: 10px;
+                grid-auto-flow: column;
+                gap: 4px;
                 align-items: center;
-                padding: 8px 10px;
-                border: 1px solid #e2e8f0;
-                border-radius: 12px;
+                border-radius: 7px;
                 background: #fff;
-            }
-            .other-product-row input {
-                width: 100%;
-                box-sizing: border-box;
-                border: 1px solid #dbe3ee;
-                border-radius: 10px;
-                padding: 10px 12px;
-                font-size: 0.96rem;
-                background: #fff;
-                color: #0f172a;
-            }
-            .other-product-row input:focus {
-                outline: none;
-                border-color: #4f46e5;
-                box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
             }
             .other-product-delete {
                 width: 42px;
                 height: 42px;
                 border: none;
-                border-radius: 10px;
+                border-radius: 7px;
                 background: #fee2e2;
                 color: #b91c1c;
                 font-size: 1.2rem;
@@ -158,11 +125,26 @@
             .other-product-delete:hover {
                 background: #fecaca;
             }
-            @media (max-width: 640px) {
-                .other-product-row {
-                    grid-template-columns: 1fr 120px 40px;
-                    gap: 8px;
-                }
+            .other-product-input-name {
+                width: 200px;
+                border: 1px solid #84b4f4;
+                border-radius: 7px;
+                padding: 10px 12px;
+                font-size: 0.96rem;
+                background: #fff;
+                color: #0f172a;
+                box-sizing: border-box;
+            }
+            .other-product-input-price {
+                box-sizing: border-box;
+                border-radius: 7px;
+                padding: 10px 12px;
+                font-size: 0.96rem;
+                background: #fff;
+                color: #0f172a;
+                width: 65px;
+                border: 1px solid #84b4f4;
+                text-align: right;
             }
         `;
         document.head.appendChild(style);
@@ -185,80 +167,63 @@
         }));
     }
 
-    function ensureListSize(rows) {
-        const list = Array.isArray(rows) ? rows.map(normalizeRow) : [];
-
-        while (list.length < MIN_ROWS) {
-            list.push(makeEmptyRow());
-        }
-
-        while (list.length > MIN_ROWS && !rowHasData(list[list.length - 1])) {
-            list.pop();
-        }
-
-        if (list.length > MIN_ROWS && rowHasData(list[list.length - 1])) {
-            list.push(makeEmptyRow());
-        }
-
-        while (list.length > MIN_ROWS && !rowHasData(list[list.length - 1])) {
-            list.pop();
-        }
-
-        while (list.length < MIN_ROWS) {
-            list.push(makeEmptyRow());
-        }
-
-        return list;
-    }
-
     function renderRows() {
         if (!modalElement) return;
         const listNode = modalElement.querySelector('.other-products-list');
         if (!listNode) return;
 
-        const rows = ensureListSize(currentRows);
-        currentRows = rows;
+        // Сохраняем активный элемент перед рендером
+        const activeEl = document.activeElement;
+        let activeState = null;
 
-        listNode.innerHTML = rows.map((row, index) => {
+        if (activeEl && listNode.contains(activeEl)) {
+            const rowNode = activeEl.closest('.other-product-row');
+            if (rowNode) {
+                activeState = {
+                    index: Number(rowNode.dataset.index),
+                    field: activeEl.dataset.field,
+                    start: activeEl.selectionStart,
+                    end: activeEl.selectionEnd
+                };
+            }
+        }
+
+        currentRows = ensureListSize(currentRows);
+
+        listNode.innerHTML = currentRows.map((row, index) => {
             const name = String(row.name || '').replace(/"/g, '&quot;');
             const price = String(row.price || '').replace(/"/g, '&quot;');
 
             return `
                 <li class="other-product-row" data-index="${index}">
-                    <input type="text" data-field="name" value="${name}" placeholder="Название" aria-label="Название">
-                    <input type="number" step="0.01" min="0" data-field="price" value="${price}" placeholder="Цена" aria-label="Цена">
+                    <input type="text" class="other-product-input-name" data-field="name" value="${name}" placeholder="Название" aria-label="Название">
+                    <input type="number" step="1" min="0" class="other-product-input-price" data-field="price" value="${price}" placeholder="₽" aria-label="Цена">
                     <button type="button" class="other-product-delete" data-delete-index="${index}" aria-label="Стереть">×</button>
                 </li>
             `;
         }).join('');
 
+        // Навешиваем слушатели событий
         listNode.querySelectorAll('input').forEach((input) => {
-            input.addEventListener('blur', () => {
-                const snapshot = readRowsFromDom();
-                const nextRows = ensureListSize(snapshot);
-                currentRows = nextRows;
-                renderRows();
-                saveRows(nextRows);
+            input.addEventListener('input', (e) => {
+                const rowEl = e.target.closest('.other-product-row');
+                const idx = Number(rowEl.dataset.index);
+                const field = e.target.dataset.field;
+
+                if (currentRows[idx]) {
+                    currentRows[idx][field] = e.target.value;
+                }
+
+                // Если начали заполнять последнюю строку — динамически добавляем еще одну
+                const isLastRow = idx === currentRows.length - 1;
+                if (isLastRow && rowHasData(currentRows[idx])) {
+                    currentRows.push(makeEmptyRow());
+                    renderRows();
+                }
             });
 
             input.addEventListener('change', () => {
-                const snapshot = readRowsFromDom();
-                const nextRows = ensureListSize(snapshot);
-                currentRows = nextRows;
-                renderRows();
-                saveRows(nextRows);
-            });
-
-            input.addEventListener('input', () => {
-                const snapshot = readRowsFromDom();
-                const lastRow = snapshot[snapshot.length - 1];
-                if (snapshot.length >= MIN_ROWS && rowHasData(lastRow)) {
-                    const nextRows = ensureListSize(snapshot.concat([makeEmptyRow()]));
-                    if (nextRows.length > snapshot.length) {
-                        currentRows = nextRows;
-                        renderRows();
-                    }
-                }
+                saveRows(currentRows);
             });
         });
 
@@ -267,16 +232,30 @@
                 const index = Number(button.dataset.deleteIndex);
                 if (Number.isNaN(index)) return;
 
-                const nextRows = ensureListSize(currentRows.map((row, rowIndex) => {
-                    if (rowIndex === index) return makeEmptyRow();
-                    return row;
-                }));
-
-                currentRows = nextRows;
+                currentRows[index] = makeEmptyRow();
+                currentRows = ensureListSize(currentRows);
                 renderRows();
-                saveRows(nextRows);
+                saveRows(currentRows);
             });
         });
+
+        // Восстанавливаем фокус
+        if (activeState && !Number.isNaN(activeState.index)) {
+            const targetRow = listNode.querySelector(`.other-product-row[data-index="${activeState.index}"]`);
+            if (targetRow) {
+                const targetInput = targetRow.querySelector(`input[data-field="${activeState.field}"]`);
+                if (targetInput) {
+                    targetInput.focus();
+                    if (targetInput.type === 'text' && typeof activeState.start === 'number') {
+                        try {
+                            targetInput.setSelectionRange(activeState.start, activeState.end);
+                        } catch (e) {
+                            /* игнорируем типы инпутов без поддержки selectionRange */
+                        }
+                    }
+                }
+            }
+        }
     }
 
     function saveRows(rows) {
@@ -297,6 +276,11 @@
     }
 
     function syncFromFirebase(snapshot) {
+        // Не перерисовываем списки, пока пользователь печатает в фокусе
+        if (modalElement && modalElement.contains(document.activeElement)) {
+            return;
+        }
+
         const data = snapshot && typeof snapshot.val === 'function' ? snapshot.val() : null;
         const loaded = [];
 
@@ -313,7 +297,7 @@
         }
 
         currentRows = ensureListSize(loaded);
-        if (modalElement) {
+        if (modalElement && isOpen) {
             renderRows();
         }
     }
@@ -356,9 +340,6 @@
         if (ref) {
             ref.on('value', syncFromFirebase);
         }
-
-        currentRows = ensureListSize([]);
-        renderRows();
 
         return modalElement;
     }
