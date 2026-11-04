@@ -154,6 +154,26 @@ function render() {
             </div>
             `;
             listContainer.appendChild(div);
+
+            const photo = document.createElement('img');
+            photo.className = 'item-photo';
+            photo.alt = `Фото товара ${item.name}`;
+            photo.loading = 'lazy';
+
+            const fallbackPhoto = 'https://cdn-icons-png.flaticon.com/512/17630/17630625.png';
+            let fallbackTried = false;
+            photo.onerror = () => {
+                if (!fallbackTried) {
+                    fallbackTried = true;
+                    photo.src = fallbackPhoto;
+                } else {
+                    photo.hidden = true;
+                }
+            };
+            photo.src = item.foto || fallbackPhoto;
+
+            const itemNames = div.querySelector('.item-names');
+            itemNames.insertBefore(photo, itemNames.firstChild);
         });
     }
 
