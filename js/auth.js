@@ -72,6 +72,16 @@ function fixUnicodeString(str) {
   }
 }
 
+function normalizeProfileName(name) {
+  const sanitizedName = sanitizeInput(typeof name === 'string' ? name.trim() : '');
+
+  if (sanitizedName === 'Ð¡Ð°Ð½Ñ ÐÐµÐ¼Ð¸Ð´ÐµÐ½ÐºÐ¾') {
+    return 'Саня Демиденко';
+  }
+
+  return sanitizedName || 'Гость';
+}
+
 function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
@@ -191,9 +201,10 @@ function updateUIAfterLogin(user) {
     className: 'user-info'
   });
 
+  const displayName = normalizeProfileName(user.name);
   const name = createSafeElement('div', {
     className: 'user-name'
-  }, [user.name || 'Гость']);
+  }, [displayName]);
 
   const email = createSafeElement('div', {
     className: 'user-email'
@@ -312,7 +323,7 @@ function loadProfilePanelFields() {
 
   // Приоритет: локально сохранённое имя пользователя, затем Google, затем 'Гость'
   const localName = localStorage.getItem('profileName');
-  if (name) name.textContent = localName || user.name || 'Гость';
+  if (name) name.textContent = normalizeProfileName(localName || user.name);
   if (email) email.textContent = user.email || 'Не авторизован';
   if (phone) phone.value = localStorage.getItem('profilePhone') || '';
   if (comment) comment.value = localStorage.getItem('profileComment') || '';
@@ -331,7 +342,7 @@ function saveProfilePanelData() {
   // Сохраняем редактируемое имя профиля
   const profileNameEl = document.getElementById('profileName');
   if (profileNameEl) {
-    const savedName = sanitizeInput(profileNameEl.textContent.trim()) || 'Гость';
+    const savedName = normalizeProfileName(profileNameEl.textContent);
     localStorage.setItem('profileName', savedName);
     // Обновляем поле в хранилище user, если он есть
     const stored = getStoredUser();
@@ -434,7 +445,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const profileNameEl = document.getElementById('profileName');
   if (profileNameEl) {
     profileNameEl.addEventListener('blur', () => {
-      const val = sanitizeInput(profileNameEl.textContent.trim()) || 'Гость';
+      const val = normalizeProfileName(profileNameEl.textContent);
       localStorage.setItem('profileName', val);
       // Обновляем user.name, если есть
       const stored = getStoredUser();
@@ -444,9 +455,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       showNotification('Имя сохранено локально', 'success');
       addLog('Сохранено имя профиля: ' + val);
+      closeProfilePanel();
     });
     profileNameEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); profileNameEl.blur(); }
+      if (e.key === 'Enter') { 
+        e.preventDefault(); 
+        profileNameEl.blur(); 
+        
+      }
     });
   }
   // Меню-панель: открытие/закрытие
