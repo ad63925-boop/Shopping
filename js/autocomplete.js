@@ -11,7 +11,7 @@ nameInput.addEventListener('focus', () => {
 
     if (allHistoryKeys.length > 0) {
         allHistoryKeys.forEach(name => {
-            const { category, lastPrice, lastQuantity } = history[name];
+            const { category, lastPrice, lastQuantity, foto } = history[name];
             const div = document.createElement('div');
             div.className = 'suggestion-card';
             div.innerHTML = `
@@ -25,7 +25,7 @@ nameInput.addEventListener('focus', () => {
             `;
             div.onclick = (e) => {
                 if (!e.target.classList.contains('suggestion-delete')) {
-                    selectSuggestion(name, category, lastPrice, lastQuantity);
+                    selectSuggestion(name, category, lastPrice, lastQuantity, foto);
                 }
             };
             autoList.appendChild(div);
@@ -50,7 +50,7 @@ nameInput.addEventListener('input', () => {
 
     if (matches.length > 0) {
         matches.forEach(name => {
-            const { category, lastPrice } = history[name];
+            const { category, lastPrice, lastQuantity, foto } = history[name];
             const div = document.createElement('div');
             div.className = 'suggestion-card';
             
@@ -69,7 +69,7 @@ nameInput.addEventListener('input', () => {
                     deleteFromHistory(e.target.dataset.name);
                     return;
                 }
-                selectSuggestion(name, category, lastPrice);
+                selectSuggestion(name, category, lastPrice, lastQuantity, foto);
             });
 
             autoList.appendChild(div);

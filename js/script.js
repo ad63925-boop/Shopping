@@ -16,6 +16,50 @@ const settingsDb = firebase.database().ref("settings"); // Для сохране
 
 let items = [];
 
+const photoUrlInput = document.getElementById('itemFoto');
+const photoPreview = document.getElementById('itemFotoPreview');
+const photoPreviewImage = document.getElementById('itemFotoPreviewImage');
+const photoPreviewStatus = document.getElementById('itemFotoPreviewStatus');
+let photoPreviewRequest = 0;
+
+function updatePhotoPreview() {
+    const url = photoUrlInput.value.trim();
+    const request = ++photoPreviewRequest;
+
+    photoPreview.hidden = !url;
+    photoPreviewImage.hidden = true;
+    photoPreviewStatus.textContent = '';
+
+    if (!url) return;
+
+    let parsedUrl;
+    try {
+        parsedUrl = new URL(url);
+    } catch (error) {
+        photoPreviewStatus.textContent = 'Введите корректную ссылку на фото.';
+        return;
+    }
+
+    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+        photoPreviewStatus.textContent = 'Ссылка должна начинаться с http:// или https://.';
+        return;
+    }
+
+    photoPreviewStatus.textContent = 'Загрузка фото…';
+    photoPreviewImage.onload = () => {
+        if (request !== photoPreviewRequest) return;
+        photoPreviewImage.hidden = false;
+        photoPreviewStatus.textContent = '';
+    };
+    photoPreviewImage.onerror = () => {
+        if (request !== photoPreviewRequest) return;
+        photoPreviewStatus.textContent = 'Не удалось загрузить фото. Проверьте ссылку.';
+    };
+    photoPreviewImage.src = parsedUrl.href;
+}
+
+photoUrlInput.addEventListener('input', updatePhotoPreview);
+
 // Загруза истории из Firebase для автоподсказок
 let history = {}; 
 const historyDb = firebase.database().ref("suggestions_history");
@@ -310,7 +354,8 @@ function addItem() {
 history[itemName.toLowerCase()] = {
     category: catInput.value,
     lastPrice: newItem.price,
-    lastQuantity: newItem.quantity
+    lastQuantity: newItem.quantity,
+    foto: itemFotoInput.value.trim() || history[itemName.toLowerCase()]?.foto || ''
 };
 
 historyDb
@@ -323,6 +368,8 @@ try {
         showNotification(`Товар " ${itemName} " успешно добавлен!`, 'success');
         // Очищаем поля ввода и возвращаем категорию к значению по умолчанию
         nameInput.value = '';
+        itemFotoInput.value = '';
+        updatePhotoPreview();
         priceInput.value = '';
         qtyInput.value = '';
         catInput.value = 'Разное';
@@ -596,8 +643,10 @@ async function saveComment(itemId, comment, input) {
 }
 
 // Функция выбора подсказки (не перемещать в другое место, там есть зависимость от функции updateSuggestions)
-function selectSuggestion(name, cat, price, quantity) {
+function selectSuggestion(name, cat, price, quantity, foto) {
     nameInput.value = name.charAt(0).toUpperCase() + name.slice(1);
+    photoUrlInput.value = foto || '';
+    updatePhotoPreview();
     
     // Обновляем категорию
     const hiddenInput = document.getElementById('itemCat');
