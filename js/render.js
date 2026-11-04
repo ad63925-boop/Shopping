@@ -172,8 +172,7 @@ function render() {
             };
             photo.src = item.foto || fallbackPhoto;
 
-            const itemNames = div.querySelector('.item-names');
-            itemNames.insertBefore(photo, itemNames.firstChild);
+            div.insertBefore(photo, div.firstChild);
         });
     }
 

@@ -1,10 +1,10 @@
 // Умный выбор категории при вводе названия
-const nameInput = document.getElementById('itemName');
-const autoList = document.getElementById('autocompleteList');
+const autocompleteNameInput = document.getElementById('itemName');
+const autocompleteList = document.getElementById('autocompleteList');
 
 // Показываем подсказки при фокусе, если есть ввод
-nameInput.addEventListener('focus', () => {
-    autoList.innerHTML = '';
+autocompleteNameInput.addEventListener('focus', () => {
+    autocompleteList.innerHTML = '';
 
     // Получаем все ключи из истории
     const allHistoryKeys = Object.keys(history);
@@ -16,6 +16,7 @@ nameInput.addEventListener('focus', () => {
             div.className = 'suggestion-card';
             div.innerHTML = `
                 <div class="suggestion-info">
+                    <span class="item-photo-preview"><img src="${foto}" alt="${name}" class="item-foto-preview-image"></span>
                     <span class="suggestion-name">${name.charAt(0).toUpperCase() + name.slice(1)}</span>
                     <span class="suggestion-cat">${getCategoryIcon(category)} ${category}</span>
             ${lastPrice ? `<span class="suggestion-price">(${lastPrice} ₽)</span>` : ''}
@@ -28,21 +29,21 @@ nameInput.addEventListener('focus', () => {
                     selectSuggestion(name, category, lastPrice, lastQuantity, foto);
                 }
             };
-            autoList.appendChild(div);
+            autocompleteList.appendChild(div);
         });
-        autoList.style.display = 'block';
+        autocompleteList.style.display = 'block';
     } else {
-        autoList.style.display = 'none';
+        autocompleteList.style.display = 'none';
     }
 });
 
 // Слушаем ввод в поле названия
-nameInput.addEventListener('input', () => {
-    const val = nameInput.value.toLowerCase();
-    autoList.innerHTML = '';
+autocompleteNameInput.addEventListener('input', () => {
+    const val = autocompleteNameInput.value.toLowerCase();
+    autocompleteList.innerHTML = '';
     
     if (val.length === 0) {
-        autoList.style.display = 'none';
+        autocompleteList.style.display = 'none';
         return;
     }
 
@@ -72,11 +73,11 @@ nameInput.addEventListener('input', () => {
                 selectSuggestion(name, category, lastPrice, lastQuantity, foto);
             });
 
-            autoList.appendChild(div);
+            autocompleteList.appendChild(div);
         });
-        autoList.style.display = 'block';
+        autocompleteList.style.display = 'block';
     } else {
-        autoList.style.display = 'none';
+        autocompleteList.style.display = 'none';
     }
 });
 

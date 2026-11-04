@@ -644,9 +644,15 @@ async function saveComment(itemId, comment, input) {
 
 // Функция выбора подсказки (не перемещать в другое место, там есть зависимость от функции updateSuggestions)
 function selectSuggestion(name, cat, price, quantity, foto) {
-    nameInput.value = name.charAt(0).toUpperCase() + name.slice(1);
-    photoUrlInput.value = foto || '';
-    updatePhotoPreview();
+    const itemNameInput = document.getElementById('itemName');
+    const itemPhotoInput = document.getElementById('itemFoto');
+    const suggestionList = document.getElementById('autocompleteList');
+    const savedPhoto = history[name.toLowerCase()]?.foto;
+    const photoUrl = typeof foto === 'string' && foto.trim() ? foto.trim() : savedPhoto || '';
+
+    itemNameInput.value = name.charAt(0).toUpperCase() + name.slice(1);
+    itemPhotoInput.value = photoUrl;
+    itemPhotoInput.dispatchEvent(new Event('input', { bubbles: true }));
     
     // Обновляем категорию
     const hiddenInput = document.getElementById('itemCat');
@@ -664,7 +670,7 @@ function selectSuggestion(name, cat, price, quantity, foto) {
         document.getElementById('itemQty').value = quantity;
     }
 
-    autoList.style.display = 'none';
+    suggestionList.style.display = 'none';
     addLog('Выбрана подсказка: ' + name);
 }
 
