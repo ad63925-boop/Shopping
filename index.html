@@ -24,6 +24,12 @@
     <i class="fa-solid fa-bag-shopping"></i>
 </header>
 
+<div id="floatingItemCount" class="floating-item-count" role="status" aria-live="polite" aria-label="Выбрано товаров: 0 из 0" hidden>
+    <span id="floatingSelectedCount">0</span>
+    <span class="floating-item-count-separator">/</span>
+    <span id="floatingTotalCount">0</span>
+</div>
+
 <!-- Бургер -->
 <div class="burger" title="Меню">
   <span></span>
@@ -254,6 +260,7 @@
         <div class="menu-panel-body">
             <!-- Кнопки меню -->
             <button id="selectAllBtn" class="btn" type="button">Выбрать все</button>
+            <button id="togglePhotosBtn" class="btn" type="button" aria-pressed="true" aria-label="Скрыть фото товаров" title="Скрыть фото товаров">Фото</button>
             
             <button id="shareBtn" class="btn" type="button">Поделиться</button>
         

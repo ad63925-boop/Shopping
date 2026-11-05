@@ -1,4 +1,16 @@
 // Функция рендера списка с группировкой по категориям
+function updateFloatingItemCount(selectedCount, totalCount) {
+    const panel = document.getElementById('floatingItemCount');
+    const selectedCountEl = document.getElementById('floatingSelectedCount');
+    const totalCountEl = document.getElementById('floatingTotalCount');
+    if (!panel || !selectedCountEl || !totalCountEl) return;
+
+    selectedCountEl.textContent = selectedCount;
+    totalCountEl.textContent = totalCount;
+    panel.setAttribute('aria-label', `Выбрано товаров: ${selectedCount} из ${totalCount}`);
+    panel.hidden = totalCount === 0;
+}
+
 function render() {
     //deferredList - ОСНОВНОЙ СПИСОК
     //shoppingList - ДОП СПИСОК
@@ -33,6 +45,7 @@ function render() {
     
   // Проверяем, есть ли товары в списке
   if (items.length === 0) {
+    updateFloatingItemCount(0, 0);
     // Если товаров нет, показываем сообщение
     listContainer.innerHTML = `<div class="emptuList">
     <h2 class="empty-list-message">Список пуст!</h2>
@@ -202,6 +215,7 @@ function render() {
     const totalCount = items.length;
 
     const selectedCount = items.filter(item => item.completed).length;
+    updateFloatingItemCount(selectedCount, totalCount);
 
     totalSumEl.innerText = total;
 

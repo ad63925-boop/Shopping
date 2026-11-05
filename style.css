@@ -111,6 +111,33 @@ body {
     font-size: 1.1rem;
 }
 
+.floating-item-count {
+    position: fixed;
+    bottom: 120px;
+    left: 12px;
+    z-index: 602;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.96);
+    color: #4CAF50;
+    box-shadow: 0px 0px 11px 5px rgb(185 181 181);
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.floating-item-count[hidden] {
+    display: none;
+}
+
+.floating-item-count-separator {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
 header {
     position: sticky;
     top: -300px;
@@ -212,6 +239,11 @@ header, .header-card, .input-card {
     position: relative;
     max-width: 100%;
     margin: 5px auto;
+}
+
+.shoppingLists.photos-hidden .item-photo-container,
+.shoppingLists.photos-hidden .item-photo-quantity {
+    display: none;
 }
 
 .item-photo-quantity {

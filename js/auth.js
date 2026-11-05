@@ -479,6 +479,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
     await toggleSelectAll();
   });
+  document.getElementById('togglePhotosBtn')?.addEventListener('click', event => {
+    event.preventDefault();
+    const listContainer = document.getElementById('shoppingList');
+    const button = event.currentTarget;
+    if (!listContainer || !(button instanceof HTMLButtonElement)) {
+      console.error('Не удалось переключить отображение фото товаров');
+      return;
+    }
+
+    const photosVisible = !listContainer.classList.toggle('photos-hidden');
+    const action = photosVisible ? 'Скрыть' : 'Показать';
+    button.setAttribute('aria-pressed', String(photosVisible));
+    button.setAttribute('aria-label', `${action} фото товаров`);
+    button.title = `${action} фото товаров`;
+  });
   await loadGoogleAuthScript();
 });
 
