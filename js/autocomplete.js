@@ -7,7 +7,7 @@ autocompleteNameInput.addEventListener('focus', () => {
     autocompleteList.innerHTML = '';
 
     // Получаем все ключи из истории
-    const allHistoryKeys = Object.keys(history);
+    const allHistoryKeys = getHistoryNamesByRecency();
 
     if (allHistoryKeys.length > 0) {
         allHistoryKeys.forEach(name => {
@@ -47,7 +47,7 @@ autocompleteNameInput.addEventListener('input', () => {
         return;
     }
 
-    const matches = Object.keys(history).filter(name => name.includes(val));
+    const matches = getHistoryNamesByRecency().filter(name => name.includes(val));
 
     if (matches.length > 0) {
         matches.forEach(name => {

@@ -132,7 +132,7 @@ function updateSuggestions() {
     }
 
     // Фильтруем ключи из объекта history, который синхронизируется с Firebase
-    const matches = Object.keys(history).filter(name => name.includes(val));
+    const matches = getHistoryNamesByRecency().filter(name => name.includes(val));
 
     if (matches.length > 0) {
         matches.forEach(name => {
@@ -159,6 +159,14 @@ function updateSuggestions() {
     } else {
         autoList.style.display = 'none';
     }
+}
+
+function getHistoryNamesByRecency() {
+    return Object.keys(history).sort((firstName, secondName) => {
+        const firstAdded = Number(history[firstName]?.lastAdded) || 0;
+        const secondAdded = Number(history[secondName]?.lastAdded) || 0;
+        return secondAdded - firstAdded;
+    });
 }
 
 // Выбор опции
@@ -355,7 +363,8 @@ history[itemName.toLowerCase()] = {
     category: catInput.value,
     lastPrice: newItem.price,
     lastQuantity: newItem.quantity,
-    foto: itemFotoInput.value.trim() || history[itemName.toLowerCase()]?.foto || ''
+    foto: itemFotoInput.value.trim() || history[itemName.toLowerCase()]?.foto || '',
+    lastAdded: Number(newItem.id)
 };
 
 historyDb

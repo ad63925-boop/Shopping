@@ -114,7 +114,7 @@ function render() {
             step="0.01"
             value="${item.quantity}"
             onchange="updateItemQuantity('${item.id}', this.value)">
-                <span class="unit"> X </span>   
+                <span class="unit"> * </span>   
             </div>
 
             <div class="item-price-wrapper">
