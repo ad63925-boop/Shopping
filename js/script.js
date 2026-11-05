@@ -145,6 +145,7 @@ function updateSuggestions() {
             <span class="suggestion-cat">${getCategoryIcon(category)} ${category}</span>
             ${lastPrice ? `<span class="suggestion-price">(${lastPrice} ₽)</span>` : ''}
             ${lastQuantity ? `<span class="suggestion-qty">${lastQuantity}</span>` : ''}
+            ${getHistoryLastAddedLabel(history[name])}
                 </div>
                 <span class="suggestion-delete" onclick="deleteFromHistory('${name}')"><i class="fa-solid fa-trash-can"></i></span>
             `;
@@ -167,6 +168,23 @@ function getHistoryNamesByRecency() {
         const secondAdded = Number(history[secondName]?.lastAdded) || 0;
         return secondAdded - firstAdded;
     });
+}
+
+function getHistoryLastAddedLabel(item) {
+    const lastAdded = Number(item?.lastAdded);
+    if (!Number.isFinite(lastAdded) || lastAdded <= 0) return '';
+
+    const addedDate = new Date(lastAdded);
+    const today = new Date();
+    const addedDay = Date.UTC(addedDate.getFullYear(), addedDate.getMonth(), addedDate.getDate());
+    const todayDay = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+    const daysAgo = Math.round((todayDay - addedDay) / 86400000);
+    const relativeDates = ['сегодня', 'вчера', 'позавчера'];
+    const label = daysAgo >= 0 && daysAgo < relativeDates.length
+        ? `(${relativeDates[daysAgo]})`
+        : addedDate.toLocaleDateString('ru-RU');
+
+    return `<span class="suggestion-date">📆 ${label}</span>`;
 }
 
 // Выбор опции
