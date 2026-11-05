@@ -172,7 +172,30 @@ function render() {
             };
             photo.src = item.foto || fallbackPhoto;
 
-            div.insertBefore(photo, div.firstChild);
+            const photoContainer = document.createElement('div');
+            photoContainer.className = 'item-photo-container';
+            photoContainer.appendChild(photo);
+
+            const photoQuantity = document.createElement('div');
+            photoQuantity.className = 'item-photo-quantity';
+
+            const photoQuantityInput = document.createElement('input');
+            photoQuantityInput.type = 'number';
+            photoQuantityInput.className = 'edit-qty-input';
+            photoQuantityInput.min = '0.01';
+            photoQuantityInput.step = '0.01';
+            photoQuantityInput.value = item.quantity;
+            photoQuantityInput.setAttribute('aria-label', `Количество товара ${item.name}`);
+            photoQuantityInput.onchange = () => updateItemQuantity(item.id, photoQuantityInput.value);
+            photoQuantity.appendChild(photoQuantityInput);
+
+            const quantityUnit = document.createElement('span');
+            quantityUnit.className = 'unit';
+            quantityUnit.textContent = item.unit;
+            photoQuantity.appendChild(quantityUnit);
+            photoContainer.appendChild(photoQuantity);
+
+            div.insertBefore(photoContainer, div.firstChild);
         });
     }
 

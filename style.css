@@ -19,6 +19,7 @@ body {
 
 .profile-container {
     display: flex;
+    background: #03a9f44d;
     text-align: left;
     gap: 10px;
     align-items: center;
@@ -113,7 +114,6 @@ body {
 header {
     position: sticky;
     top: -300px;
-    padding: 5px;
     z-index: 0;
     text-shadow: 2px 2px 4px black;
     text-align: center;
@@ -127,7 +127,6 @@ header {
       font-size: 26px;
     font-weight: 700;
     text-align: center;
-    margin-bottom: 10px;
 }
 
 .header-card, .input-card { 
@@ -207,6 +206,40 @@ header, .header-card, .input-card {
     background-color: #b6c9ec;
     margin: 5px auto;
     box-shadow: 0px 0px 6px 1px;
+}
+
+.item-photo-container {
+    position: relative;
+    max-width: 100%;
+    margin: 5px auto;
+}
+
+.item-photo-quantity {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 6px;
+    padding: 2px;
+    background: rgba(255, 4, 4, 0.9);
+    color: #fff;
+    line-height: 1;
+    transform: translateX(-50%);
+}
+
+.item-photo-quantity .edit-qty-input {
+    width: 55px;
+    padding: 2px;
+    border: 1px solid #fff;
+    border-radius: 4px;
+    background: transparent;
+    color: #fff;
+}
+
+.item-photo-quantity .unit {
+    color: #fff;
 }
 
 .edit-name-input {
